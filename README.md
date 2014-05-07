@@ -14,3 +14,25 @@ Still in Development.
 %  
 % UTide v1p0 9/2011 d.codiga@gso.uri.edu  
 % http://www.po.gso.uri.edu/~codiga/utide/utide.htm  
+
+**File Structure for locating functions**
+----
+If changes are made to file structure, please update.
+
+- ut_solv
+    - ut_solv
+    - ut_solv1
+    - ut_slvinit
+
+- ut_reconstr
+    - ut_reconstr
+    - ut_reconstr1
+    - ut_rcinit
+
+- ut_constants
+    - ut_constants.mat
+    - ut_cs2cep
+    - ut_E
+    - ut_FUV
+    - ut_cnstitsel
+    - ut_astron
