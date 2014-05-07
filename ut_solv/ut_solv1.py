@@ -1,3 +1,4 @@
+from ut_slvinit import ut_slvinit
 def ut_solv1(tin,uin,vin,lat,cnstit,Rayleigh,varargin):
 
     print 'ut_solv: '

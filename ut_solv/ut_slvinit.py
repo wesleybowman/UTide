@@ -1,3 +1,5 @@
+import numpy as np
+
 def ut_slvinit(tin,uin,vin,cnstit,Rayleigh,args):
 
     opt = {}
