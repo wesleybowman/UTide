@@ -1,4 +1,10 @@
+import numpy as np
+import scipy
 from ut_slvinit import ut_slvinit
+from ut_E import ut_E
+from ut_cnstitsel import ut_cnstitsel
+from ut_cs2cep import ut_cs2cep
+
 def ut_solv1(tin,uin,vin,lat,cnstit,Rayleigh,varargin):
 
     print 'ut_solv: '
