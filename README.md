@@ -15,6 +15,8 @@ Still in Development.
 % UTide v1p0 9/2011 d.codiga@gso.uri.edu  
 % http://www.po.gso.uri.edu/~codiga/utide/utide.htm  
 
+***Added Experimental branch, where all code for a pull request should be submitted for testing.***
+
 **File Structure for locating functions**
 ----
 If changes are made to file structure, please update.
