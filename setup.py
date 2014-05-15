@@ -14,4 +14,8 @@ setup(name='UTide',
       author_email='wesley.bowman23@gmail.com',
       license='MIT',
       packages=['utide'],
+      package_data = {
+        # If any package contains *.txt files, include them:
+        '': ['*.mat'],
+      },
       zip_safe=False)
