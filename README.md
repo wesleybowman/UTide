@@ -17,6 +17,16 @@ Still in Development.
 
 ***Added Experimental branch, where all code for a pull request should be submitted for testing.***
 
+Installation
+=====
+
+Download the zip file and unzip it.
+
+```
+python setup.py install
+```
+
+
 **File Structure for locating functions**
 ----
 If changes are made to file structure, please update.
