@@ -25,6 +25,7 @@ Download the zip file and unzip it.
 ```
 python setup.py install
 ```
+(untested, may not work)
 
 
 **File Structure for locating functions**
@@ -32,19 +33,16 @@ python setup.py install
 If changes are made to file structure, please update.
 
 - ut_solv
-    - ut_solv
-    - ut_solv1
-    - ut_slvinit
+- ut_solv1
+- ut_slvinit
 
 - ut_reconstr
-    - ut_reconstr
-    - ut_reconstr1
-    - ut_rcinit
+- ut_reconstr1
+- ut_rcinit
 
-- ut_constants
-    - ut_constants.mat
-    - ut_cs2cep
-    - ut_E
-    - ut_FUV
-    - ut_cnstitsel
-    - ut_astron
+- ut_constants.mat
+- ut_cs2cep
+- ut_E
+- ut_FUV
+- ut_cnstitsel
+- ut_astron
