@@ -4,6 +4,7 @@ from ut_slvinit import ut_slvinit
 from ut_E import ut_E
 from ut_cnstitsel import ut_cnstitsel
 from ut_cs2cep import ut_cs2cep
+from ut_confidence import ut_confidence
 
 def ut_solv1(tin,uin,vin,lat,cnstit,Rayleigh,varargin):
 
@@ -109,6 +110,9 @@ def ut_solv1(tin,uin,vin,lat,cnstit,Rayleigh,varargin):
             coef['mean'] = np.real(m[-1-1])
             coef['slope'] = np.real(m[-1])/lor
 
+    coef = ut_confidence(coef, opt, t, e, tin, tgd, uvgd, elor, xraw, xmod, W, m, B,
+                   nm, nt, nc, Xu, Yu, Xv, Yv)
+
     if opt['twodim']:
         PE = np.sum(coef['Lsmaj']**2+coef['Lsmin']**2)
         PE = 100* (coef['Lsmaj']**2+coef['Lsmin']**2)/PE
@@ -124,4 +128,3 @@ def ut_solv1(tin,uin,vin,lat,cnstit,Rayleigh,varargin):
     coef['aux']['lind'] = coef['aux']['lind'][ind]
 
     return coef
-
