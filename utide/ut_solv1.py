@@ -110,8 +110,10 @@ def ut_solv1(tin,uin,vin,lat,cnstit,Rayleigh,varargin):
             coef['mean'] = np.real(m[-1-1])
             coef['slope'] = np.real(m[-1])/lor
 
-    coef = ut_confidence(coef, opt, t, e, tin, tgd, uvgd, elor, xraw, xmod, W, m, B,
-                   nm, nt, nc, Xu, Yu, Xv, Yv)
+    confidence = False
+    if confidence == True:
+        coef = ut_confidence(coef, opt, t, e, tin, tgd, uvgd, elor, xraw, xmod, W, m, B,
+                    nm, nt, nc, Xu, Yu, Xv, Yv)
 
     if opt['twodim']:
         PE = np.sum(coef['Lsmaj']**2+coef['Lsmin']**2)
