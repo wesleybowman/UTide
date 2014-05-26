@@ -12,11 +12,12 @@ setup(name='UTide',
       url='https://github.com/wesleybowman/UTide',
       author='Wesley Bowman',
       author_email='wesley.bowman23@gmail.com',
+      maintainer='Wesley Bowman',
       license='MIT',
       packages=['utide'],
-      package_data = {
-        # If any package contains *.txt files, include them:
-        '': ['*.mat'],
-      },
-      data_files=[('utide', ['ut_constants.mat'])],
+      #package_data = {
+      #  # If any package contains *.txt files, include them:
+      #  '': ['*.mat'],
+      #},
+      #data_files=[('utide', ['ut_constants.mat'])],
       zip_safe=False)
