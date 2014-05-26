@@ -18,5 +18,5 @@ setup(name='UTide',
         # If any package contains *.txt files, include them:
         '': ['*.mat'],
       },
-      data_files=[('', ['ut_constants.mat'])],
+      data_files=[('utide', ['ut_constants.mat'])],
       zip_safe=False)
