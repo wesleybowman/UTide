@@ -83,7 +83,7 @@ def ut_solv1(tin,uin,vin,lat,cnstit,Rayleigh,varargin):
 
     if not opt['twodim']:
         #XY = np.hstack((Xu, Yu))
-        coef['A'], _ , _ ,coef['g '] = ut_cs2cep(Xu, Yu)
+        coef['A'], _, _, coef['g '] = ut_cs2cep(Xu, Yu)
         #coef['A'], _ , _ ,coef['g '] = ut_cs2cep(XY)
 
     else:

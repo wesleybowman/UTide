@@ -1,4 +1,6 @@
 import numpy as np
+
+
 def ut_cs2cep(Xu, Yu, Xv=np.array([False]), Yv=np.array([False])):
 
     if not Xv.all():
@@ -17,4 +19,4 @@ def ut_cs2cep(Xu, Yu, Xv=np.array([False]), Yv=np.array([False])):
     theta = ((epsp+epsm)/2) % 180
     g = (-epsp+theta) % 360
 
-    return Lsmaj,Lsmin,theta,g
+    return Lsmaj, Lsmin, theta, g

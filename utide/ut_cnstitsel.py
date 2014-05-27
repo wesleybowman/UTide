@@ -4,7 +4,8 @@ from ut_astron import ut_astron
 
 def ut_cnstitsel(tref,minres,incnstit,infer):
 
-    mat_contents = sio.loadmat('./ut_constants.mat', struct_as_record=False, squeeze_me=True)
+    #mat_contents = sio.loadmat('./ut_constants.mat', struct_as_record=False, squeeze_me=True)
+    mat_contents = sio.loadmat(ut_constants, struct_as_record=False, squeeze_me=True)
     shallow = mat_contents['shallow']
     const = mat_contents['const']
 

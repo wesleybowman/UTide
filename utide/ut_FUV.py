@@ -20,7 +20,8 @@ def ut_FUV(t, tref, lind, lat, ngflgs):
 
         ntt = len(tt)
 
-        mat_contents = sio.loadmat('ut_constants.mat', struct_as_record=False, squeeze_me=True)
+        #mat_contents = sio.loadmat('ut_constants.mat', struct_as_record=False, squeeze_me=True)
+        mat_contents = sio.loadmat(ut_constants, struct_as_record=False, squeeze_me=True)
         sat = mat_contents['sat']
         const = mat_contents['const']
         shallow = mat_contents['shallow']
