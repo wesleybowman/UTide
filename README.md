@@ -25,6 +25,11 @@ Download the zip file and unzip it.
 ```
 python setup.py install
 ```
+or
+```
+python setup.py install --user
+```
+if the user doesn't have access to all files.
 (untested, may not work)
 
 
