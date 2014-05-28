@@ -15,9 +15,5 @@ setup(name='UTide',
       maintainer='Wesley Bowman',
       license='MIT',
       packages=['utide'],
-      #package_data = {
-      #  # If any package contains *.txt files, include them:
-      #  '': ['*.mat'],
-      #},
       data_files=[('utide', ['utide/ut_constants.mat'])],
       zip_safe=False)
