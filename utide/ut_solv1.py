@@ -83,7 +83,7 @@ def ut_solv1(tin,uin,vin,lat,cnstit,Rayleigh,varargin):
 
     if not opt['twodim']:
         #XY = np.hstack((Xu, Yu))
-        coef['A'], _, _, coef['g '] = ut_cs2cep(Xu, Yu)
+        coef['A'], _, _, coef['g'] = ut_cs2cep(Xu, Yu)
         #coef['A'], _ , _ ,coef['g '] = ut_cs2cep(XY)
 
     else:
@@ -118,13 +118,20 @@ def ut_solv1(tin,uin,vin,lat,cnstit,Rayleigh,varargin):
     if opt['twodim']:
         PE = np.sum(coef['Lsmaj']**2+coef['Lsmin']**2)
         PE = 100* (coef['Lsmaj']**2+coef['Lsmin']**2)/PE
+    else:
+        #PE = 100*coef.A.^2/sum(coef.A.^2);
+        PE = 100* coef['A']**2/ np.sum(coef['A']**2)
 
     ind = PE.argsort()[::-1]
-    coef['Lsmaj'] = coef['Lsmaj'][ind]
-    coef['Lsmin'] = coef['Lsmin'][ind]
-    coef['theta'] = coef['theta'][ind]
     coef['g'] = coef['g'][ind]
     coef['name'] = coef['name'][ind]
+    if opt['twodim']:
+        coef['Lsmaj'] = coef['Lsmaj'][ind]
+        coef['Lsmin'] = coef['Lsmin'][ind]
+        coef['theta'] = coef['theta'][ind]
+    else:
+        coef['A'] = coef['A'][ind]
+
 
     coef['aux']['frq'] = coef['aux']['frq'][ind]
     coef['aux']['lind'] = coef['aux']['lind'][ind]

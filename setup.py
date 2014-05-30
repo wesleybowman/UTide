@@ -6,7 +6,7 @@ def readme():
         return f.read()
 
 setup(name='UTide',
-      version='1.0_exp',
+      version='v1p0',
       description='Python distribution of the MatLab package UTide.',
       long_description=readme(),
       url='https://github.com/wesleybowman/UTide',
