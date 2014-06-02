@@ -6,16 +6,16 @@ from ut_cnstitsel import ut_cnstitsel
 from ut_cs2cep import ut_cs2cep
 from ut_confidence import ut_confidence
 
-#def ut_solv1(tin,uin,vin,lat,cnstit,Rayleigh,varargin):
+# def ut_solv1(tin,uin,vin,lat,cnstit,Rayleigh,varargin):
 def ut_solv1(tin, uin, vin, lat, **opts):
 
     print 'ut_solv: '
-    #nt,t,u,v,tref,lor,elor,opt,tgd,uvgd = ut_slvinit(tin,uin,vin,cnstit,Rayleigh,varargin)
-    nt,t,u,v,tref,lor,elor,opt,tgd,uvgd = ut_slvinit(tin,uin,vin,**opts)
+    # nt,t,u,v,tref,lor,elor,opt,tgd,uvgd = ut_slvinit(tin,uin,vin,cnstit,Rayleigh,varargin)
+    nt, t, u, v, tref, lor, elor, opt, tgd, uvgd = ut_slvinit(tin,uin,vin,**opts)
 
-    #opt['cnstit'] = cnstit
-    [nNR,nR,nI,cnstit,coef] = ut_cnstitsel(tref, opt['rmin']/(24*lor),
-                                           opt['cnstit'], opt['infer'])
+    # opt['cnstit'] = cnstit
+    [nNR, nR, nI, cnstit, coef] = ut_cnstitsel(tref, opt['rmin']/(24*lor),
+                                               opt['cnstit'], opt['infer'])
 
     # a function we don't need
     # coef.aux.rundescr = ut_rundescr(opt,nNR,nR,nI,t,tgd,uvgd,lat)
@@ -28,19 +28,18 @@ def ut_solv1(tin, uin, vin, lat, **opts):
     ngflgs = [opt['nodsatlint'], opt['nodsatnone'],
               opt['gwchlint'], opt['gwchnone']]
 
-    #ngflgs = [opt.nodsatlint, opt.nodsatnone opt.gwchlint opt.gwchnone];
+    E = ut_E(t, tref, cnstit['NR']['frq'], cnstit['NR']['lind'],
+             lat, ngflgs, opt['prefilt'])
 
-    E = ut_E(t,tref,cnstit['NR']['frq'],cnstit['NR']['lind'],lat,ngflgs,opt['prefilt'])
-
-    B = np.hstack((E,E.conj()))
+    B = np.hstack((E, E.conj()))
 
     # more infer stuff
 
     if opt['notrend']:
-        B = np.hstack((B,np.ones((nt,1))))
+        B = np.hstack((B, np.ones((nt, 1))))
         nm = 2 * (nNR + nR) + 1
     else:
-        B = np.hstack((B, np.ones((nt,1)), (t-tref)/lor))
+        B = np.hstack((B, np.ones((nt, 1)), (t-tref)/lor))
         nm = 2*(nNR + nR) + 2
 
     print 'Solution ...'
@@ -48,13 +47,13 @@ def ut_solv1(tin, uin, vin, lat, **opts):
     xraw = u
 
     if opt['twodim']:
-        #xraw = complex(u,v);
+        # xraw = complex(u,v);
         xraw = u+v*1j
 
-    if opt['method']=='ols':
-        #m = B\xraw;
+    if opt['method'] == 'ols':
+        # m = B\xraw;
         m = np.linalg.lstsq(B, xraw)[0]
-        #W = sparse(1:nt,1:nt,1);
+        # W = sparse(1:nt,1:nt,1);
         W = scipy.sparse.identity(nt)
 #    else:
 #        lastwarn('');
@@ -84,18 +83,14 @@ def ut_solv1(tin, uin, vin, lat, **opts):
     Yu = -np.imag(ap - am)
 
     if not opt['twodim']:
-        #XY = np.hstack((Xu, Yu))
         coef['A'], _, _, coef['g'] = ut_cs2cep(Xu, Yu)
-        #coef['A'], _ , _ ,coef['g '] = ut_cs2cep(XY)
         Xv = []
         Yv = []
 
     else:
         Xv = np.imag(ap+am)
         Yv = np.real(ap-am)
-        #XY = np.vstack((Xu, Yu, Xv, Yv))
         coef['Lsmaj'], coef['Lsmin'], coef['theta'], coef['g'] = ut_cs2cep(Xu, Yu, Xv, Yv)
-        #coef['Lsmaj'], coef['Lsmin'], coef['theta'], coef['g '] = ut_cs2cep(XY)
 
     ## mean and trend
     if opt['twodim']:
@@ -114,16 +109,16 @@ def ut_solv1(tin, uin, vin, lat, **opts):
             coef['mean'] = np.real(m[-1-1])
             coef['slope'] = np.real(m[-1])/lor
 
-    if opt['conf_int'] == True:
-        coef = ut_confidence(coef, opt, t, e, tin, tgd, uvgd, elor, xraw, xmod, W, m, B,
-                    nm, nt, nc, Xu, Yu, Xv, Yv)
+    if opt['conf_int'] is True:
+        coef = ut_confidence(coef, opt, t, e, tin, tgd, uvgd, elor, xraw, xmod,
+                             W, m, B, nm, nt, nc, Xu, Yu, Xv, Yv)
 
     if opt['twodim']:
-        PE = np.sum(coef['Lsmaj']**2+coef['Lsmin']**2)
-        PE = 100* (coef['Lsmaj']**2+coef['Lsmin']**2)/PE
+        PE = np.sum(coef['Lsmaj']**2 + coef['Lsmin']**2)
+        PE = 100 * (coef['Lsmaj']**2 + coef['Lsmin']**2) / PE
     else:
-        #PE = 100*coef.A.^2/sum(coef.A.^2);
-        PE = 100* coef['A']**2/ np.sum(coef['A']**2)
+        # PE = 100*coef.A.^2/sum(coef.A.^2);
+        PE = 100 * coef['A']**2 / np.sum(coef['A']**2)
 
     ind = PE.argsort()[::-1]
     coef['g'] = coef['g'][ind]
@@ -132,7 +127,7 @@ def ut_solv1(tin, uin, vin, lat, **opts):
         coef['Lsmaj'] = coef['Lsmaj'][ind]
         coef['Lsmin'] = coef['Lsmin'][ind]
         coef['theta'] = coef['theta'][ind]
-        if opt['conf_int'] == True:
+        if opt['conf_int'] is True:
             coef['Lsmaj_ci'] = coef['Lsmaj_ci'][ind]
             coef['Lsmin_ci'] = coef['Lsmin_ci'][ind]
             coef['theta_ci'] = coef['theta_ci'][ind]
@@ -140,10 +135,9 @@ def ut_solv1(tin, uin, vin, lat, **opts):
 
     else:
         coef['A'] = coef['A'][ind]
-        if opt['conf_int'] == True:
+        if opt['conf_int'] is True:
             coef['A_ci'] = coef['A_ci'][ind]
             coef['g_ci'] = coef['g_ci'][ind]
-
 
     coef['aux']['frq'] = coef['aux']['frq'][ind]
     coef['aux']['lind'] = coef['aux']['lind'][ind]

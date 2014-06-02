@@ -109,21 +109,27 @@ import numpy as np
 
 def ut_slvinit(tin, uin, vin, **opts):
 
+    if len(tin) != len(uin):
+        raise('''ut_solv: vectors of input times and
+               input values must be same size.''')
+
     opt = {}
 
     tgd = ~np.isnan(tin)
     uin = uin[tgd]
     tin = tin[tgd]
 
-    #if vin.shape[0] == 0:
     if len(vin) == 0:
         opt['twodim'] = False
         v = np.array([])
     else:
+        if len(tin) != len(vin):
+            raise('''ut_solv: vectors of input times and
+                input values must be same size.''')
+
         opt['twodim'] = True
         vin = vin[tgd]
 
-    #if twodim:
     if opt['twodim']:
         uvgd = ~np.isnan(uin) & ~np.isnan(vin)
         v = vin[uvgd]
@@ -173,33 +179,8 @@ def ut_slvinit(tin, uin, vin, **opts):
     for key, item in opts.items():
         opt[key] = item
 
-    #methnotset = 1
     allmethods = ['ols', 'andrews', 'bisquare', 'fair', 'huber',
                   'logistic', 'talwar', 'welsch']
-#
-#    args = [string.lower() for string in args]
-#
-#    if 'notrend' in args:
-#        #opt['notrend'] = 1
-#        opt['notrend'] = True
-#
-#    if 'rmin' in args:
-#        opt['rmin'] = Rayleigh
-#
-#    if 'nodiagn' in args:
-#        #opt['nodiagn']=1
-#        opt['nodiagn'] = True
-#
-#    if 'linci' in args:
-#        #opt['linci'] = 1
-#        opt['linci'] = True
-#
-#    if allmethods:
-#        methods = [i for i in allmethods if i in args]
-#        if len(methods) > 1:
-#            print 'ut_solv: Only one "method" option allowed.'
-#        else:
-#            opt['method'] = methods[0]
 
     if opt['method'] != 'cauchy':
         ind = np.argwhere(opt['method'] in allmethods)[0][0]
