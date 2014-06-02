@@ -85,6 +85,8 @@ def ut_solv1(tin,uin,vin,lat,cnstit,Rayleigh,varargin):
         #XY = np.hstack((Xu, Yu))
         coef['A'], _, _, coef['g'] = ut_cs2cep(Xu, Yu)
         #coef['A'], _ , _ ,coef['g '] = ut_cs2cep(XY)
+        Xv = []
+        Yv = []
 
     else:
         Xv = np.imag(ap+am)
@@ -110,7 +112,7 @@ def ut_solv1(tin,uin,vin,lat,cnstit,Rayleigh,varargin):
             coef['mean'] = np.real(m[-1-1])
             coef['slope'] = np.real(m[-1])/lor
 
-    confidence = False
+    confidence = True
     if confidence == True:
         coef = ut_confidence(coef, opt, t, e, tin, tgd, uvgd, elor, xraw, xmod, W, m, B,
                     nm, nt, nc, Xu, Yu, Xv, Yv)
@@ -129,8 +131,17 @@ def ut_solv1(tin,uin,vin,lat,cnstit,Rayleigh,varargin):
         coef['Lsmaj'] = coef['Lsmaj'][ind]
         coef['Lsmin'] = coef['Lsmin'][ind]
         coef['theta'] = coef['theta'][ind]
+        if confidence == True:
+            coef['Lsmaj_ci'] = coef['Lsmaj_ci'][ind]
+            coef['Lsmin_ci'] = coef['Lsmin_ci'][ind]
+            coef['theta_ci'] = coef['theta_ci'][ind]
+            coef['g_ci'] = coef['theta_ci'][ind]
+
     else:
         coef['A'] = coef['A'][ind]
+        if confidence == True:
+            coef['A_ci'] = coef['A_ci'][ind]
+            coef['g_ci'] = coef['g_ci'][ind]
 
 
     coef['aux']['frq'] = coef['aux']['frq'][ind]
