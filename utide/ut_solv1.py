@@ -6,12 +6,14 @@ from ut_cnstitsel import ut_cnstitsel
 from ut_cs2cep import ut_cs2cep
 from ut_confidence import ut_confidence
 
-def ut_solv1(tin,uin,vin,lat,cnstit,Rayleigh,varargin):
+#def ut_solv1(tin,uin,vin,lat,cnstit,Rayleigh,varargin):
+def ut_solv1(tin, uin, vin, lat, **opts):
 
     print 'ut_solv: '
-    nt,t,u,v,tref,lor,elor,opt,tgd,uvgd = ut_slvinit(tin,uin,vin,cnstit,Rayleigh,varargin)
+    #nt,t,u,v,tref,lor,elor,opt,tgd,uvgd = ut_slvinit(tin,uin,vin,cnstit,Rayleigh,varargin)
+    nt,t,u,v,tref,lor,elor,opt,tgd,uvgd = ut_slvinit(tin,uin,vin,**opts)
 
-    opt['cnstit'] = cnstit
+    #opt['cnstit'] = cnstit
     [nNR,nR,nI,cnstit,coef] = ut_cnstitsel(tref, opt['rmin']/(24*lor),
                                            opt['cnstit'], opt['infer'])
 
@@ -112,8 +114,7 @@ def ut_solv1(tin,uin,vin,lat,cnstit,Rayleigh,varargin):
             coef['mean'] = np.real(m[-1-1])
             coef['slope'] = np.real(m[-1])/lor
 
-    confidence = True
-    if confidence == True:
+    if opt['conf_int'] == True:
         coef = ut_confidence(coef, opt, t, e, tin, tgd, uvgd, elor, xraw, xmod, W, m, B,
                     nm, nt, nc, Xu, Yu, Xv, Yv)
 
@@ -131,7 +132,7 @@ def ut_solv1(tin,uin,vin,lat,cnstit,Rayleigh,varargin):
         coef['Lsmaj'] = coef['Lsmaj'][ind]
         coef['Lsmin'] = coef['Lsmin'][ind]
         coef['theta'] = coef['theta'][ind]
-        if confidence == True:
+        if opt['conf_int'] == True:
             coef['Lsmaj_ci'] = coef['Lsmaj_ci'][ind]
             coef['Lsmin_ci'] = coef['Lsmin_ci'][ind]
             coef['theta_ci'] = coef['theta_ci'][ind]
@@ -139,7 +140,7 @@ def ut_solv1(tin,uin,vin,lat,cnstit,Rayleigh,varargin):
 
     else:
         coef['A'] = coef['A'][ind]
-        if confidence == True:
+        if opt['conf_int'] == True:
             coef['A_ci'] = coef['A_ci'][ind]
             coef['g_ci'] = coef['g_ci'][ind]
 
