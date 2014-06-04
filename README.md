@@ -37,7 +37,7 @@ if the user doesn't have access to all files.
 These can be inputted into ut_solv, to change the default values, which are
 indicated.
 
-    conf_int='True'
+    conf_int=True
     cnstit='auto'
     notrend=0
     prefilt=[]
