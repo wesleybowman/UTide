@@ -23,7 +23,8 @@ def ut_solv(tin, uin, vin, lat, **opts):
     Need to put in docstring and figure a good way to put in all the optional
     parameters
 
-    Keyword Arguements:
+    Keyword Arguments:
+    conf_int=True
     cnstit='auto'
     notrend=0
     prefilt=[]
