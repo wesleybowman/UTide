@@ -32,6 +32,33 @@ python setup.py install --user
 if the user doesn't have access to all files.
 (untested, may not work)
 
+**Optinal Keywords**
+----
+These can be inputted into ut_solv, to change the default values, which are
+indicated.
+
+    cnstit='auto'
+    notrend=0
+    prefilt=[]
+    nodsatlint=0
+    nodsatnone=0
+    gwchlint=0
+    gwchnone=0
+    infer=[]
+    inferaprx=0
+    rmin=1
+    method='cauchy'
+    tunrdn=1
+    linci=0
+    white=0
+    nrlzn=200
+    lsfrqosmp=1
+    nodiagn=0
+    diagnplots=0
+    diagnminsnr=2
+    ordercnstit=[]
+    runtimedisp='yyy'
+
 
 **File Structure for locating functions**
 ----
