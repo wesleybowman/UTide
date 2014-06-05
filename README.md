@@ -34,7 +34,7 @@ if the user doesn't have access to all files.
 
 **Optinal Keywords**
 ----
-These can be inputted into ut_solv, to change the default values, which are
+These can be inputted into **ut_solv**, to change the default values, which are
 indicated.
 
     conf_int=True
@@ -60,7 +60,7 @@ indicated.
     ordercnstit=[]
     runtimedisp='yyy'
 
-These can be inputted into ut_reconstr, to change the default values, which are
+These can be inputted into **ut_reconstr**, to change the default values, which are
 indicated.
 
     cnstit = []
