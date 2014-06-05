@@ -142,7 +142,7 @@ def ut_slvinit(tin, uin, vin, **opts):
     eps = np.finfo(np.float64).eps
 
     if np.var(np.unique(np.diff(tin))) < eps:
-        opt['equi'] = 1 # based on times; u/v can still have nans ("gappy")
+        opt['equi'] = 1  # based on times; u/v can still have nans ("gappy")
         lor = (np.max(tin)-np.min(tin))
         elor = lor*len(tin)/(len(tin)-1)
         tref = 0.5*(tin[0]+tin[-1])
@@ -152,7 +152,7 @@ def ut_slvinit(tin, uin, vin, **opts):
         elor = lor*nt/(nt-1)
         tref = 0.5*(t[0]+t[-1])
 
-    ## options
+    # options
     opt['conf_int'] = True
     opt['cnstit'] = 'auto'
     opt['notrend'] = 0
@@ -177,7 +177,10 @@ def ut_slvinit(tin, uin, vin, **opts):
     opt['runtimedisp'] = 'yyy'
 
     for key, item in opts.items():
-        opt[key] = item
+        try:
+            opt[key] = item
+        except KeyError:
+            print 'ut_solv: unrecognized input: {0}'.format(key)
 
     allmethods = ['ols', 'andrews', 'bisquare', 'fair', 'huber',
                   'logistic', 'talwar', 'welsch']
@@ -189,7 +192,7 @@ def ut_slvinit(tin, uin, vin, **opts):
     else:
         opt['tunconst'] = 2.385
 
-    opt['tunconst'] = opt['tunconst'] /opt['tunrdn']
+    opt['tunconst'] = opt['tunconst'] / opt['tunrdn']
 
     return nt, t, u, v, tref, lor, elor, opt, tgd, uvgd
 

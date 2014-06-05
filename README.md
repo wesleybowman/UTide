@@ -60,6 +60,13 @@ indicated.
     ordercnstit=[]
     runtimedisp='yyy'
 
+These can be inputted into ut_reconstr, to change the default values, which are
+indicated.
+
+    cnstit = []
+    minsnr = 2
+    minpe = 0
+
 
 **File Structure for locating functions**
 ----

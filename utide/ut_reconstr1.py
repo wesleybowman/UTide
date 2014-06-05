@@ -3,12 +3,12 @@ from ut_rcninit import ut_rcninit
 from ut_E import ut_E
 
 
-def ut_reconstr1(tin, coef, varargin):
+def ut_reconstr1(tin, coef, **opts):
 
     print 'ut_reconstr: '
 
     # parse inputs and options
-    t, opt = ut_rcninit(tin,varargin)
+    t, opt = ut_rcninit(tin, **opts)
 
     # determine constituents to include
     #if ~isempty(opt.cnstit)
@@ -24,7 +24,6 @@ def ut_reconstr1(tin, coef, varargin):
     else:
         #ind = 1:length(coef.aux.frq) # not needed
         if coef['aux']['opt']['twodim']:
-        #if coef.aux.opt.twodim:
             SNR = (coef['Lsmaj']**2 +coef['Lsmin']**2)/((coef['Lsmaj_ci']/1.96)**2 + (coef['Lsmin_ci']/1.96)**2)
             PE = sum(coef['Lsmaj']**2 + coef['Lsmin']**2)
             PE = 100*(coef['Lsmaj']**2 + coef['Lsmin']**2)/PE
@@ -34,10 +33,8 @@ def ut_reconstr1(tin, coef, varargin):
 
         ind = ind[SNR[ind]>=opt['minsnr ']& PE[ind]>=opt['minpe']]
 
-
     # complex coefficients
     rpd = np.pi/180
-    #if coef.aux.opt.twodim
     if coef['aux']['opt']['twodim']:
         ap = 0.5*(coef['Lsmaj'][ind] + coef['Lsmin'][ind]) * np.exp(1j*(coef['theta'][ind] - coef['g'][ind])*rpd)
         am = 0.5*(coef['Lsmaj'][ind] - coef['Lsmin'][ind]) * np.exp(1j*(coef['theta'][ind] + coef['g'][ind])*rpd)
@@ -46,16 +43,11 @@ def ut_reconstr1(tin, coef, varargin):
         am = np.conj(ap)
 
     # exponentials
-#    ngflgs = [coef.aux.opt.nodsatlint coef.aux.opt.nodsatnone ...
-#        coef.aux.opt.gwchlint coef.aux.opt.gwchnone];
 
     ngflgs = [coef['aux']['opt']['nodsatlint'],coef['aux']['opt']['nodsatnone'],
               coef['aux']['opt']['gwchlint'],coef['aux']['opt']['gwchnone']]
 
     print 'prep/calcs ... '
-
-#    E = ut_E(t,coef.aux.reftime,coef.aux.frq(ind),coef.aux.lind(ind),...
-#        coef.aux.lat,ngflgs,coef.aux.opt.prefilt);
 
     E = ut_E(t,
              coef['aux']['reftime'],coef['aux']['frq'][ind],
@@ -71,7 +63,6 @@ def ut_reconstr1(tin, coef, varargin):
     if coef['aux']['opt']['twodim']:
         v = u
         if coef['aux']['opt']['notrend']:
-        #if coef.aux.opt.notrend
             u[whr] = np.real(fit) + coef['umean']
             v[whr] = np.imag(fit) + coef['vmean']
         else:
@@ -80,16 +71,12 @@ def ut_reconstr1(tin, coef, varargin):
 
     else:
         if coef['aux']['opt']['notrend']:
-        #if coef.aux.opt.notrend
             u[whr] = np.real(fit) + coef['mean']
         else:
-            u[whr] = np.real(fit) + coef['mean ']+ coef['slope']*(t-coef['aux']['reftime'])
+            u[whr] = np.real(fit) + coef['mean '] + coef['slope']*(t-coef['aux']['reftime'])
 
         v = []
-
 
     print 'Done.\n'
 
     return u, v
-
-

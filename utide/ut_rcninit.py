@@ -1,4 +1,7 @@
-def ut_rcninit(tin,args):
+import numpy as np
+
+
+def ut_rcninit(tin, **opts):
 
     t = tin[:]
 
@@ -9,6 +12,12 @@ def ut_rcninit(tin,args):
     opt['cnstit'] = []
     opt['minsnr'] = 2
     opt['minpe'] = 0
+
+    for key, item in opts.items():
+        try:
+            opt[key] = item
+        except KeyError:
+            print 'ut_reconstr: unrecognized input: {0}'.format(key)
 
     #args = list(args)
     #args = [string.lower() for string in args]
