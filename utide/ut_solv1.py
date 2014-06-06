@@ -6,7 +6,6 @@ from ut_cnstitsel import ut_cnstitsel
 from ut_cs2cep import ut_cs2cep
 from ut_confidence import ut_confidence
 
-# def ut_solv1(tin,uin,vin,lat,cnstit,Rayleigh,varargin):
 def ut_solv1(tin, uin, vin, lat, **opts):
 
     print 'ut_solv: '
@@ -67,7 +66,7 @@ def ut_solv1(tin, uin, vin, lat, **opts):
 #            return;
 #        W = sparse(1:nt,1:nt,solnstats.w);
 
-    xmod = B*m
+    #xmod = B*m
     xmod = np.dot(B, m)
 
     if not opt['twodim']:
@@ -83,6 +82,7 @@ def ut_solv1(tin, uin, vin, lat, **opts):
     Yu = -np.imag(ap - am)
 
     if not opt['twodim']:
+        #import pdb; pdb.set_trace()
         coef['A'], _, _, coef['g'] = ut_cs2cep(Xu, Yu)
         Xv = []
         Yv = []
@@ -117,7 +117,6 @@ def ut_solv1(tin, uin, vin, lat, **opts):
         PE = np.sum(coef['Lsmaj']**2 + coef['Lsmin']**2)
         PE = 100 * (coef['Lsmaj']**2 + coef['Lsmin']**2) / PE
     else:
-        # PE = 100*coef.A.^2/sum(coef.A.^2);
         PE = 100 * coef['A']**2 / np.sum(coef['A']**2)
 
     ind = PE.argsort()[::-1]

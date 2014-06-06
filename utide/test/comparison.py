@@ -48,25 +48,29 @@ def compare(coefName, matName):
                         #print np.allclose(mat, pyth)
                     except TypeError:
                         for j in coef[k][i]:
-                            mat = eval('mcoef.' + k + '.' + i + '.' + j)
-                            pyth = coef[k][i][j]
-                            #print '\n' + k + ':' + i + ':' + j
-                            #print mat
-                            #print pyth
-                            if type(pyth) == str:
-                                #print mat == pyth
-                                if not mat == pyth:
-                                    print mat
-                                    print pyth
+                            try:
+                                mat = eval('mcoef.' + k + '.' + i + '.' + j)
+                                pyth = coef[k][i][j]
+                                #print '\n' + k + ':' + i + ':' + j
+                                #print mat
+                                #print pyth
+                                if type(pyth) == str:
+                                    #print mat == pyth
+                                    if not mat == pyth:
+                                        print mat
+                                        print pyth
 
-                            else:
-                                if not np.allclose(mat, pyth).all():
-                                    print '\n' + k + ':' + i + ':' + j
-                                    print mat
-                                    print pyth
-                                #print np.allclose(mat, pyth)
+                                else:
+                                    if not np.allclose(mat, pyth).all():
+                                        print '\n' + k + ':' + i + ':' + j
+                                        print mat
+                                        print pyth
+                                    #print np.allclose(mat, pyth)
+                            except AttributeError:
+                                pass
 
 if __name__ == '__main__':
 
-    compare('speedCoef.p', 'speedCoef.mat')
-    compare('elevCoef.p', 'elevCoef.mat')
+    #compare('speedCoef.p', 'speedCoef.mat')
+    #compare('elevCoef.p', 'elevCoef.mat')
+    compare('pythoncoef.p', 'matlabcoef.mat')

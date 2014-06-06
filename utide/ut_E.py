@@ -9,7 +9,10 @@ def ut_E(t,tref,frq,lind,lat,ngflgs,prefilt):
     if ngflgs[1] and ngflgs[3]:
         F = np.ones((nt,nc))
         U = np.zeros((nt,nc))
-        V = 24*(t-tref)*frq
+        #import pdb; pdb.set_trace()
+        V = np.dot(24*(t-tref)[:,None],frq[:,None].T)
+        #V = 24*(t-tref)*frq
+        #V = 24*(t-tref)[:,None]*frq[:,None].T
     else:
         F, U, V = ut_FUV(t,tref,lind,lat,ngflgs);
 

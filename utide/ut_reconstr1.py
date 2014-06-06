@@ -23,6 +23,7 @@ def ut_reconstr1(tin, coef, **opts):
 #                'not found in coef.name']);
     else:
         #ind = 1:length(coef.aux.frq) # not needed
+        ind = np.arange(len(coef['aux']['frq']))
         if coef['aux']['opt']['twodim']:
             SNR = (coef['Lsmaj']**2 +coef['Lsmin']**2)/((coef['Lsmaj_ci']/1.96)**2 + (coef['Lsmin_ci']/1.96)**2)
             PE = sum(coef['Lsmaj']**2 + coef['Lsmin']**2)
@@ -31,7 +32,9 @@ def ut_reconstr1(tin, coef, **opts):
             SNR = (coef['A']**2)/((coef['A_ci']/1.96)**2)
             PE = 100*coef['A']**2/sum(coef['A']**2)
 
-        ind = ind[SNR[ind]>=opt['minsnr ']& PE[ind]>=opt['minpe']]
+        #ind = ind[SNR[ind]>=opt['minsnr'] & PE[ind]>=opt['minpe']]
+        ind = np.where(np.logical_and(SNR[ind]>=opt['minsnr'],
+                                      PE[ind]>=opt['minpe']))[0]
 
     # complex coefficients
     rpd = np.pi/180
@@ -52,7 +55,7 @@ def ut_reconstr1(tin, coef, **opts):
     E = ut_E(t,
              coef['aux']['reftime'],coef['aux']['frq'][ind],
              coef['aux']['lind'][ind],coef['aux']['lat'], ngflgs,
-             coef['aux']['opt']['prefilt'] )
+             coef['aux']['opt']['prefilt'])
 
     # fit
     fit = E*ap + np.conj(E)*am
@@ -66,14 +69,14 @@ def ut_reconstr1(tin, coef, **opts):
             u[whr] = np.real(fit) + coef['umean']
             v[whr] = np.imag(fit) + coef['vmean']
         else:
-            u[whr] = np.real(fit) + coef['umean ']+ coef['uslope']*(t-coef['aux']['reftime'])
-            v[whr] = np.imag(fit) + coef['vmean ']+ coef['vslope']*(t-coef['aux']['reftime'])
+            u[whr] = np.real(fit) + coef['umean']+ coef['uslope']*(t-coef['aux']['reftime'])
+            v[whr] = np.imag(fit) + coef['vmean']+ coef['vslope']*(t-coef['aux']['reftime'])
 
     else:
         if coef['aux']['opt']['notrend']:
             u[whr] = np.real(fit) + coef['mean']
         else:
-            u[whr] = np.real(fit) + coef['mean '] + coef['slope']*(t-coef['aux']['reftime'])
+            u[whr] = np.real(fit) + coef['mean'] + coef['slope']*(t-coef['aux']['reftime'])
 
         v = []
 

@@ -21,11 +21,12 @@ def ut_cnstitsel(tref,minres,incnstit,infer):
     for k in ii.nonzero()[0]:
         ik = const.ishallow[k]+np.arange(const.nshallow[k])
         ik = ik.astype(int)-1
-        const.freq[k] = np.sum(const.freq[shallow.iname[ik]]*shallow.coef[ik])
+        const.freq[k] = np.sum(const.freq[shallow.iname[ik] - 1] *
+                               shallow.coef[ik])
 
-    ## cnstit.NR
+    # cnstit.NR
     cnstit['NR'] = {}
-    if incnstit.lower()=='auto':
+    if incnstit.lower() == 'auto':
         cnstit['NR']['lind'] = np.where(const.df >= minres)[0]
     else:
         pass
@@ -36,12 +37,12 @@ def ut_cnstitsel(tref,minres,incnstit,infer):
     cnstit['NR']['name'] = const.name[cnstit['NR']['lind']]
     nNR = len(cnstit['NR']['frq'])
 
-    ## cnstit.R
+    # cnstit.R
     nR = 0
     nI = 0
     cnstit['R'] = []
 
-    nallc = nNR+nR+nI
+    nallc = nNR + nR + nI
 
     coef['name'] = cnstit['NR']['name']
     coef['aux'] = {}
@@ -51,6 +52,5 @@ def ut_cnstitsel(tref,minres,incnstit,infer):
     # another infer if statement
 
     coef['aux']['reftime'] = tref
-
 
     return nNR, nR, nI, cnstit, coef
