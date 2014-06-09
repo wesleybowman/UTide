@@ -42,7 +42,6 @@ amp_err = amp - coef['A'][0]
 
 phase_err = phase - coef['g'][0]
 
-''' Need to look into ut_reconstr '''
 ts_recon, _ = ut_reconstr(time, coef)
 
 err = np.sqrt(np.mean((time_series-ts_recon[0])**2))

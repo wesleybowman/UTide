@@ -22,19 +22,21 @@ def ut_reconstr1(tin, coef, **opts):
 #            error(['ut_reconstr: one or more of input constituents Cnstit '...
 #                'not found in coef.name']);
     else:
-        #ind = 1:length(coef.aux.frq) # not needed
+
         ind = np.arange(len(coef['aux']['frq']))
         if coef['aux']['opt']['twodim']:
-            SNR = (coef['Lsmaj']**2 +coef['Lsmin']**2)/((coef['Lsmaj_ci']/1.96)**2 + (coef['Lsmin_ci']/1.96)**2)
+            SNR = (coef['Lsmaj']**2 + coef['Lsmin']**2) / ((coef['Lsmaj_ci']/1.96)**2 +
+                                                           (coef['Lsmin_ci']/1.96)**2)
+
             PE = sum(coef['Lsmaj']**2 + coef['Lsmin']**2)
             PE = 100*(coef['Lsmaj']**2 + coef['Lsmin']**2)/PE
         else:
             SNR = (coef['A']**2)/((coef['A_ci']/1.96)**2)
             PE = 100*coef['A']**2/sum(coef['A']**2)
 
-        #ind = ind[SNR[ind]>=opt['minsnr'] & PE[ind]>=opt['minpe']]
-        ind = np.where(np.logical_and(SNR[ind]>=opt['minsnr'],
-                                      PE[ind]>=opt['minpe']))[0]
+        # ind = ind[SNR[ind]>=opt['minsnr'] & PE[ind]>=opt['minpe']]
+        ind = np.where(np.logical_and(SNR[ind] >= opt['minsnr'],
+                                      PE[ind] >= opt['minpe']))[0]
 
     # complex coefficients
     rpd = np.pi/180
@@ -47,18 +49,19 @@ def ut_reconstr1(tin, coef, **opts):
 
     # exponentials
 
-    ngflgs = [coef['aux']['opt']['nodsatlint'],coef['aux']['opt']['nodsatnone'],
-              coef['aux']['opt']['gwchlint'],coef['aux']['opt']['gwchnone']]
+    ngflgs = [coef['aux']['opt']['nodsatlint'], coef['aux']['opt']['nodsatnone'],
+              coef['aux']['opt']['gwchlint'], coef['aux']['opt']['gwchnone']]
 
     print 'prep/calcs ... '
 
     E = ut_E(t,
-             coef['aux']['reftime'],coef['aux']['frq'][ind],
-             coef['aux']['lind'][ind],coef['aux']['lat'], ngflgs,
+             coef['aux']['reftime'], coef['aux']['frq'][ind],
+             coef['aux']['lind'][ind], coef['aux']['lat'], ngflgs,
              coef['aux']['opt']['prefilt'])
 
     # fit
-    fit = E*ap + np.conj(E)*am
+    # fit = E*ap + np.conj(E)*am
+    fit = np.dot(E, ap) + np.dot(np.conj(E), am)
 
     # mean (& trend)
     u = np.nan*np.ones(tin.shape)

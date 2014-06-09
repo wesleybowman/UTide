@@ -46,13 +46,13 @@ err(jj)= sqrt(mean((time_series-ts_recon).^2));
 
 ts_fvcom=coef.A(1)*cos(2*pi*((time-mean(time))/(period(jj)/(24*3600))-coef.g(1)/360));
 
-figure
-plot(time,time_series)
-hold on
-plot(time,ts_recon,'k')
-plot(time,ts_fvcom,'r')
-hold off
-datetick
+%figure
+% plot(time,time_series)
+% hold on
+% plot(time,ts_recon,'k')
+% plot(time,ts_fvcom,'r')
+% hold off
+% datetick
 
 end
 
