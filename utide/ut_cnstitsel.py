@@ -5,7 +5,6 @@ from utide import ut_constants
 
 def ut_cnstitsel(tref,minres,incnstit,infer):
 
-    #mat_contents = sio.loadmat('./ut_constants.mat', struct_as_record=False, squeeze_me=True)
     mat_contents = sio.loadmat(ut_constants, struct_as_record=False, squeeze_me=True)
     shallow = mat_contents['shallow']
     const = mat_contents['const']
@@ -26,12 +25,32 @@ def ut_cnstitsel(tref,minres,incnstit,infer):
 
     # cnstit.NR
     cnstit['NR'] = {}
-    if incnstit.lower() == 'auto':
+
+    ordercnstit = ['M2','S2','N2','K2','K1','O1','P1','Q1']
+    ordercnstit = 'frq'
+
+    #if incnstit.lower() == 'auto':
+    if incnstit == 'auto':
         cnstit['NR']['lind'] = np.where(const.df >= minres)[0]
     else:
-        pass
+        cnstit['NR']['lind'] = np.nan * np.ones((len(incnstit),1))
+
+        for j,v in enumerate(incnstit):
+
+            temp = np.core.defchararray.replace(const.name, " ", "")
+            v = np.core.defchararray.replace(v, " ", "")
+            lind1 = np.where(temp == v)[0][0]
+            cnstit['NR']['lind'][j] = lind1
+
+
+        cnstit['NR']['lind'] = cnstit['NR']['lind'].astype(int).flatten()
+
+        if ordercnstit == 'frq':
+            seq = const.freq[cnstit['NR']['lind']].argsort()
+            cnstit['NR']['lind'] = cnstit['NR']['lind'][seq].astype(int).flatten()
 
     # skipped some stuff here cause they involve infer
+
 
     cnstit['NR']['frq'] = const.freq[cnstit['NR']['lind']]
     cnstit['NR']['name'] = const.name[cnstit['NR']['lind']]

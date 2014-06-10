@@ -12,10 +12,8 @@ ts = 735604
 duration = 35
 dt = 1/24.0
 
-#time = np.arange(ts, ts+duration, dt)
 time = np.linspace(ts, ts+duration, 841)
 time_origin = 6.939615e5
-
 
 mat_contents = sio.loadmat('ut_constants.mat', struct_as_record=False, squeeze_me=True)
 
@@ -32,9 +30,16 @@ jj=48-1
 time_series = amp * np.cos((((time-time_origin) * (2*np.pi/period[jj]) *
                              (24*3600)) - 2 * np.pi * phase / 360))
 
-coef = ut_solv(time, time_series, [], lat, cnstit='auto', gwchnone=True,
+order = ['M2','S2','N2','K2','K1','O1','P1','Q1']
+#order = ['M2  ','S2  ','N2  ','K2  ','K1  ','O1  ','P1  ','Q1  ']
+
+coef = ut_solv(time, time_series, [], lat, cnstit=order, gwchnone=True,
                nodsatnone=True, notrend=True, rmin=0.95, method='ols',
-               nodiagn=True, linci=True, conf_int=True)
+               nodiagn=True, linci=True, conf_int=True, ordercnstit=order)
+
+#coef = ut_solv(time, time_series, [], lat, cnstit='auto', gwchnone=True,
+#               nodsatnone=True, notrend=True, rmin=0.95, method='ols',
+#               nodiagn=True, linci=True, conf_int=True)
 
 pickle.dump(coef, open("pythoncoef.p", "wb"))
 

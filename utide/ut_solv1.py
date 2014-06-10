@@ -9,7 +9,6 @@ from ut_confidence import ut_confidence
 def ut_solv1(tin, uin, vin, lat, **opts):
 
     print 'ut_solv: '
-    # nt,t,u,v,tref,lor,elor,opt,tgd,uvgd = ut_slvinit(tin,uin,vin,cnstit,Rayleigh,varargin)
     nt, t, u, v, tref, lor, elor, opt, tgd, uvgd = ut_slvinit(tin,uin,vin,**opts)
 
     # opt['cnstit'] = cnstit
@@ -82,7 +81,6 @@ def ut_solv1(tin, uin, vin, lat, **opts):
     Yu = -np.imag(ap - am)
 
     if not opt['twodim']:
-        #import pdb; pdb.set_trace()
         coef['A'], _, _, coef['g'] = ut_cs2cep(Xu, Yu)
         Xv = []
         Yv = []
@@ -92,7 +90,7 @@ def ut_solv1(tin, uin, vin, lat, **opts):
         Yv = np.real(ap-am)
         coef['Lsmaj'], coef['Lsmin'], coef['theta'], coef['g'] = ut_cs2cep(Xu, Yu, Xv, Yv)
 
-    ## mean and trend
+    # mean and trend
     if opt['twodim']:
         if opt['notrend']:
             coef['umean'] = np.real(m[-1])
@@ -113,13 +111,49 @@ def ut_solv1(tin, uin, vin, lat, **opts):
         coef = ut_confidence(coef, opt, t, e, tin, tgd, uvgd, elor, xraw, xmod,
                              W, m, B, nm, nt, nc, Xu, Yu, Xv, Yv)
 
-    if opt['twodim']:
-        PE = np.sum(coef['Lsmaj']**2 + coef['Lsmin']**2)
-        PE = 100 * (coef['Lsmaj']**2 + coef['Lsmin']**2) / PE
-    else:
-        PE = 100 * coef['A']**2 / np.sum(coef['A']**2)
+    # re-order constituents
+    if len(opt['ordercnstit']) != 0:
 
-    ind = PE.argsort()[::-1]
+        if opt['ordercnstit'] == 'frq':
+            ind = coef['aux']['frq'].argsort()
+
+        elif opt['ordercnstit'] == 'snr':
+            if not opt['nodiagn']:
+                ind = coef['diagn']['SNR'].argsort()[::-1]
+            else:
+                if opt['twodim']:
+                    SNR = (coef['Lsmaj']**2 + coef['Lsmin']**2) / (
+                        (coef['Lsmaj_ci']/1.96)**2 +
+                        (coef['Lsmin_ci']/1.96)**2)
+
+                else:
+                    SNR = (coef['A']**2) / (coef['A_ci']/1.96)**2
+
+                ind = SNR.argsort()[::-1]
+
+        else:
+            '''There has to be a better way to do this.'''
+            ind = np.zeros((len(opt['ordercnstit'])))
+            for j, v in enumerate(opt['ordercnstit']):
+                temp = np.core.defchararray.replace(coef['name'], " ", "")
+                v = np.core.defchararray.replace(v, " ", "")
+                lind1 = np.where(temp == v)[0][0]
+                ind[j] = lind1
+            ind = ind.astype(int)
+
+    else:
+        if not opt['nodiagn']:
+            ind = indPE
+
+        else:
+            if opt['twodim']:
+                PE = np.sum(coef['Lsmaj']**2 + coef['Lsmin']**2)
+                PE = 100 * (coef['Lsmaj']**2 + coef['Lsmin']**2) / PE
+            else:
+                PE = 100 * coef['A']**2 / np.sum(coef['A']**2)
+
+            ind = PE.argsort()[::-1]
+
     coef['g'] = coef['g'][ind]
     coef['name'] = coef['name'][ind]
     if opt['twodim']:
