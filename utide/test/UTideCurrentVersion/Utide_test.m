@@ -31,12 +31,12 @@ jj = 48
 
 time_series=amp*cos((((time-time_origin)*(2*pi/period(jj))*(24*3600))-2*pi*phase/double(360)));
 
-order={'M2  ','S2  ','N2  ','K2  ','K1  ','O1  ','P1  ','Q1  '}
+%order={'M2  ','S2  ','N2  ','K2  ','K1  ','O1  ','P1  ','Q1  '}
 order={'M2','S2','N2','K2','K1','O1','P1','Q1'}
 
-coef = ut_solv(time,time_series ,[] , lat, order,'GwchNone','NodsatNone','NoTrend','Rmin',0.95,'OLS','NoDiagn','LinCI','OrderCnstit',order);
+%coef = ut_solv(time,time_series ,[] , lat, order,'GwchNone','NodsatNone','NoTrend','Rmin',0.95,'OLS','NoDiagn','LinCI','OrderCnstit',order);
 
-coef = ut_solv(time,time_series ,[] , lat, order,'GwchNone','NodsatNone','NoTrend','Rmin',0.95,'OLS','NoDiagn','LinCI');
+coef = ut_solv(time,time_series ,[] , lat, 'auto','GwchNone','NodsatNone','NoTrend','Rmin',0.95,'OLS','NoDiagn','LinCI');
 
 save ../matlabcoef.mat coef
 %[nameu,fu,tidecon,xout]=t_tide(time_series,'starttime',time(1),'latitude',lat);
@@ -59,7 +59,7 @@ ts_fvcom=coef.A(1)*cos(2*pi*((time-mean(time))/(period(jj)/(24*3600))-coef.g(1)/
 % hold off
 % datetick
 
-end
+%end
 
 
 % figure

@@ -94,15 +94,6 @@ def ut_FUV(t, tref, lind, lat, ngflgs):
             tt = t # exact times
 
         ntt = len(tt)
-#        if exist('astro','var')
-#            if ~isequal(size(astro,2),ntt)
-#                [astro,~]=ut_astron(tt');
-#            end
-#        else
-#            [astro,~]=ut_astron(tt');
-#
-#        if ~exist('const','var')
-#            load('ut_constants.mat')
 
         mat_contents = sio.loadmat(ut_constants,
                                    struct_as_record=False, squeeze_me=True)

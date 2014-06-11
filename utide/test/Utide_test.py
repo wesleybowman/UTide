@@ -37,9 +37,12 @@ coef = ut_solv(time, time_series, [], lat, cnstit=order, gwchnone=True,
                nodsatnone=True, notrend=True, rmin=0.95, method='ols',
                nodiagn=True, linci=True, conf_int=True, ordercnstit=order)
 
-#coef = ut_solv(time, time_series, [], lat, cnstit='auto', gwchnone=True,
-#               nodsatnone=True, notrend=True, rmin=0.95, method='ols',
-#               nodiagn=True, linci=True, conf_int=True)
+coef = ut_solv(time, time_series, [], lat, cnstit='auto', gwchnone=True,
+               nodsatnone=True, notrend=True, rmin=0.95, method='ols',
+               nodiagn=True, linci=True, conf_int=True)
+
+ut_solv(time, time_series, [], lat, cnstit='auto', gwchnone=True, nodsatnone=True, notrend=True, rmin=0.95, method='ols', nodiagn=True, linci=True, conf_int=True)
+
 
 pickle.dump(coef, open("pythoncoef.p", "wb"))
 
@@ -53,6 +56,8 @@ err = np.sqrt(np.mean((time_series-ts_recon[0])**2))
 
 ts_fvcom=coef['A'][0]*np.cos(2*np.pi*((time-np.mean(time))/(period[jj]/(24*3600))-coef['g'][0]/360))
 
-plt.plot(time, ts_recon)
-plt.plot(time, ts_fvcom)
-plt.show()
+PLOT = False
+if PLOT:
+    plt.plot(time, ts_recon)
+    plt.plot(time, ts_fvcom)
+    plt.show()
