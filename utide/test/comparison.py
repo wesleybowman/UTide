@@ -74,3 +74,4 @@ if __name__ == '__main__':
     #compare('speedCoef.p', 'speedCoef.mat')
     #compare('elevCoef.p', 'elevCoef.mat')
     compare('pythoncoef.p', 'matlabcoef.mat')
+    compare('speedpythoncoef.p', 'speedmatlabcoef.mat')

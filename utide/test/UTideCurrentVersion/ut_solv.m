@@ -1313,9 +1313,9 @@ if ~isempty(opt.ordercnstit)
             end
             [~,ind] = sort(SNR,'descend');
         end
-    else        
-       [~,ind] = ismember(cellstr(opt.ordercnstit),cellstr(opt.cnstit));
-       %[~,ind] = ismember(cellstr(opt.ordercnstit),cellstr(coef.name));
+    else
+       %[~,ind] = ismember(cellstr(opt.ordercnstit),cellstr(opt.cnstit));
+       [~,ind] = ismember(cellstr(opt.ordercnstit),cellstr(coef.name));
     end
 else
     if ~opt.nodiagn

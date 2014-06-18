@@ -15,7 +15,8 @@ def ut_confidence(coef, opt, t, e, tin, tgd, uvgd, elor, xraw, xmod, W, m, B,
         # band-averaged (ba) spectral densities
         if opt['equi']:
             if np.sum(tgd) > np.sum(uvgd):
-                efill = np.interp1(t,e,tin(tgd))
+                #efill = np.interp1(t,e,tin(tgd))
+                efill = np.interp1d(t,e,tin[tgd])
                 if np.any(np.isnan(efill)): # fill start&/end nans w/ nearest good
                     ind = np.where(np.isnan(efill))[0]
                     #ind2 = ind(ind<find(~isnan(efill),1,'first'));
@@ -26,10 +27,9 @@ def ut_confidence(coef, opt, t, e, tin, tgd, uvgd, elor, xraw, xmod, W, m, B,
 
                 ba = ut_pdgm(tin[tgd],efill,coef['aux']['frq'],1,0)
             else:
-                ba = ut_pdgm(tin[tgd],e,coef['aux']['frq'],1,0)
+                ba = ut_pdgm(tin[tgd], e, coef['aux']['frq'], 1, 0)
 
         else:
-
             ba = ut_pdgm(t,e,coef.aux.frq,0,opt.lsfrqosmp);
 
         #import pdb; pdb.set_trace()

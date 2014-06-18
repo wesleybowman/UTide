@@ -33,15 +33,32 @@ time_series = amp * np.cos((((time-time_origin) * (2*np.pi/period[jj]) *
 order = ['M2','S2','N2','K2','K1','O1','P1','Q1']
 #order = ['M2  ','S2  ','N2  ','K2  ','K1  ','O1  ','P1  ','Q1  ']
 
-coef = ut_solv(time, time_series, [], lat, cnstit=order, gwchnone=True,
-               nodsatnone=True, notrend=True, rmin=0.95, method='ols',
-               nodiagn=True, linci=True, conf_int=True, ordercnstit=order)
+#coef = ut_solv(time, time_series, time_series, lat, cnstit=order,
+#               notrend=True, rmin=0.95, method='ols',
+#               nodiagn=True, linci=True, conf_int=True, ordercnstit=order)
+#
+#coef = ut_solv(time, time_series, time_series, lat, cnstit=order, gwchnone=True,
+#               nodsatnone=True, notrend=True, rmin=0.95, method='ols',
+#               nodiagn=True, linci=True, conf_int=True, ordercnstit=order)
+
+#speedcoef = ut_solv(time, time_series, time_series, lat, cnstit='auto',
+#               notrend=True, rmin=0.95, method='ols',
+#               nodiagn=True, linci=True, conf_int=True)
+#
+#
+#pickle.dump(speedcoef, open("speedpythoncoef.p", "wb"))
+
+#coef = ut_solv(time, time_series, [], lat, cnstit=order, gwchnone=True,
+#               nodsatnone=True, notrend=True, rmin=0.95, method='ols',
+#               nodiagn=True, linci=True, conf_int=True, ordercnstit=order)
 
 coef = ut_solv(time, time_series, [], lat, cnstit='auto', gwchnone=True,
                nodsatnone=True, notrend=True, rmin=0.95, method='ols',
                nodiagn=True, linci=True, conf_int=True)
 
-ut_solv(time, time_series, [], lat, cnstit='auto', gwchnone=True, nodsatnone=True, notrend=True, rmin=0.95, method='ols', nodiagn=True, linci=True, conf_int=True)
+coef = ut_solv(time, time_series, [], lat, cnstit='auto',
+               notrend=True, rmin=0.95, method='ols',
+               nodiagn=True, linci=True, conf_int=True)
 
 
 pickle.dump(coef, open("pythoncoef.p", "wb"))

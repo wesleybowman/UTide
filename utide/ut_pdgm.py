@@ -5,7 +5,6 @@ from ut_fbndavg import ut_fbndavg
 
 def ut_pdgm(t,e,cfrq,equi,frqosmp):
 
-    #import pdb; pdb.set_trace()
     P = {}
     nt = len(e)
     #hn = np.hanning(nt)
@@ -34,12 +33,11 @@ def ut_pdgm(t,e,cfrq,equi,frqosmp):
     else:
         # ut_lmbscga
         pass
-    #import pdb; pdb.set_trace()
 
     #import pdb; pdb.set_trace()
 
-    fac = (nt-1)/(2*np.pi*(t[-1]-t[0])*24) # conv fac: rad/sample to cph
-    allfrq = allfrq*fac # to [cycle/hour] from [rad/samp]
+    fac = (nt-1)/(2*np.pi*(t[-1]-t[0])*24)  # conv fac: rad/sample to cph
+    allfrq = allfrq*fac  # to [cycle/hour] from [rad/samp]
     Puu1s = Puu1s / fac  # to [e units^2/cph] from [e units^2/(rad/samp)]
 
     #import pdb; pdb.set_trace()
@@ -64,11 +62,10 @@ def ut_pdgm(t,e,cfrq,equi,frqosmp):
             #Puv1s, _ = ut_lmbscgc(real(e),imag(e),t,hn,frqosmp);
             pass
 
-        Pvv1s = Pvv1s/fac
-        P['Pvv'], _ = ut_fbndavg(Pvv1s,allfrq,cfrq)
-        Puv1s = np.real(Puv1s)/fac
-        P['Puv'], _ = ut_fbndavg(Puv1s,allfrq,cfrq)
+        Pvv1s = Pvv1s / fac
+        P['Pvv'], _ = ut_fbndavg(Pvv1s, allfrq, cfrq)
+        Puv1s = np.real(Puv1s) / fac
+        P['Puv'], _ = ut_fbndavg(Puv1s, allfrq, cfrq)
         P['Puv'] = np.abs(P['Puv'])
-
 
     return P

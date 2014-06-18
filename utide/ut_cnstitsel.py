@@ -26,9 +26,6 @@ def ut_cnstitsel(tref,minres,incnstit,infer):
     # cnstit.NR
     cnstit['NR'] = {}
 
-    ordercnstit = ['M2','S2','N2','K2','K1','O1','P1','Q1']
-    ordercnstit = 'frq'
-
     #if incnstit.lower() == 'auto':
     if incnstit == 'auto':
         cnstit['NR']['lind'] = np.where(const.df >= minres)[0]
@@ -45,9 +42,9 @@ def ut_cnstitsel(tref,minres,incnstit,infer):
 
         cnstit['NR']['lind'] = cnstit['NR']['lind'].astype(int).flatten()
 
-        if ordercnstit == 'frq':
-            seq = const.freq[cnstit['NR']['lind']].argsort()
-            cnstit['NR']['lind'] = cnstit['NR']['lind'][seq].astype(int).flatten()
+#        if ordercnstit == 'frq':
+#            seq = const.freq[cnstit['NR']['lind']].argsort()
+#            cnstit['NR']['lind'] = cnstit['NR']['lind'][seq].astype(int).flatten()
 
     # skipped some stuff here cause they involve infer
 
