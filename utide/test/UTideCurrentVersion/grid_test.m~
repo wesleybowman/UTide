@@ -19,11 +19,11 @@ time=time+datenum('17-Nov-1858');  %On this data, the MJD = 0
 
 order={'M2','S2','N2','K2','K1','O1','P1','Q1'}
 
-coef = ut_solv(time, double(ua), double(va), latc(1), 'auto','NoTrend','Rmin',0.95,'OLS','NoDiagn','LinCI');
+coef = ut_solv(time, double(ua), double(va), latc(1), 'auto','NoTrend','Rmin',1.0,'OLS','NoDiagn','LinCI');
 
 save ../speedmatlabcoef.mat coef
 
 
-coef = ut_solv(time, double(ua), [], lat(1), 'auto','NoTrend','Rmin',0.95,'OLS','NoDiagn','LinCI');
+coef = ut_solv(time, double(ua), [], latc(1), 'auto','NoTrend','Rmin',1.0,'OLS','NoDiagn','LinCI');
 
 save ../matlabcoef.mat coef

@@ -16,7 +16,6 @@ def compareRec(coefName, matName, twodim=False):
         print np.allclose(U,rec[0])
         print 'V'
         print np.allclose(V,rec[1])
-        print rec[0]-rec[1]
     else:
         ts_recon = matRec['ts_recon']
         print np.allclose(ts_recon, rec)

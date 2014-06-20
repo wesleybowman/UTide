@@ -164,7 +164,7 @@ def ut_solv1(tin, uin, vin, lat, **opts):
             coef['Lsmaj_ci'] = coef['Lsmaj_ci'][ind]
             coef['Lsmin_ci'] = coef['Lsmin_ci'][ind]
             coef['theta_ci'] = coef['theta_ci'][ind]
-            coef['g_ci'] = coef['theta_ci'][ind]
+            coef['g_ci'] = coef['g_ci'][ind]
 
     else:
         coef['A'] = coef['A'][ind]

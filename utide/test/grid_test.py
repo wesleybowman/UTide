@@ -48,6 +48,7 @@ order = ['M2','S2','N2','K2','K1','O1','P1','Q1']
 speedcoef = ut_solv(time, ua[:, 0], va[:, 0], latc[0], cnstit='auto',
                notrend=True, rmin=0.95, method='ols',
                nodiagn=True, linci=True, conf_int=True)
+
 #
 pickle.dump(speedcoef, open("speedpythoncoef.p", "wb"))
 
@@ -55,8 +56,12 @@ pickle.dump(speedcoef, open("speedpythoncoef.p", "wb"))
 #               nodsatnone=True, notrend=True, rmin=0.95, method='ols',
 #               nodiagn=True, linci=True, conf_int=True, ordercnstit=order)
 
-coef = ut_solv(time, ua[:,0], [], latc[0], cnstit='auto', gwchnone=True,
-               nodsatnone=True, notrend=True, rmin=0.95, method='ols',
+#coef = ut_solv(time, ua[:,0], [], lat[0], cnstit='auto', gwchnone=True,
+#               nodsatnone=True, notrend=True, rmin=0.95, method='ols',
+#               nodiagn=True, linci=True, conf_int=True)
+
+coef = ut_solv(time, ua[:,0], [], lat[0], cnstit='auto',
+               notrend=True, rmin=0.95, method='ols',
                nodiagn=True, linci=True, conf_int=True)
 
 #coef = ut_solv(time, time_series, [], lat, cnstit='auto',
