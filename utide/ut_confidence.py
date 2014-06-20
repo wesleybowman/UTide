@@ -1,5 +1,6 @@
 from __future__ import division
 import numpy as np
+import scipy.interpolate as sip
 from ut_pdgm import ut_pdgm
 from ut_linci import ut_linci
 
@@ -16,7 +17,9 @@ def ut_confidence(coef, opt, t, e, tin, tgd, uvgd, elor, xraw, xmod, W, m, B,
         if opt['equi']:
             if np.sum(tgd) > np.sum(uvgd):
                 #efill = np.interp1(t,e,tin(tgd))
-                efill = np.interp(t,e,tin[tgd])
+                #efill = np.interp(t,e,tin[tgd])
+                eTemp = sip.interp1d(t,e)
+                efill = eTemp(tin[tgd])
                 if np.any(np.isnan(efill)): # fill start&/end nans w/ nearest good
                     ind = np.where(np.isnan(efill))[0]
                     #ind2 = ind(ind<find(~isnan(efill),1,'first'));
