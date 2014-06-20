@@ -16,7 +16,7 @@ def ut_confidence(coef, opt, t, e, tin, tgd, uvgd, elor, xraw, xmod, W, m, B,
         if opt['equi']:
             if np.sum(tgd) > np.sum(uvgd):
                 #efill = np.interp1(t,e,tin(tgd))
-                efill = np.interp1d(t,e,tin[tgd])
+                efill = np.interp(t,e,tin[tgd])
                 if np.any(np.isnan(efill)): # fill start&/end nans w/ nearest good
                     ind = np.where(np.isnan(efill))[0]
                     #ind2 = ind(ind<find(~isnan(efill),1,'first'));
