@@ -23,7 +23,12 @@ coef = ut_solv(time, double(ua), double(va), latc(1), 'auto','NoTrend','Rmin',0.
 
 save ../speedmatlabcoef.mat coef
 
+[u, v] = ut_reconstr(time, coef);
+save ../speedmatlabrecon.mat u v
 
 coef = ut_solv(time, double(ua), [], lat(1), 'auto','NoTrend','Rmin',0.95,'OLS','NoDiagn','LinCI');
 
 save ../matlabcoef.mat coef
+
+[ts_recon, ~]=ut_reconstr(time, coef);
+save ../matlabrecon.mat ts_recon

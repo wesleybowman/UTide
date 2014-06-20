@@ -7,3 +7,4 @@
 #cp UTideCurrentVersion/speedmatlabrecon .
 python Utide_test.py
 python comparison.py
+python reconCompare.py

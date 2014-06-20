@@ -52,6 +52,10 @@ speedcoef = ut_solv(time, ua[:, 0], va[:, 0], latc[0], cnstit='auto',
 #
 pickle.dump(speedcoef, open("speedpythoncoef.p", "wb"))
 
+u,v = ut_reconstr(time, speedcoef)
+
+pickle.dump([u,v], open("speedpythonrecon.p", "wb"))
+
 #coef = ut_solv(time, time_series, [], lat, cnstit=order, gwchnone=True,
 #               nodsatnone=True, notrend=True, rmin=0.95, method='ols',
 #               nodiagn=True, linci=True, conf_int=True, ordercnstit=order)
@@ -71,3 +75,4 @@ coef = ut_solv(time, ua[:,0], [], lat[0], cnstit='auto',
 pickle.dump(coef, open("pythoncoef.p", "wb"))
 
 ts_recon, _ = ut_reconstr(time, coef)
+pickle.dump(ts_recon, open("pythonrecon.p", "wb"))

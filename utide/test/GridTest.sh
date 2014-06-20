@@ -5,3 +5,4 @@
 #cp UTideCurrentVersion/matlabcoef.mat .
 python grid_test.py
 python comparison.py
+python reconCompare.py

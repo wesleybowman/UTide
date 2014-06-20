@@ -82,7 +82,7 @@ def compareRec(coefName, matName, twodim=False):
 
 if __name__ == '__main__':
 
-    print 'Elev'
+    print '\nElev'
     compareRec('pythonrecon.p', 'matlabrecon.mat')
 
     print '\nVelocity'
