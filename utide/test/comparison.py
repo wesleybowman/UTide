@@ -3,11 +3,11 @@ import scipy.io as sio
 import numpy as np
 
 
-def compare(coefName, matName):
+def compare(coefName, matName, cName='coef'):
 
     #matCoef = sio.loadmat('coef.mat', struct_as_record=False, squeeze_me=True)
     matCoef = sio.loadmat(matName, struct_as_record=False, squeeze_me=True)
-    mcoef = matCoef['coef']
+    mcoef = matCoef[cName]
 
     coef = pickle.load(open(coefName, 'rb'))
 
@@ -73,5 +73,7 @@ if __name__ == '__main__':
 
     #compare('speedCoef.p', 'speedCoef.mat')
     #compare('elevCoef.p', 'elevCoef.mat')
+    print 'Elev'
     compare('pythoncoef.p', 'matlabcoef.mat')
+    print '\nVelocity'
     compare('speedpythoncoef.p', 'speedmatlabcoef.mat')

@@ -64,10 +64,10 @@ def ut_reconstr1(tin, coef, **opts):
     fit = np.dot(E, ap) + np.dot(np.conj(E), am)
 
     # mean (& trend)
-    u = np.nan*np.ones(tin.shape)
+    u = np.nan * np.ones(tin.shape)
     whr = ~np.isnan(tin)
     if coef['aux']['opt']['twodim']:
-        v = u
+        v = np.nan * np.ones(tin.shape)
         if coef['aux']['opt']['notrend']:
             u[whr] = np.real(fit) + coef['umean']
             v[whr] = np.imag(fit) + coef['vmean']

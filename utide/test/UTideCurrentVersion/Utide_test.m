@@ -1,4 +1,4 @@
-%clear all
+clear all
 
 ts=735604;
 duration=35;
@@ -34,16 +34,19 @@ time_series=amp*cos((((time-time_origin)*(2*pi/period(jj))*(24*3600))-2*pi*phase
 %order={'M2  ','S2  ','N2  ','K2  ','K1  ','O1  ','P1  ','Q1  '}
 order={'M2','S2','N2','K2','K1','O1','P1','Q1'}
 
-%coef = ut_solv(time,time_series ,[] , lat, order,'GwchNone','NodsatNone','NoTrend','Rmin',0.95,'OLS','NoDiagn','LinCI','OrderCnstit',order);
+%speedcoef = ut_solv(time,time_series , time_series, lat, order,'GwchNone','NodsatNone','NoTrend','Rmin',0.95,'OLS','NoDiagn','LinCI','OrderCnstit',order);
 %coef = ut_solv(time,time_series , time_series , lat, 'auto','GwchNone','NodsatNone','NoTrend','Rmin',0.95,'OLS','NoDiagn','LinCI');
 
-%speedcoef = ut_solv(time,time_series , time_series , lat, 'auto','NoTrend','Rmin',0.95,'OLS','NoDiagn','LinCI');
+coef = ut_solv(time,time_series , time_series , lat, 'auto','NoTrend','Rmin',0.95,'OLS','NoDiagn','LinCI');
 %
-%save ../speedmatlabcoef.mat speedcoef
+save ../speedmatlabcoef.mat coef
+[u, v] = ut_reconstr(time, coef);
+save ../speedmatlabrecon.mat u v
 
-coef = ut_solv(time,time_series ,[] , lat, order,'GwchNone','NodsatNone','NoTrend','Rmin',0.95,'OLS','NoDiagn','LinCI','OrderCnstit',order);
-%coef = ut_solv(time,time_series ,[] , lat, 'auto','GwchNone','NodsatNone','NoTrend','Rmin',0.95,'OLS','NoDiagn','LinCI');
-coef = ut_solv(time,time_series ,[] , lat, 'auto','NoTrend','Rmin',0.95,'OLS','NoDiagn','LinCI');
+
+%coef = ut_solv(time,time_series ,[] , lat, order,'GwchNone','NodsatNone','NoTrend','Rmin',0.95,'OLS','NoDiagn','LinCI','OrderCnstit',order);
+coef = ut_solv(time,time_series ,[] , lat, 'auto','GwchNone','NodsatNone','NoTrend','Rmin',0.95,'OLS','NoDiagn','LinCI');
+%coef = ut_solv(time,time_series ,[] , lat, 'auto','NoTrend','Rmin',0.95,'OLS','NoDiagn','LinCI');
 
 save ../matlabcoef.mat coef
 %[nameu,fu,tidecon,xout]=t_tide(time_series,'starttime',time(1),'latitude',lat);
@@ -52,7 +55,9 @@ amp_err(jj)=amp-coef.A(1);
 
 phase_err(jj)=phase-coef.g(1);
 
-ts_recon=ut_reconstr(time, coef);
+[ts_recon, ~]=ut_reconstr(time, coef);
+save ../matlabrecon.mat ts_recon
+
 
 err(jj)= sqrt(mean((time_series-ts_recon).^2));
 
