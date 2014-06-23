@@ -30,7 +30,26 @@ or
 python setup.py install --user
 ```
 if the user doesn't have access to all files.
-(untested, may not work)
+
+**Under Construction**
+----
+The only method that is currently implemented is 'ols.' For the rest to work,
+MatLab's robustfit needs to be written in python.
+
+Diagnostics is still under work (and a lot of functions within it). It will not
+run diagntable or the diagnplots.
+
+Functions that aren't finished (there may be more that I overlooked):
+ut_finish
+ut_diagnfigs
+ut_diagnrcn
+ut_diagntable
+ut_cluster
+ut_nearposdef
+ut_lmbscgc (might can use scipy.signal.lombscargle)
+ut_lmbscga (might can use scipy.signal.lombscargle)
+ut_rundescr
+
 
 **Optinal Keywords**
 ----

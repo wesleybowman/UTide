@@ -5,6 +5,7 @@ from ut_E import ut_E
 from ut_cnstitsel import ut_cnstitsel
 from ut_cs2cep import ut_cs2cep
 from ut_confidence import ut_confidence
+from ut_diagn import ut_diagn
 
 def ut_solv1(tin, uin, vin, lat, **opts):
 
@@ -37,7 +38,7 @@ def ut_solv1(tin, uin, vin, lat, **opts):
         B = np.hstack((B, np.ones((nt, 1))))
         nm = 2 * (nNR + nR) + 1
     else:
-        B = np.hstack((B, np.ones((nt, 1)), (t-tref)/lor))
+        B = np.hstack((B, np.ones((nt, 1)), ((t-tref)/lor)[:, np.newaxis]))
         nm = 2*(nNR + nR) + 2
 
     print 'Solution ...'
@@ -65,7 +66,6 @@ def ut_solv1(tin, uin, vin, lat, **opts):
 #            return;
 #        W = sparse(1:nt,1:nt,solnstats.w);
 
-    #xmod = B*m
     xmod = np.dot(B, m)
 
     if not opt['twodim']:
@@ -110,6 +110,10 @@ def ut_solv1(tin, uin, vin, lat, **opts):
     if opt['conf_int'] is True:
         coef = ut_confidence(coef, opt, t, e, tin, tgd, uvgd, elor, xraw, xmod,
                              W, m, B, nm, nt, nc, Xu, Yu, Xv, Yv)
+
+    # diagnostics
+    if not opt['nodiagn']:
+        coef, indPE = ut_diagn(coef, opt)
 
     # re-order constituents
     if len(opt['ordercnstit']) != 0:
@@ -174,5 +178,7 @@ def ut_solv1(tin, uin, vin, lat, **opts):
 
     coef['aux']['frq'] = coef['aux']['frq'][ind]
     coef['aux']['lind'] = coef['aux']['lind'][ind]
+
+    print "Done.\n"
 
     return coef
