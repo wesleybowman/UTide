@@ -33,7 +33,7 @@ def ut_confidence(coef, opt, t, e, tin, tgd, uvgd, elor, xraw, xmod, W, m, B,
                 ba = ut_pdgm(tin[tgd], e, coef['aux']['frq'], 1, 0)
 
         else:
-            ba = ut_pdgm(t,e,coef.aux.frq,0,opt.lsfrqosmp);
+            ba = ut_pdgm(t,e,coef['aux']['frq'],0,opt['lsfrqosmp']);
 
         #import pdb; pdb.set_trace()
         # power [ (e units)^2 ] from spectral density [ (e units)^2 / cph ]
