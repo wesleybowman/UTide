@@ -147,10 +147,14 @@ def ut_slvinit(tin, uin, vin, **opts):
         elor = lor*len(tin)/(len(tin)-1)
         tref = 0.5*(tin[0]+tin[-1])
     else:
-        opt['equi'] = 0
-        lor = (np.max(t) - np.min(t))
-        elor = lor*nt/(nt-1)
-        tref = 0.5*(t[0]+t[-1])
+        opt['equi'] = 1  # based on times; u/v can still have nans ("gappy")
+        lor = (np.max(tin)-np.min(tin))
+        elor = lor*len(tin)/(len(tin)-1)
+        tref = 0.5*(tin[0]+tin[-1])
+#        opt['equi'] = 0
+#        lor = (np.max(t) - np.min(t))
+#        elor = lor*nt/(nt-1)
+#        tref = 0.5*(t[0]+t[-1])
 
     # options
     opt['conf_int'] = True
@@ -164,7 +168,8 @@ def ut_slvinit(tin, uin, vin, **opts):
     opt['infer'] = []
     opt['inferaprx'] = 0
     opt['rmin'] = 1
-    opt['method'] = 'cauchy'
+    #opt['method'] = 'cauchy'
+    opt['method'] = 'ols'
     opt['tunrdn'] = 1
     opt['linci'] = 0
     opt['white'] = 0

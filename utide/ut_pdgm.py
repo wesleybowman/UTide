@@ -30,9 +30,9 @@ def ut_pdgm(t,e,cfrq,equi,frqosmp):
         allfrq, Puu1s = scipy.signal.welch(np.real(e), window=hn, noverlap=0, nfft=nt, fs=2*np.pi)
         #hn = mlab.window_hanning(t)
         #Puu1s, allfrq = mlab.psd(np.real(e), window=hn, noverlap=0, NFFT=nt, Fs=2*np.pi)
+
     else:
-        # ut_lmbscga
-        pass
+        Puu1s, allfrq = ut_lmbscga(real(e), t, hn, frqosmp);
 
     #import pdb; pdb.set_trace()
 
@@ -58,8 +58,8 @@ def ut_pdgm(t,e,cfrq,equi,frqosmp):
             Puv1s, temp = mlab.csd(np.real(e),np.imag(e), noverlap=0, NFFT=nt, window=hn, Fs=2*np.pi)
 
         else:
-            #Pvv1s, _ = ut_lmbscga(imag(e),t,hn,frqosmp);
-            #Puv1s, _ = ut_lmbscgc(real(e),imag(e),t,hn,frqosmp);
+            Pvv1s, _ = ut_lmbscga(imag(e),t,hn,frqosmp);
+            Puv1s, _ = ut_lmbscgc(real(e),imag(e),t,hn,frqosmp);
             pass
 
         Pvv1s = Pvv1s / fac
