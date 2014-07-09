@@ -12,7 +12,8 @@ def ut_reconstr1(tin, coef, **opts):
 
     # determine constituents to include
     #if ~isempty(opt.cnstit)
-    if not np.empty(opt['cnstit']):
+    #if not np.empty(opt['cnstit']):
+    if opt['cnstit']:
 
         #[~,ind] = ismember(cellstr(opt.cnstit),coef.name);
         #opt['cnstit'] in coef['name']

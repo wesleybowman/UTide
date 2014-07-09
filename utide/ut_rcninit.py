@@ -9,7 +9,7 @@ def ut_rcninit(tin, **opts):
     #t(isnan(t)) = []
     opt = {}
 
-    opt['cnstit'] = []
+    opt['cnstit'] = False
     opt['minsnr'] = 2
     opt['minpe'] = 0
 
