@@ -60,6 +60,14 @@ ut_lmbscgc (might can use scipy.signal.lombscargle)
 ut_lmbscga (might can use scipy.signal.lombscargle)
 ut_rundescr
 
+A sample call would be
+```
+from utide import *
+coef = ut_solv(time, time_series_u, time_series_v, lat, cnstit='auto',
+               notrend=True, rmin=0.95, method='ols',
+               nodiagn=True, linci=True, conf_int=True)
+```
+
 
 **Optinal Keywords**
 ----
