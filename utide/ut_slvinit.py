@@ -125,7 +125,7 @@ def ut_slvinit(tin, uin, vin, **opts):
     else:
         if len(tin) != len(vin):
             raise('''ut_solv: vectors of input times and
-                input values must be same size.''')
+                  input values must be same size.''')
 
         opt['twodim'] = True
         vin = vin[tgd]
