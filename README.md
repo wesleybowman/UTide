@@ -31,6 +31,16 @@ python setup.py install --user
 ```
 if the user doesn't have access to all files.
 
+If you want to work on developing the package, then
+```
+python setup.py develop
+```
+is the way to go. The package can then be imported using
+```
+from utide import *
+```
+
+
 **Under Construction**
 ----
 The only method that is currently implemented is 'ols.' For the rest to work,
