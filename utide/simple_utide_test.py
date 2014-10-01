@@ -11,7 +11,7 @@ from ut_solv import ut_solv
 from ut_reconstr import ut_reconstr
 
 
-def simple_test(debug=True):
+def simple_utide_test(debug=True):
     ts = 735604
     duration = 35
 
