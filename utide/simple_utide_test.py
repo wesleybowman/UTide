@@ -2,10 +2,7 @@ from __future__ import division
 import numpy as np
 import scipy.io as sio
 import matplotlib.pyplot as plt
-import cPickle as pickle
-#import sys
-#sys.path.append('/home/wesley/github/UTide/')
-#from utide import ut_solv, ut_reconstr
+
 from utide import ut_constants
 from ut_solv import ut_solv
 from ut_reconstr import ut_reconstr
@@ -41,7 +38,6 @@ def simple_utide_test(debug=True):
                 nodsatnone=True, notrend=True, rmin=0.95, method='ols',
                 nodiagn=True, linci=True, conf_int=True)
 
-
     amp_err = amp - elev_coef['A'][0]
 
     phase_err = phase - elev_coef['g'][0]
@@ -55,6 +51,7 @@ def simple_utide_test(debug=True):
     ts_fvcom=elev_coef['A'][0]*np.cos(2*np.pi*((time-np.mean(time))/(period[jj]/(24*3600))-elev_coef['g'][0]/360))
 
     if debug:
-        plt.plot(time, ts_recon)
-        plt.plot(time, ts_fvcom)
+        plt.plot(time, ts_recon, label='Reconstruction')
+        plt.plot(time, ts_fvcom, label='Time Series')
+        plt.legend()
         plt.show()
