@@ -40,6 +40,12 @@ is the way to go. The package can then be imported using
 from utide import *
 ```
 
+To test and make sure that the package has been installed and imported correctly, run:
+```
+from utide import *
+simple_utide_test()
+```
+
 
 **Under Construction**
 ----
