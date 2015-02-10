@@ -8,4 +8,5 @@ from ut_solv import ut_solv
 from ut_reconstr import ut_reconstr
 from simple_utide_test import simple_utide_test
 
-__version__ = 'v1p0'
+
+__version__ = '0.1b0.dev0'
