@@ -1,6 +1,5 @@
 from setuptools import setup
 
-
 def readme():
     with open('README.md') as f:
         return f.read()
@@ -15,5 +14,5 @@ setup(name='UTide',
       maintainer='Wesley Bowman',
       license='MIT',
       packages=['utide'],
-      data_files=[('utide', ['utide/ut_constants.mat'])],
+      package_data={'utide': ['data/*.mat']},
       zip_safe=False)

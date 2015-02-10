@@ -1,6 +1,9 @@
+import os
 import numpy as np
 import scipy.io as sio
 import scipy.sparse
+
+from utide import ut_constants
 
 def ut_solv(tin, uin, vin, lat, cnstit, Rayleigh, *varargin):
 
@@ -201,7 +204,8 @@ def ut_FUV(t, tref, lind, lat, ngflgs):
 
         ntt = len(tt)
 
-        mat_contents = sio.loadmat('ut_constants.mat', struct_as_record=False, squeeze_me=True)
+        mat_contents = sio.loadmat(ut_constants, struct_as_record=False,
+                                   squeeze_me=True)
         sat = mat_contents['sat']
         const = mat_contents['const']
         shallow = mat_contents['shallow']
@@ -284,8 +288,8 @@ def ut_FUV(t, tref, lind, lat, ngflgs):
 #        if ~exist('const','var')
 #            load('ut_constants.mat')
 
-        mat_contents = sio.loadmat('ut_constants.mat',
-                                   struct_as_record=False, squeeze_me=True)
+        mat_contents = sio.loadmat(ut_constants, struct_as_record=False,
+                                   squeeze_me=True)
         sat = mat_contents['sat']
         const = mat_contents['const']
         shallow = mat_contents['shallow']
@@ -324,7 +328,8 @@ def ut_FUV(t, tref, lind, lat, ngflgs):
 
 def ut_cnstitsel(tref,minres,incnstit,infer):
 
-    mat_contents = sio.loadmat('ut_constants.mat', struct_as_record=False, squeeze_me=True)
+    mat_contents = sio.loadmat(ut_constants, struct_as_record=False,
+                               squeeze_me=True)
     shallow = mat_contents['shallow']
     const = mat_contents['const']
 
@@ -531,7 +536,8 @@ def ut_astron(jd):
 
 def loadMAT(filename):
 
-    mat_contents = sio.loadmat('ut_constants.mat', struct_as_record=False, squeeze_me=True)
+    mat_contents = sio.loadmat(ut_constants, struct_as_record=False,
+                               squeeze_me=True)
 
     items = []
     items = {}
