@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def ut_linci(X,Y,sigX,sigY):
+def ut_linci(X, Y, sigX, sigY):
     # UT_LINCI()
     # current ellipse parameter uncertainties from cosine/sine coefficient
     # uncertainties, by linearized relations w/ correlations presumed zero
@@ -38,52 +38,56 @@ def ut_linci(X,Y,sigX,sigY):
     Yv = np.imag(Y[:])
     sigYv = np.imag(sigY[:])
 
-    rp=.5*np.sqrt((Xu+Yv)**2+(Xv-Yu)**2)
-    rm=.5*np.sqrt((Xu-Yv)**2+(Xv+Yu)**2)
-    sigXu2=sigXu**2
-    sigYu2=sigYu**2
-    sigXv2=sigXv**2
-    sigYv2=sigYv**2
+    rp = 0.5 * np.sqrt((Xu+Yv)**2 + (Xv-Yu)**2)
+    rm = 0.5 * np.sqrt((Xu-Yv)**2 + (Xv+Yu)**2)
+    sigXu2 = sigXu**2
+    sigYu2 = sigYu**2
+    sigXv2 = sigXv**2
+    sigYv2 = sigYv**2
 
-    ex=(Xu+Yv)/rp
-    fx=(Xu-Yv)/rm
-    gx=(Yu-Xv)/rp
-    hx=(Yu+Xv)/rm
+    ex = (Xu+Yv) / rp
+    fx = (Xu-Yv) / rm
+    gx = (Yu-Xv) / rp
+    hx = (Yu+Xv) / rm
 
     # major axis
-    dXu2=(.25*(ex+fx))**2
-    dYu2=(.25*(gx+hx))**2
-    dXv2=(.25*(hx-gx))**2
-    dYv2=(.25*(ex-fx))**2
-    sig1 = np.sqrt(dXu2*sigXu2+dYu2*sigYu2+dXv2*sigXv2+dYv2*sigYv2)
+    dXu2 = (0.25*(ex+fx))**2
+    dYu2 = (0.25*(gx+hx))**2
+    dXv2 = (0.25*(hx-gx))**2
+    dYv2 = (0.25*(ex-fx))**2
+    sig1 = np.sqrt(dXu2 * sigXu2 + dYu2 * sigYu2 +
+                   dXv2 * sigXv2 + dYv2 * sigYv2)
 
     # phase
-    rn=2*(Xu*Yu+Xv*Yv)
-    rd=Xu**2-Yu**2+Xv**2-Yv**2
-    den=rn**2+rd**2
-    dXu2=((rd*Yu-rn*Xu)/den)**2
-    dYu2=((rd*Xu+rn*Yu)/den)**2
-    dXv2=((rd*Yv-rn*Xv)/den)**2
-    dYv2=((rd*Xv+rn*Yv)/den)**2
-    sig2 = (180/np.pi)*np.sqrt(dXu2*sigXu2+dYu2*sigYu2+dXv2*sigXv2+dYv2*sigYv2)
+    rn = 2 * (Xu * Yu + Xv * Yv)
+    rd = Xu**2 - Yu**2 + Xv**2 - Yv**2
+    den = rn**2 + rd**2
+    dXu2 = ((rd*Yu - rn*Xu) / den)**2
+    dYu2 = ((rd*Xu + rn*Yu) / den)**2
+    dXv2 = ((rd*Yv - rn*Xv) / den)**2
+    dYv2 = ((rd*Xv + rn*Yv) / den)**2
+    sig2 = (180/np.pi) * np.sqrt(dXu2 * sigXu2 + dYu2 * sigYu2 +
+                                 dXv2 * sigXv2 + dYv2 * sigYv2)
 
-    #if ~isreal(X)
+    # if ~isreal(X)
     if not np.isreal(X):
-        # minor axis
-        dXu2=(.25*(ex-fx))**2
-        dYu2=(.25*(gx-hx))**2
-        dXv2=(.25*(hx+gx))**2
-        dYv2=(.25*(ex+fx))**2
-        sig1 = sig1 + 1j*np.sqrt(dXu2*sigXu2+dYu2*sigYu2+dXv2*sigXv2+dYv2*sigYv2)
+        # Minor axis.
+        dXu2 = (0.25 * (ex-fx))**2
+        dYu2 = (0.25 * (gx-hx))**2
+        dXv2 = (0.25 * (hx+gx))**2
+        dYv2 = (0.25 * (ex+fx))**2
+        sig1 = sig1 + 1j*np.sqrt(dXu2 * sigXu2 + dYu2 * sigYu2 +
+                                 dXv2 * sigXv2 + dYv2 * sigYv2)
 
-        # orientation
-        rn=2.*(Xu*Xv+Yu*Yv)
-        rd=Xu**2+Yu**2-(Xv**2+Yv**2)
-        den=rn**2+rd**2
-        dXu2=((rd*Xv-rn*Xu)/den)**2
-        dYu2=((rd*Yv-rn*Yu)/den)**2
-        dXv2=((rd*Xu+rn*Xv)/den)**2
-        dYv2=((rd*Yu+rn*Yv)/den)**2
-        sig2 = sig2 + 1j*(180/np.pi)*np.sqrt(dXu2*sigXu2+dYu2*sigYu2 + dXv2*sigXv2+dYv2*sigYv2)
+        # Orientation.
+        rn = 2.0 * (Xu * Xv + Yu * Yv)
+        rd = Xu**2 + Yu**2 - (Xv**2 + Yv**2)
+        den = rn**2 + rd**2
+        dXu2 = ((rd*Xv - rn*Xu) / den)**2
+        dYu2 = ((rd*Yv - rn*Yu) / den)**2
+        dXv2 = ((rd*Xu + rn*Xv) / den)**2
+        dYv2 = ((rd*Yu + rn*Yv) / den)**2
+        sig2 = sig2 + 1j*(180/np.pi) * np.sqrt(dXu2 * sigXu2 + dYu2 * sigYu2 +
+                                               dXv2 * sigXv2 + dYv2 * sigYv2)
 
     return sig1, sig2

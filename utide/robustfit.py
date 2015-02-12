@@ -5,32 +5,32 @@ import numpy as np
 def robustfit(X, y, wfun='bisquare', tune=[], const=True,
               priorw=[], dowarn=True):
 
-    tuning = {'andrews':1.339,
-              'bisquare':4.685,
-              'cauchy':2.385,
-              'fair':1.400,
-              'huber':1.345,
-              'logistic':1.205,
-              'ols':1,
-              'talwar':2.795,
-              'welsch':2.985}
+    tuning = {'andrews': 1.339,
+              'bisquare': 4.685,
+              'cauchy': 2.385,
+              'fair': 1.400,
+              'huber': 1.345,
+              'logistic': 1.205,
+              'ols': 1,
+              'talwar': 2.795,
+              'welsch': 2.985}
 
     tune = tuning[wfun]
 
     if not priorw:
         priorw = np.ones(y.shape)
 
-    #statrobustfit(X, y, wfun, tune, wasnan, const, priorw, dowarn)
+    # statrobustfit(X, y, wfun, tune, wasnan, const, priorw, dowarn)
     b, stats = statrobustfit(X, y, wfun, tune, const, priorw, dowarn)
 
 
-#def statrobustfit(X, y, wfun, tune, wasnan, const, priorw, dowarn):
+# def statrobustfit(X, y, wfun, tune, wasnan, const, priorw, dowarn):
 def statrobustfit(X, y, wfun, tune, const, priorw, dowarn):
 
     n, p = X.shape
 
     if const:
-        X = np.hstack((np.ones((n,1)),X))
+        X = np.hstack((np.ones((n, 1)), X))
         p += 1
 
     if not np.all(priorw == 1):
@@ -41,21 +41,23 @@ def statrobustfit(X, y, wfun, tune, const, priorw, dowarn):
         sw = 1
 
     Q, R = np.linalg.qr(X)
-    tol = abs(R[0]) * max(n,p) * np.spacing(1)
+    tol = abs(R[0]) * max(n, p) * np.spacing(1)
     xrank = sum(abs(np.diag(R)) > tol)
 
     if xrank == p:
-        b, resid, rank, s = np.linalg.lstsq(R , np.dot(Q.T, y))
+        b, resid, rank, s = np.linalg.lstsq(R, np.dot(Q.T, y))
 
+    # FIXME: 'b0' is assigned to but never used.
     b0 = np.zeros(b.shape)
 
-    stats={}
+    stats = {}
 
     return b, stats
 
+
 def andrews(r):
     r = max(np.sqrt(np.spacing(1)), abs(r))
-    w = (abs(r)<np.pi) * np.sin(r) / r
+    w = (abs(r) < np.pi) * np.sin(r) / r
     return w
 
 
@@ -101,14 +103,14 @@ def welsch(r):
 
 
 def test(r):
-    print andrews(r)
-    print bisquare(r)
-    print cauchy(r)
-    print fair(r)
-    print huber(r)
-    print logistic(r)
-    print talwar(r)
-    print welsch(r)
+    print(andrews(r))
+    print(bisquare(r))
+    print(cauchy(r))
+    print(fair(r))
+    print(huber(r))
+    print(logistic(r))
+    print(talwar(r))
+    print(welsch(r))
 
 #        case 'andrews'
 #            wfun = @andrews;

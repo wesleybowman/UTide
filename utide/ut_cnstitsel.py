@@ -3,9 +3,11 @@ import scipy.io as sio
 from ut_astron import ut_astron
 from utide import ut_constants
 
-def ut_cnstitsel(tref,minres,incnstit,infer):
 
-    mat_contents = sio.loadmat(ut_constants, struct_as_record=False, squeeze_me=True)
+def ut_cnstitsel(tref, minres, incnstit, infer):
+
+    mat_contents = sio.loadmat(ut_constants, struct_as_record=False,
+                               squeeze_me=True)
     shallow = mat_contents['shallow']
     const = mat_contents['const']
 
@@ -26,28 +28,27 @@ def ut_cnstitsel(tref,minres,incnstit,infer):
     # cnstit.NR
     cnstit['NR'] = {}
 
-    #if incnstit.lower() == 'auto':
+    # if incnstit.lower() == 'auto':
     if incnstit == 'auto':
         cnstit['NR']['lind'] = np.where(const.df >= minres)[0]
     else:
-        cnstit['NR']['lind'] = np.nan * np.ones((len(incnstit),1))
+        cnstit['NR']['lind'] = np.nan * np.ones((len(incnstit), 1))
 
-        for j,v in enumerate(incnstit):
+        for j, v in enumerate(incnstit):
 
             temp = np.core.defchararray.replace(const.name, " ", "")
             v = np.core.defchararray.replace(v, " ", "")
             lind1 = np.where(temp == v)[0][0]
             cnstit['NR']['lind'][j] = lind1
 
-
         cnstit['NR']['lind'] = cnstit['NR']['lind'].astype(int).flatten()
 
 #        if ordercnstit == 'frq':
 #            seq = const.freq[cnstit['NR']['lind']].argsort()
-#            cnstit['NR']['lind'] = cnstit['NR']['lind'][seq].astype(int).flatten()
+#            tmp = cnstit['NR']['lind'][seq].astype(int).
+#            cnstit['NR']['lind'] = tmp.flatten()
 
-    # skipped some stuff here cause they involve infer
-
+    # Skipped some stuff here cause they involve infer.
 
     cnstit['NR']['frq'] = const.freq[cnstit['NR']['lind']]
     cnstit['NR']['name'] = const.name[cnstit['NR']['lind']]
@@ -57,7 +58,7 @@ def ut_cnstitsel(tref,minres,incnstit,infer):
     nR = 0
     nI = 0
     cnstit['R'] = []
-
+    # FIXME: 'nallc' is assigned to but never used!
     nallc = nNR + nR + nI
 
     coef['name'] = cnstit['NR']['name']

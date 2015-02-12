@@ -7,10 +7,12 @@ from ut_cs2cep import ut_cs2cep
 from ut_confidence import ut_confidence
 from ut_diagn import ut_diagn
 
+
 def ut_solv1(tin, uin, vin, lat, **opts):
 
-    print 'ut_solv: '
-    nt, t, u, v, tref, lor, elor, opt, tgd, uvgd = ut_slvinit(tin,uin,vin,**opts)
+    print('ut_solv: ')
+    packed = ut_slvinit(tin, uin, vin, **opts)
+    nt, t, u, v, tref, lor, elor, opt, tgd, uvgd = packed
 
     # opt['cnstit'] = cnstit
     [nNR, nR, nI, cnstit, coef] = ut_cnstitsel(tref, opt['rmin']/(24*lor),
@@ -22,7 +24,7 @@ def ut_solv1(tin, uin, vin, lat, **opts):
     coef['aux']['opt'] = opt
     coef['aux']['lat'] = lat
 
-    print 'matrix prep ... '
+    print('matrix prep ... ')
 
     ngflgs = [opt['nodsatlint'], opt['nodsatnone'],
               opt['gwchlint'], opt['gwchnone']]
@@ -41,7 +43,7 @@ def ut_solv1(tin, uin, vin, lat, **opts):
         B = np.hstack((B, np.ones((nt, 1)), ((t-tref)/lor)[:, np.newaxis]))
         nm = 2*(nNR + nR) + 2
 
-    print 'Solution ...'
+    print('Solution ...')
 
     xraw = u
 
@@ -88,7 +90,8 @@ def ut_solv1(tin, uin, vin, lat, **opts):
     else:
         Xv = np.imag(ap+am)
         Yv = np.real(ap-am)
-        coef['Lsmaj'], coef['Lsmin'], coef['theta'], coef['g'] = ut_cs2cep(Xu, Yu, Xv, Yv)
+        packed = ut_cs2cep(Xu, Yu, Xv, Yv)
+        coef['Lsmaj'], coef['Lsmin'], coef['theta'], coef['g'] = packed
 
     # mean and trend
     if opt['twodim']:
@@ -179,6 +182,6 @@ def ut_solv1(tin, uin, vin, lat, **opts):
     coef['aux']['frq'] = coef['aux']['frq'][ind]
     coef['aux']['lind'] = coef['aux']['lind'][ind]
 
-    print "Done.\n"
+    print("Done.\n")
 
     return coef
