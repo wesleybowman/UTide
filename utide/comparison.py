@@ -3,20 +3,22 @@ import scipy.io as sio
 import numpy as np
 
 
+# FIXME: coef.mat does not exist.
 matCoef = sio.loadmat('../coef.mat', struct_as_record=False, squeeze_me=True)
 mcoef = matCoef['coef']
 
 coef = pickle.load(open('coef.p', 'rb'))
 
 for k in coef.keys():
+    # FIXME: Avoid the use of eval.
     mat = eval('mcoef.' + k)
     pyth = coef[k]
     try:
         if not np.allclose(mat, pyth).all():
-            print '\n' + k
-            print mat
-            print pyth
-        #print np.allclose(mat, pyth)
+            print('\n'.format(k))
+            print(mat)
+            print(pyth)
+        # print(np.allclose(mat, pyth))
     except TypeError:
         if k == 'name':
             names = []
@@ -24,13 +26,13 @@ for k in coef.keys():
                 names.append(i.replace(' ', ''))
 
             mat = eval('mcoef.' + k)
-            ind = np.where( mat == names)[0].shape[0]
+            ind = np.where(mat == names)[0].shape[0]
             size = len(names)
-            #if not mat.all() == names:
+            # if not mat.all() == names:
             if not ind == size:
-                print mat
-                print pyth
-                print mat == pyth
+                print(mat)
+                print(pyth)
+                print(mat == pyth)
 
         else:
             for i in coef[k]:
@@ -39,26 +41,26 @@ for k in coef.keys():
                 pyth = coef[k][i]
                 try:
                     if not np.allclose(mat, pyth).all():
-                        print '\n' + k + ':' + i
-                        print mat
-                        print pyth
-                    #print np.allclose(mat, pyth)
+                        print('\n{}:{}'.format(k, i))
+                        print(mat)
+                        print(pyth)
+                    # print(np.allclose(mat, pyth))
                 except TypeError:
                     for j in coef[k][i]:
                         mat = eval('mcoef.' + k + '.' + i + '.' + j)
                         pyth = coef[k][i][j]
-                        #print '\n' + k + ':' + i + ':' + j
-                        #print mat
-                        #print pyth
+                        # print('\n{}:{}:{}'.format(k, i, j))
+                        # print(mat)
+                        # print(pyth)
                         if type(pyth) == str:
-                            #print mat == pyth
+                            # print(mat == pyth)
                             if not mat == pyth:
-                                print mat
-                                print pyth
+                                print(mat)
+                                print(pyth)
 
                         else:
                             if not np.allclose(mat, pyth).all():
-                                print '\n' + k + ':' + i + ':' + j
-                                print mat
-                                print pyth
-                            #print np.allclose(mat, pyth)
+                                print('\n{}:{}:{}'.format(k, i, j))
+                                print(mat)
+                                print(pyth)
+                            # print(np.allclose(mat, pyth))

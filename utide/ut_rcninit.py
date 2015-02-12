@@ -6,7 +6,7 @@ def ut_rcninit(tin, **opts):
     t = tin[:]
 
     t[np.isnan(t)] = []
-    #t(isnan(t)) = []
+    # t(isnan(t)) = []
     opt = {}
 
     opt['cnstit'] = False
@@ -17,10 +17,10 @@ def ut_rcninit(tin, **opts):
         try:
             opt[key] = item
         except KeyError:
-            print 'ut_reconstr: unrecognized input: {0}'.format(key)
+            print('ut_reconstr: unrecognized input: {0}'.format(key))
 
-    #args = list(args)
-    #args = [string.lower() for string in args]
+    # args = list(args)
+    # args = [string.lower() for string in args]
 
     # Need an example of the args
 

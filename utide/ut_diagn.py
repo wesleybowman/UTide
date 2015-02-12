@@ -4,7 +4,7 @@ import numpy as np
 
 def ut_diagn(coef, opt):
 
-    print 'diagnostics... '
+    print('diagnostics...')
     coef['diagn'] = {}
 
     if opt['twodim']:
@@ -26,7 +26,6 @@ def ut_diagn(coef, opt):
     coef['diagn']['SNR'] = SNR[indPE]
 
     return coef, indPE
-
 
 
 #    [~,indPE] = sort(PE,'descend');
@@ -56,4 +55,4 @@ def ut_diagn(coef, opt):
 #            ut_diagnfigs(coef,indPE,tin,uin,[],usnrc,[],e);
 #        end
 #    end
-#end
+# end

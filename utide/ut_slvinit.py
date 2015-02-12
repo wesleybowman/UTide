@@ -1,6 +1,7 @@
 import numpy as np
 
-#def ut_slvinit(tin,uin,vin,cnstit,Rayleigh,args):
+
+# def ut_slvinit(tin, uin, vin, cnstit, Rayleigh, args):
 #
 #    opt = {}
 #    args = list(args)
@@ -101,8 +102,8 @@ import numpy as np
 #
 #    opt['tunconst'] = opt['tunconst'] /opt['tunrdn']
 #
-## only needed if we sort the options
-##    nf = len(opt)
+# only needed if we sort the options
+#    nf = len(opt)
 #
 #    return nt, t, u, v, tref, lor, elor, opt, tgd, uvgd
 
@@ -156,7 +157,7 @@ def ut_slvinit(tin, uin, vin, **opts):
 #        elor = lor*nt/(nt-1)
 #        tref = 0.5*(t[0]+t[-1])
 
-    # options
+    # Options.
     opt['conf_int'] = True
     opt['cnstit'] = 'auto'
     opt['notrend'] = 0
@@ -168,7 +169,7 @@ def ut_slvinit(tin, uin, vin, **opts):
     opt['infer'] = []
     opt['inferaprx'] = 0
     opt['rmin'] = 1
-    #opt['method'] = 'cauchy'
+    # opt['method'] = 'cauchy'
     opt['method'] = 'ols'
     opt['tunrdn'] = 1
     opt['linci'] = 0
@@ -185,7 +186,7 @@ def ut_slvinit(tin, uin, vin, **opts):
         try:
             opt[key] = item
         except KeyError:
-            print 'ut_solv: unrecognized input: {0}'.format(key)
+            print('ut_solv: unrecognized input: {0}'.format(key))
 
     allmethods = ['ols', 'andrews', 'bisquare', 'fair', 'huber',
                   'logistic', 'talwar', 'welsch']
@@ -202,24 +203,24 @@ def ut_slvinit(tin, uin, vin, **opts):
     return nt, t, u, v, tref, lor, elor, opt, tgd, uvgd
 
 
-#cnstit='auto',
-#notrend=0,
-#prefilt=[],
-#nodsatlint=0,
-#nodsatnone=0,
-#gwchlint=0,
-#gwchnone=0,
-#infer=[],
-#inferaprx=0,
-#rmin=1,
-#method='cauchy',
-#tunrdn=1,
-#linci=0,
-#white=0,
-#nrlzn=200,
-#lsfrqosmp=1,
-#nodiagn=0,
-#diagnplots=0,
-#diagnminsnr=2,
-#ordercnstit=[],
-#runtimedisp='yyy'
+# cnstit='auto',
+# notrend=0,
+# prefilt=[],
+# nodsatlint=0,
+# nodsatnone=0,
+# gwchlint=0,
+# gwchnone=0,
+# infer=[],
+# inferaprx=0,
+# rmin=1,
+# method='cauchy',
+# tunrdn=1,
+# linci=0,
+# white=0,
+# nrlzn=200,
+# lsfrqosmp=1,
+# nodiagn=0,
+# diagnplots=0,
+# diagnminsnr=2,
+# ordercnstit=[],
+# runtimedisp='yyy'
