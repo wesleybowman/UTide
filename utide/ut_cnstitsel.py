@@ -1,7 +1,10 @@
+from __future__ import absolute_import, division
+
 import numpy as np
 import scipy.io as sio
-from ut_astron import ut_astron
-from utide import ut_constants
+
+from .ut_astron import ut_astron
+from . import ut_constants
 
 
 def ut_cnstitsel(tref, minres, incnstit, infer):

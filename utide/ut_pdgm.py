@@ -1,8 +1,11 @@
+from __future__ import absolute_import, division
+
 import numpy as np
 import scipy.signal
 import matplotlib.mlab as mlab
-from ut_fbndavg import ut_fbndavg
-from ut_lmbscga import ut_lmbscga
+
+from .ut_fbndavg import ut_fbndavg
+from .ut_lmbscga import ut_lmbscga
 
 
 def ut_pdgm(t, e, cfrq, equi, frqosmp):

@@ -1,8 +1,10 @@
-from __future__ import division
+from __future__ import absolute_import, division
+
 import numpy as np
 import scipy.interpolate as sip
-from ut_pdgm import ut_pdgm
-from ut_linci import ut_linci
+
+from .ut_pdgm import ut_pdgm
+from .ut_linci import ut_linci
 
 
 def ut_confidence(coef, opt, t, e, tin, tgd, uvgd, elor, xraw, xmod, W, m, B,
@@ -12,7 +14,7 @@ def ut_confidence(coef, opt, t, e, tin, tgd, uvgd, elor, xraw, xmod, W, m, B,
     print('conf. int vls... ')
 
     if not opt['white']:
-        # band-averaged (ba) spectral densities
+        # Band-averaged (ba) spectral densities.
         if opt['equi']:
             if np.sum(tgd) > np.sum(uvgd):
                 # efill = np.interp1(t, e, tin(tgd))

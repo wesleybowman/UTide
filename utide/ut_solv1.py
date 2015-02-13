@@ -1,11 +1,14 @@
-import numpy as np
+from __future__ import absolute_import, division
+
 import scipy
-from ut_slvinit import ut_slvinit
-from ut_E import ut_E
-from ut_cnstitsel import ut_cnstitsel
-from ut_cs2cep import ut_cs2cep
-from ut_confidence import ut_confidence
-from ut_diagn import ut_diagn
+import numpy as np
+
+from .ut_E import ut_E
+from .ut_diagn import ut_diagn
+from .ut_cs2cep import ut_cs2cep
+from .ut_slvinit import ut_slvinit
+from .ut_cnstitsel import ut_cnstitsel
+from .ut_confidence import ut_confidence
 
 
 def ut_solv1(tin, uin, vin, lat, **opts):

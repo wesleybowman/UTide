@@ -1,8 +1,10 @@
-import numpy as np
-import scipy.io as sio
-import scipy.sparse
+from __future__ import absolute_import, division
 
-from utide import ut_constants
+import numpy as np
+import scipy.sparse
+import scipy.io as sio
+
+from . import ut_constants
 
 
 def ut_solv(tin, uin, vin, lat, cnstit, Rayleigh, *varargin):

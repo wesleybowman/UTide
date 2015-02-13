@@ -1,5 +1,8 @@
-from ut_solv import ut_E
+from __future__ import absolute_import, division
+
 import numpy as np
+
+from .ut_solv import ut_E
 
 
 def ut_reconstr(tin, coef, varargin):

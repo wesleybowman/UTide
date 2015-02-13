@@ -1,11 +1,12 @@
-from __future__ import division
+from __future__ import absolute_import, division
+
 import numpy as np
 import scipy.io as sio
 import matplotlib.pyplot as plt
 
-from utide import ut_constants
-from ut_solv import ut_solv
-from ut_reconstr import ut_reconstr
+from . import ut_constants
+from .ut_solv import ut_solv
+from .ut_reconstr import ut_reconstr
 
 
 def simple_utide_test(debug=True):
