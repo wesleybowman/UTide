@@ -1,6 +1,9 @@
-import cPickle as pickle
-import scipy.io as sio
+from __future__ import absolute_import, division
+
+import pickle
+
 import numpy as np
+import scipy.io as sio
 
 
 # FIXME: coef.mat does not exist.

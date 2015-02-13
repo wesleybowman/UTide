@@ -1,5 +1,8 @@
+from __future__ import absolute_import, division
+
 import numpy as np
-from ut_FUV import ut_FUV
+
+from .ut_FUV import ut_FUV
 
 
 def ut_E(t, tref, frq, lind, lat, ngflgs, prefilt):
