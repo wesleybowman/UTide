@@ -210,11 +210,9 @@ def ut_FUV(t, tref, lind, lat, ngflgs):
 
         ntt = len(tt)
 
-        mat_contents = sio.loadmat(ut_constants, struct_as_record=False,
-                                   squeeze_me=True)
-        sat = mat_contents['sat']
-        const = mat_contents['const']
-        shallow = mat_contents['shallow']
+        sat = ut_constants.sat
+        const = ut_constants.const
+        shallow = ut_constants.shallow
 
         astro, ader = ut_astron(tt)
 
@@ -295,11 +293,9 @@ def ut_FUV(t, tref, lind, lat, ngflgs):
 #        if ~exist('const','var')
 #            load('ut_constants.mat')
 
-        mat_contents = sio.loadmat(ut_constants, struct_as_record=False,
-                                   squeeze_me=True)
-        sat = mat_contents['sat']
-        const = mat_contents['const']
-        shallow = mat_contents['shallow']
+        sat = ut_constants.sat
+        const = ut_constants.const
+        shallow = ut_constants.shallow
         astro, ader = ut_astron(tt)
 
         # V = np.dot(const.doodson, astro)
@@ -337,10 +333,8 @@ def ut_FUV(t, tref, lind, lat, ngflgs):
 
 def ut_cnstitsel(tref, minres, incnstit, infer):
 
-    mat_contents = sio.loadmat(ut_constants, struct_as_record=False,
-                               squeeze_me=True)
-    shallow = mat_contents['shallow']
-    const = mat_contents['const']
+    shallow = ut_constants.shallow
+    const = ut_constants.const
 
     cnstit = {}
     coef = {}
@@ -543,18 +537,3 @@ def ut_astron(jd):
     return astro, ader
 
 
-def loadMAT(filename):
-
-    mat_contents = sio.loadmat(ut_constants, struct_as_record=False,
-                               squeeze_me=True)
-
-    items = []
-    items = {}
-
-    for i in mat_contents:
-        name = '{0}'.format(i)
-        items[name] = mat_contents[name]
-        # i = mat_contents[name]
-        # items.append(i)
-
-    return items
