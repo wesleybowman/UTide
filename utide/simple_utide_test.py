@@ -16,11 +16,7 @@ def simple_utide_test(debug=True):
     time = np.linspace(ts, ts+duration, 841)
     time_origin = 6.939615e5
 
-    mat_contents = sio.loadmat(ut_constants, struct_as_record=False,
-                               squeeze_me=True)
-
-    # shallow = mat_contents['shallow']
-    const = mat_contents['const']
+    const = ut_constants.const
 
     amp = 1.0
     phase = 53

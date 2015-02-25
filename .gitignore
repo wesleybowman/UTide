@@ -53,7 +53,16 @@ coverage.xml
 docs/_build/
 
 *.zip
-*.mat
+# *.mat   # we might want other .mat files for tests
 *.m
 *.p
 
+# Editor temporary/working/backup files #
+.#*
+[#]*#
+*~
+*$
+*.bak
+*.kdev4
+.project
+.pydevproject
