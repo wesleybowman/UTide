@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 from . import ut_constants
 from .ut_solv import solve
-from .ut_reconstr import ut_reconstr
+from .ut_reconstr import reconstruct
 
 
 def simple_utide_test(debug=True):
@@ -39,9 +39,9 @@ def simple_utide_test(debug=True):
 
     amp_err = amp - elev_coef['A'][0]
     phase_err = phase - elev_coef['g'][0]
-    ts_recon, _ = ut_reconstr(time, elev_coef)
+    ts_recon, _ = reconstruct(time, elev_coef)
 
-    u, v = ut_reconstr(time, speed_coef)
+    u, v = reconstruct(time, speed_coef)
 
     err = np.sqrt(np.mean((time_series-ts_recon[0])**2))
 

@@ -10,7 +10,7 @@ _ut_constants_fname = os.path.join(_base_dir, 'ut_constants.mat')
 ut_constants = loadmatbunch(_ut_constants_fname, masked=False)
 
 from .ut_solv import solve
-from .ut_reconstr import ut_reconstr
+from .ut_reconstr import reconstruct
 
 
 __version__ = '0.1b0.dev0'
