@@ -4,9 +4,9 @@ import numpy as np
 import scipy.io as sio
 import matplotlib.pyplot as plt
 
-from . import ut_constants
-from .ut_solv import solve
-from .ut_reconstr import reconstruct
+from utide import ut_constants
+from utide import solve
+from utide import reconstruct
 
 
 def simple_utide_test(debug=True):
