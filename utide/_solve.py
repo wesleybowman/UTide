@@ -11,7 +11,7 @@ from .harmonics import ut_E
 from .ut_diagn import ut_diagn
 from .ut_cs2cep import ut_cs2cep
 from .constituent_selection import ut_cnstitsel
-from .ut_confidence import ut_confidence
+from .confidence import ut_confidence
 
 def solve(tin, uin, vin, lat, **opts):
     '''
