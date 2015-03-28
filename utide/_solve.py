@@ -9,7 +9,7 @@ import scipy       # This will go away; see FIXME below
 
 from .harmonics import ut_E
 from .diagnostics import ut_diagn
-from .ut_cs2cep import ut_cs2cep
+from .ellipse_params import ut_cs2cep
 from .constituent_selection import ut_cnstitsel
 from .confidence import _confidence
 
