@@ -3,7 +3,7 @@ from __future__ import absolute_import, division
 import numpy as np
 import scipy.io as sio
 
-from .ut_astron import ut_astron
+from .astronomy import ut_astron
 from . import ut_constants
 
 

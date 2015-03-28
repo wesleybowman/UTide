@@ -1,7 +1,7 @@
 from __future__ import absolute_import, division
 
 import numpy as np
-from .ut_E import ut_E
+from .harmonics import ut_E
 
 
 def reconstruct(tin, coef, **opts):
