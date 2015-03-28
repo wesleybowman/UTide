@@ -11,7 +11,7 @@ from .harmonics import ut_E
 from .diagnostics import ut_diagn
 from .ut_cs2cep import ut_cs2cep
 from .constituent_selection import ut_cnstitsel
-from .confidence import ut_confidence
+from .confidence import _confidence
 
 def solve(tin, uin, vin, lat, **opts):
     '''
@@ -151,8 +151,8 @@ def _solv1(tin, uin, vin, lat, **opts):
             coef['slope'] = np.real(m[-1])/lor
 
     if opt['conf_int'] is True:
-        coef = ut_confidence(coef, opt, t, e, tin, tgd, uvgd, elor, xraw, xmod,
-                             W, m, B, nm, nt, nc, Xu, Yu, Xv, Yv)
+        coef = _confidence(coef, opt, t, e, tin, tgd, uvgd, elor, xraw, xmod,
+                           W, m, B, nm, nt, nc, Xu, Yu, Xv, Yv)
 
     # diagnostics
     if not opt['nodiagn']:
