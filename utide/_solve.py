@@ -10,7 +10,7 @@ import scipy       # This will go away; see FIXME below
 from .harmonics import ut_E
 from .ut_diagn import ut_diagn
 from .ut_cs2cep import ut_cs2cep
-from .ut_cnstitsel import ut_cnstitsel
+from .constituent_selection import ut_cnstitsel
 from .ut_confidence import ut_confidence
 
 def solve(tin, uin, vin, lat, **opts):
