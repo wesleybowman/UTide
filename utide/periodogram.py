@@ -4,7 +4,7 @@ import numpy as np
 import scipy.signal
 import matplotlib.mlab as mlab
 
-from .ut_fbndavg import ut_fbndavg
+from .band_average import ut_fbndavg
 from .ut_lmbscga import ut_lmbscga
 
 

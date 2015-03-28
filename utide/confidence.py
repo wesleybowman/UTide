@@ -11,7 +11,7 @@ from __future__ import absolute_import, division
 import numpy as np
 import scipy.interpolate as sip
 
-from .ut_pdgm import ut_pdgm
+from .periodogram import ut_pdgm
 
 
 def _confidence(coef, opt, t, e, tin, tgd, uvgd, elor, xraw, xmod, W, m, B,
