@@ -1,20 +1,57 @@
+"""
+Central module for calculating the tidal amplitudes, phases, etc.
+"""
+
 from __future__ import absolute_import, division
 
-import scipy
 import numpy as np
+import scipy       # This will go away; see FIXME below
 
-from .ut_E import ut_E
-from .ut_diagn import ut_diagn
-from .ut_cs2cep import ut_cs2cep
-from .ut_slvinit import ut_slvinit
-from .ut_cnstitsel import ut_cnstitsel
-from .ut_confidence import ut_confidence
+from .harmonics import ut_E
+from .diagnostics import ut_diagn
+from .ellipse_params import ut_cs2cep
+from .constituent_selection import ut_cnstitsel
+from .confidence import _confidence
+
+def solve(tin, uin, vin, lat, **opts):
+    '''
+    Need to put in docstring and figure a good way to put in all the optional
+    parameters
+
+    Keyword Arguments:
+    conf_int=True
+    cnstit='auto'
+    notrend=0
+    prefilt=[]
+    nodsatlint=0
+    nodsatnone=0
+    gwchlint=0
+    gwchnone=0
+    infer=[]
+    inferaprx=0
+    rmin=1
+    method='cauchy'
+    tunrdn=1
+    linci=0
+    white=0
+    nrlzn=200
+    lsfrqosmp=1
+    nodiagn=0
+    diagnplots=0
+    diagnminsnr=2
+    ordercnstit=[]
+    runtimedisp='yyy'
+    '''
+
+    coef = _solv1(tin, uin, vin, lat, **opts)
+
+    return coef
 
 
-def ut_solv1(tin, uin, vin, lat, **opts):
+def _solv1(tin, uin, vin, lat, **opts):
 
-    print('ut_solv: ')
-    packed = ut_slvinit(tin, uin, vin, **opts)
+    print('solve: ')
+    packed = _slvinit(tin, uin, vin, **opts)
     nt, t, u, v, tref, lor, elor, opt, tgd, uvgd = packed
 
     # opt['cnstit'] = cnstit
@@ -58,7 +95,7 @@ def ut_solv1(tin, uin, vin, lat, **opts):
         # m = B\xraw;
         m = np.linalg.lstsq(B, xraw)[0]
         # W = sparse(1:nt,1:nt,1);
-        W = scipy.sparse.identity(nt)
+        W = scipy.sparse.identity(nt)    ## FIXME: we shouldn't need this
 #    else:
 #        lastwarn('');
 #        [m,solnstats] = robustfit(B,ctranspose(xraw),...
@@ -114,8 +151,8 @@ def ut_solv1(tin, uin, vin, lat, **opts):
             coef['slope'] = np.real(m[-1])/lor
 
     if opt['conf_int'] is True:
-        coef = ut_confidence(coef, opt, t, e, tin, tgd, uvgd, elor, xraw, xmod,
-                             W, m, B, nm, nt, nc, Xu, Yu, Xv, Yv)
+        coef = _confidence(coef, opt, t, e, tin, tgd, uvgd, elor, xraw, xmod,
+                           W, m, B, nm, nt, nc, Xu, Yu, Xv, Yv)
 
     # diagnostics
     if not opt['nodiagn']:
@@ -188,3 +225,96 @@ def ut_solv1(tin, uin, vin, lat, **opts):
     print("Done.\n")
 
     return coef
+
+
+def _slvinit(tin, uin, vin, **opts):
+
+    if len(tin) != len(uin):
+        raise ValueError('''solve: vectors of input times and
+               input values must be same size.''')
+
+    opt = {}
+
+    tgd = ~np.isnan(tin)
+    uin = uin[tgd]
+    tin = tin[tgd]
+
+    if len(vin) == 0:
+        opt['twodim'] = False
+        v = np.array([])
+    else:
+        if len(tin) != len(vin):
+            raise('''solve: vectors of input times and
+                  input values must be same size.''')
+
+        opt['twodim'] = True
+        vin = vin[tgd]
+
+    if opt['twodim']:
+        uvgd = ~np.isnan(uin) & ~np.isnan(vin)
+        v = vin[uvgd]
+    else:
+        uvgd = ~np.isnan(uin)
+
+    t = tin[uvgd]
+    nt = len(t)
+    u = uin[uvgd]
+    eps = np.finfo(np.float64).eps
+
+    if np.var(np.unique(np.diff(tin))) < eps:
+        opt['equi'] = 1  # based on times; u/v can still have nans ("gappy")
+        lor = (np.max(tin)-np.min(tin))
+        elor = lor*len(tin)/(len(tin)-1)
+        tref = 0.5*(tin[0]+tin[-1])
+    else:
+        opt['equi'] = 1  # based on times; u/v can still have nans ("gappy")
+        lor = (np.max(tin)-np.min(tin))
+        elor = lor*len(tin)/(len(tin)-1)
+        tref = 0.5*(tin[0]+tin[-1])
+
+    # Options.
+    opt['conf_int'] = True
+    opt['cnstit'] = 'auto'
+    opt['notrend'] = 0
+    opt['prefilt'] = []
+    opt['nodsatlint'] = 0
+    opt['nodsatnone'] = 0
+    opt['gwchlint'] = 0
+    opt['gwchnone'] = 0
+    opt['infer'] = []
+    opt['inferaprx'] = 0
+    opt['rmin'] = 1
+    # opt['method'] = 'cauchy'
+    opt['method'] = 'ols'
+    opt['tunrdn'] = 1
+    opt['linci'] = 0
+    opt['white'] = 0
+    opt['nrlzn'] = 200
+    opt['lsfrqosmp'] = 1
+    opt['nodiagn'] = 0
+    opt['diagnplots'] = 0
+    opt['diagnminsnr'] = 2
+    opt['ordercnstit'] = []
+    opt['runtimedisp'] = 'yyy'
+
+    for key, item in opts.items():
+        try:
+            opt[key] = item
+        except KeyError:
+            print('solve: unrecognized input: {0}'.format(key))
+
+    allmethods = ['ols', 'andrews', 'bisquare', 'fair', 'huber',
+                  'logistic', 'talwar', 'welsch']
+
+    if opt['method'] != 'cauchy':
+        ind = np.argwhere(opt['method'] in allmethods)[0][0]
+        allconst = [np.nan, 1.339, 4.685, 1.400, 1.345, 1.205, 2.795, 2.985]
+        opt['tunconst'] = allconst[ind]
+    else:
+        opt['tunconst'] = 2.385
+
+    opt['tunconst'] = opt['tunconst'] / opt['tunrdn']
+
+    return nt, t, u, v, tref, lor, elor, opt, tgd, uvgd
+
+

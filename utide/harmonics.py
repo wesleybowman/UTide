@@ -1,13 +1,75 @@
+"""
+Function ut_E() returns complex exponential basis functions
+for a given set of frequencies.
+"""
+
 from __future__ import absolute_import, division
 
-import scipy.io as sio
 import numpy as np
 
-from .ut_astron import ut_astron
+from .astronomy import ut_astron
 from . import ut_constants
 
 
-def ut_FUV(t, tref, lind, lat, ngflgs):
+def ut_E(t, tref, frq, lind, lat, ngflgs, prefilt):
+    """
+    % UT_E()
+    % compute complex exponential basis function
+    % inputs
+    %   t = times [datenum UTC] (nt x 1)
+    %   tref = reference time [datenum UTC] (1 x 1)
+    %   frq = frequencies [cph] (nc x 1)
+    %   lind = list indices of constituents in ut_constants.mat (nc x 1)
+    %   lat = latitude [deg N] (1 x 1)
+    %   ngflgs = [NodsatLint NodsatNone GwchLint GwchNone] each 0/1
+    %       ([0 1 0 1] case not allowed, and not needed, in ut_E)
+    %   prefilt = 'prefilt' input to ut_solv
+    % output
+    %   E = complex exponential basis function [unitless] (nt x nc)
+    % UTide v1p0 9/2011 d.codiga@gso.uri.edu
+    """
+
+    nt = len(t)
+    nc = len(lind)
+    if ngflgs[1] and ngflgs[3]:
+        F = np.ones((nt, nc))
+        U = np.zeros((nt, nc))
+        # import pdb; pdb.set_trace()
+        V = np.dot(24*(t-tref)[:, None], frq[:, None].T)
+        # V = 24*(t-tref)*frq
+        # V = 24*(t-tref)[:,None]*frq[:,None].T
+    else:
+        F, U, V = FUV(t, tref, lind, lat, ngflgs)
+
+    E = F * np.exp(1j*(U+V)*2*np.pi)
+
+    # if ~isempty(prefilt)
+    # if len(prefilt)!=0:
+    #     P=interp1(prefilt.frq,prefilt.P,frq).T
+    #     P( P>max(prefilt.rng) | P<min(prefilt.rng) | isnan(P) )=1;
+    #     E = E*P(ones(nt,1),:);
+
+    return E
+
+
+
+def FUV(t, tref, lind, lat, ngflgs):
+    """
+    % UT_FUV()
+    % compute nodal/satellite correction factors and astronomical argument
+    % inputs
+    %   t = times [datenum UTC] (nt x 1)
+    %   tref = reference time [datenum UTC] (1 x 1)
+    %   lind = list indices of constituents in ut_constants.mat (nc x 1)
+    %   lat = latitude [deg N] (1 x 1)
+    %   ngflgs = [NodsatLint NodsatNone GwchLint GwchNone] each 0/1
+    % output
+    %   F = real nodsat correction to amplitude [unitless] (nt x nc)
+    %   U = nodsat correction to phase [cycles] (nt x nc)
+    %   V = astronomical argument [cycles] (nt x nc)
+    % UTide v1p0 9/2011 d.codiga@gso.uri.edu
+    % (uses parts of t_vuf.m from t_tide, Pawlowicz et al 2002)
+    """
 
     nt = len(t)
     nc = len(lind)
@@ -134,3 +196,4 @@ def ut_FUV(t, tref, lind, lat, ngflgs):
 #        end
 
     return F, U, V
+

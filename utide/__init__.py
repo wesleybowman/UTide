@@ -9,8 +9,8 @@ _ut_constants_fname = os.path.join(_base_dir, 'ut_constants.mat')
 # At least for now, use NaNs rather than masked arrays.
 ut_constants = loadmatbunch(_ut_constants_fname, masked=False)
 
-from .ut_solv import ut_solv
-from .ut_reconstr import ut_reconstr
+from ._solve import solve
+from ._reconstruct import reconstruct
 
 
 __version__ = '0.1b0.dev0'

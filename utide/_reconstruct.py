@@ -1,16 +1,22 @@
 from __future__ import absolute_import, division
 
 import numpy as np
-from .ut_E import ut_E
-from .ut_rcninit import ut_rcninit
+from .harmonics import ut_E
 
 
-def ut_reconstr1(tin, coef, **opts):
+def reconstruct(tin, coef, **opts):
 
-    print('ut_reconstr:')
+    u, v = _reconstr1(tin, coef, **opts)
+
+    return u, v
+
+
+def _reconstr1(tin, coef, **opts):
+
+    print('reconstruct:')
 
     # parse inputs and options
-    t, opt = ut_rcninit(tin, **opts)
+    t, opt = _rcninit(tin, **opts)
 
     # determine constituents to include
     # if ~isempty(opt.cnstit)
@@ -22,7 +28,7 @@ def ut_reconstr1(tin, coef, **opts):
         ind = np.where(opt['cnstit'] == coef['name'])
 
 #        if ~isequal(length(ind),length(cellstr(opt.cnstit)))
-#            error(['ut_reconstr: one or more of input constituents Cnstit '...
+#            error(['reconstruct: one or more of input constituents Cnstit '...
 #                'not found in coef.name']);
     else:
 
@@ -96,3 +102,46 @@ def ut_reconstr1(tin, coef, **opts):
     print('Done.\n')
 
     return u, v
+
+def _rcninit(tin, **opts):
+
+    t = tin[:]
+
+    t[np.isnan(t)] = []
+    # t(isnan(t)) = []
+    opt = {}
+
+    opt['cnstit'] = False
+    opt['minsnr'] = 2
+    opt['minpe'] = 0
+
+    for key, item in opts.items():
+        try:
+            opt[key] = item
+        except KeyError:
+            print('reconstruct: unrecognized input: {0}'.format(key))
+
+    # args = list(args)
+    # args = [string.lower() for string in args]
+
+    # Need an example of the args
+
+#    while ~isempty(args)
+#        switch(lower(args{1}))
+#            case 'cnstit'
+#                opt.cnstit = args{2};
+#                args(1:2) = [];
+#            case 'minsnr'
+#                opt.minsnr = args{2};
+#                args(1:2) = [];
+#            case 'minpe'
+#                opt.minpe = args{2};
+#                args(1:2) = [];
+#            otherwise
+#                error(['reconstruct: unrecognized input: ' args{1}]);
+#        end
+#    end
+
+    return t, opt
+
+

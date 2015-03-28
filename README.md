@@ -1,24 +1,24 @@
 UTide
 =====
 
-Python distribution of the MatLab package UTide
+Python implementation of the MatLab package UTide
 
-Still in Development.
+Still in heavy development--everything is subject to change.
 
-% For more information see:  
-% Codiga, D.L., 2011. Unified Tidal Analysis and Prediction Using the  
-% UTide Matlab Functions. Technical Report 2011-01. Graduate School  
-% of Oceanography, University of Rhode Island, Narragansett, RI.  
-% 59pp. ftp://www.po.gso.uri.edu/pub/downloads/codiga/pubs/  
-% 2011Codiga-UTide-Report.pdf  
-%  
-% UTide v1p0 9/2011 d.codiga@gso.uri.edu  
-% http://www.po.gso.uri.edu/~codiga/utide/utide.htm  
+% For more information see:
+% Codiga, D.L., 2011. Unified Tidal Analysis and Prediction Using the
+% UTide Matlab Functions. Technical Report 2011-01. Graduate School
+% of Oceanography, University of Rhode Island, Narragansett, RI.
+% 59pp. ftp://www.po.gso.uri.edu/pub/downloads/codiga/pubs/
+% 2011Codiga-UTide-Report.pdf
+%
+% UTide v1p0 9/2011 d.codiga@gso.uri.edu
+% http://www.po.gso.uri.edu/~codiga/utide/utide.htm
 
 ***Added Experimental branch, where all code for a pull request should be submitted for testing.***
 
 Installation
-=====
+============
 
 Download the zip file and unzip it.
 
@@ -35,25 +35,25 @@ If you want to work on developing the package, then
 ```
 python setup.py develop
 ```
-is the way to go. The package can then be imported using
+is the way to go. The public functions can then be imported using
 ```
-from utide import *
+from utide import solve, reconstruct
 ```
 
 To test and make sure that the package has been installed and imported correctly, run:
 ```
-from utide import *
-simple_utide_test()
+from utide import simple_utide_test
+simple_utide_test.simple_utide_test()
 ```
 
 
 **Under Construction**
 ----
 The only method that is currently implemented is 'ols.' For the rest to work,
-MatLab's robustfit needs to be written in python.
+we need to supply a suitable robust fit routine.
 
-Diagnostics is still under work (and a lot of functions within it). It will not
-run diagntable or the diagnplots.
+Diagnostics is still under work (and a lot of functions within it).
+It will not run diagntable or the diagnplots.
 
 Functions that aren't finished (there may be more that I overlooked):
 ut_finish
@@ -62,22 +62,22 @@ ut_diagnrcn
 ut_diagntable
 ut_cluster
 ut_nearposdef
-ut_lmbscgc (might can use scipy.signal.lombscargle)
-ut_lmbscga (might can use scipy.signal.lombscargle)
+ut_lmbscgc (could use scipy.signal.lombscargle)
+ut_lmbscga
 ut_rundescr
 
 A sample call would be
 ```
-from utide import *
-coef = ut_solv(time, time_series_u, time_series_v, lat, cnstit='auto',
+from utide import solve
+coef = solve(time, time_series_u, time_series_v, lat, cnstit='auto',
                notrend=True, rmin=0.95, method='ols',
                nodiagn=True, linci=True, conf_int=True)
 ```
 
 
-**Optinal Keywords**
+**Optional Keywords**
 ----
-These can be inputted into **ut_solv**, to change the default values, which are
+These can be supplied to **solve**, to change the default values, which are
 indicated.
 
     conf_int=True
@@ -103,8 +103,8 @@ indicated.
     ordercnstit=[]
     runtimedisp='yyy'
 
-These can be inputted into **ut_reconstr**, to change the default values, which are
-indicated.
+These can be supplied to **reconstruct** to change the
+default values, which are indicated.
 
     cnstit = []
     minsnr = 2
@@ -113,17 +113,19 @@ indicated.
 
 **File Structure for locating functions**
 ----
-If changes are made to file structure, please update.
+When changes are made to file structure, please update.
 
-- ut_solv
-- ut_solv1
-- ut_slvinit
-- ut_reconstr
-- ut_reconstr1
-- ut_rcinit
-- ut_constants.mat
-- ut_cs2cep
-- ut_E
-- ut_FUV
-- ut_cnstitsel
-- ut_astron
+- _solve.py: solve, _solve1, _slvinit
+- _reconstruct.py: reconstruct, _reconstr1, _rcinit
+- astronomy.py: ut_astron
+- band_average.py: ut_fbndavg
+- confidence.py: _confidence, ut_linci
+- constituent_selection.py: ut_cnstitsel
+- diagnostics.py: ut_diagn
+- ellipse_params.py: ut_cs2cep
+- harmonics.py: ut_E, ut_FUV
+- periodogram.py: ut_pdgm
+- utilities.py: Bunch, showmatbunch, loadmatbunch
+- simple_utide_test.py: simple_utide_test
+- data/ut_constants.mat
+
