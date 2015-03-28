@@ -51,6 +51,7 @@ coverage.xml
 
 # Sphinx documentation
 docs/_build/
+doc/_build/
 
 *.zip
 # *.mat   # we might want other .mat files for tests
