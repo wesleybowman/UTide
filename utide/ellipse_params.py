@@ -10,37 +10,48 @@ from __future__ import absolute_import, division
 import numpy as np
 
 
-def ut_cs2cep(Xu, Yu, Xv=np.array([False]), Yv=np.array([False])):
-"""
-% UT_CS2CEP()
-% compute current ellipse parameters from cosine-sine coefficients
-% inputs
-%   two-dim case: XY = [Xu Yu Xv Yv] 4-column matrix
-%   one-dim case: XY = [Xu Yu] 2-column matrix
-%                      OR 4-column w/ Xv=Yv=zeros(size(Xu))
-%      where: Xu,Yu are cosine, sine coeffs of u, & same for v
-% outputs
-%   two-dim case:
-%     Lsmaj, Lsmin = column vectors [units of XY] (size of Xu)
-%     theta = column vector [deg. ccw rel. +x-axis, 0-180] (size of Xu)
-%     g = column vector [degrees, 0-360] (size of Xu)
-%   one-dim case: same, where Lsmaj = A, and Lsmin and theta are zeros
-% UTide v1p0 9/2011 d.codiga@gso.uri.edu
-"""
-    if not Xv.all():
-        Xv = np.zeros(Xu.shape)
-        Yv = np.zeros(Yu.shape)
+def ut_cs2cep(Xu, Yu, Xv=None, Yv=None):
+    """
+    Compute ellipse parameters from cosine and sine coefficients.
 
-    ap = ((Xu+Yv)+1j*(Xv-Yu))/2
-    am = ((Xu-Yv)+1j*(Xv+Yu))/2
+    For the 2-D case (currents), Xu, Yu are the cosine and sine
+    coefficients of the zonal component, and Xv and Yv of the
+    meridional component.
+
+    For the 1-D case (height), Xv and Yv are None (default).
+
+    Returns:
+        Lsmaj, Lsmin: semi-major and semi-minor axes
+        theta: major axis orientation, degrees ccw from x-axis, 0-180
+        g: phase, degrees, 0-360
+
+    1-D case: Lsmin and theta are zero
+
+    Note: Following the matlab, Lsmin can be negative.
+
+    % UTide v1p0 9/2011 d.codiga@gso.uri.edu
+    """
+
+    if Xv is None:
+        ap = (Xu - 1j*Yu)
+        Lsmaj = np.abs(ap)
+        Lsmin = np.zeros_like(Xu)
+        theta = np.zeros_like(Xu)
+        g = -np.angle(ap, deg=True) % 360
+        return Lsmaj, Lsmin, theta, g
+
+    # 2-D case
+    ap = ((Xu+Yv) + 1j*(Xv-Yu))/2
+    am = ((Xu-Yv) + 1j*(Xv+Yu))/2
     Ap = np.abs(ap)
     Am = np.abs(am)
     Lsmaj = Ap+Am
     Lsmin = Ap-Am
-    epsp = np.angle(ap)*180/np.pi
-    epsm = np.angle(am)*180/np.pi
+    epsp = np.angle(ap, deg=True)
+    epsm = np.angle(am, deg=True)
 
     theta = ((epsp+epsm)/2) % 180
     g = (-epsp+theta) % 360
 
     return Lsmaj, Lsmin, theta, g
+
