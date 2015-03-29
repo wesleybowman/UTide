@@ -181,7 +181,7 @@ def _solv1(tin, uin, vin, lat, **opts):
             ilist = [constit_index_dict[name] for name in opt['ordercnstit']]
             ind = np.array(ilist, dtype=int)
 
-    else:
+    else:    # any other string: order by decreasing energy
         if not opt['nodiagn']:
             ind = indPE
 
@@ -194,23 +194,18 @@ def _solv1(tin, uin, vin, lat, **opts):
 
             ind = PE.argsort()[::-1]
 
-    coef['g'] = coef['g'][ind]
-    coef['name'] = coef['name'][ind]
+    reorderlist = ['g', 'name']
     if opt['twodim']:
-        coef['Lsmaj'] = coef['Lsmaj'][ind]
-        coef['Lsmin'] = coef['Lsmin'][ind]
-        coef['theta'] = coef['theta'][ind]
-        if opt['conf_int'] is True:
-            coef['Lsmaj_ci'] = coef['Lsmaj_ci'][ind]
-            coef['Lsmin_ci'] = coef['Lsmin_ci'][ind]
-            coef['theta_ci'] = coef['theta_ci'][ind]
-            coef['g_ci'] = coef['g_ci'][ind]
-
+        reorderlist += ['Lsmaj', 'Lsmin', 'theta']
+        if opt['conf_int']:
+            reorderlist += ['Lsmaj_ci', 'Lsmin_ci', 'theta_ci', 'g_ci']
     else:
-        coef['A'] = coef['A'][ind]
-        if opt['conf_int'] is True:
-            coef['A_ci'] = coef['A_ci'][ind]
-            coef['g_ci'] = coef['g_ci'][ind]
+        reorderlist += ['A']
+        if opt['conf_int']:
+            reorderlist += ['A_ci']
+
+    for key in reorderlist:
+        coef[key] = coef[key][ind]
 
     coef['aux']['frq'] = coef['aux']['frq'][ind]
     coef['aux']['lind'] = coef['aux']['lind'][ind]
