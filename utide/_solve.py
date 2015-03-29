@@ -5,7 +5,6 @@ Central module for calculating the tidal amplitudes, phases, etc.
 from __future__ import absolute_import, division
 
 import numpy as np
-import scipy       # This will go away; see FIXME below
 
 from .harmonics import ut_E
 from .diagnostics import ut_diagn
@@ -95,7 +94,7 @@ def _solv1(tin, uin, vin, lat, **opts):
         # m = B\xraw;
         m = np.linalg.lstsq(B, xraw)[0]
         # W = sparse(1:nt,1:nt,1);
-        W = scipy.sparse.identity(nt)    ## FIXME: we shouldn't need this
+        W = np.ones(nt)  # Uniform weighting; we could use a scalar 1, or None
 #    else:
 #        lastwarn('');
 #        [m,solnstats] = robustfit(B,ctranspose(xraw),...
@@ -113,7 +112,7 @@ def _solv1(tin, uin, vin, lat, **opts):
     if not opt['twodim']:
         xmod = np.real(xmod)
 
-    e = W*(xraw-xmod)
+    e = W*(xraw-xmod)  # Weighted residuals
 
     nc = nNR+nR
     ap = m[np.hstack((np.arange(nNR), 2*nNR+np.arange(nR)))]
