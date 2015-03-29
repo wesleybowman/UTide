@@ -15,7 +15,7 @@ from .periodogram import ut_pdgm
 
 
 def _confidence(coef, opt, t, e, tin, tgd, uvgd, elor, xraw, xmod, W, m, B,
-                  nm, nt, nc, Xu, Yu, Xv, Yv):
+                nc, Xu, Yu, Xv, Yv):
     """
     This confidence interval calculation does not correspond
     to a single ut_ matlab function, but is based on code
@@ -96,7 +96,8 @@ def _confidence(coef, opt, t, e, tin, tgd, uvgd, elor, xraw, xmod, W, m, B,
     # In the 1-D case xmod is only the real part, but in that
     # case _Wx is real, and we are taking the real part in the
     # end, so the imaginary part would not contribute anything.
-
+    nt = len(xraw)
+    nm = B.shape[1]
     varMSM = np.real(np.dot(xraw.conj(), _Wx) -
              np.dot(xmod.conj(), _Wx)) / (nt-nm)
 

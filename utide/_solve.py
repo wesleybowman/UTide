@@ -13,7 +13,7 @@ from .constituent_selection import ut_cnstitsel
 from .confidence import _confidence
 from . import constit_index_dict
 
-def solve(tin, uin, vin, lat, **opts):
+def solve(tin, uin, vin=None, lat=None, **opts):
     '''
     Need to put in docstring and figure a good way to put in all the optional
     parameters
@@ -51,12 +51,13 @@ def solve(tin, uin, vin, lat, **opts):
 def _solv1(tin, uin, vin, lat, **opts):
 
     print('solve: ')
-    packed = _slvinit(tin, uin, vin, **opts)
-    nt, t, u, v, tref, lor, elor, opt, tgd, uvgd = packed
+    packed = _slvinit(tin, uin, vin, lat, **opts)
+    t, u, v, tref, lor, elor, opt, tgd, uvgd = packed
+    nt = len(t)
 
     # opt['cnstit'] = cnstit
-    [nNR, nR, nI, cnstit, coef] = ut_cnstitsel(tref, opt['rmin']/(24*lor),
-                                               opt['cnstit'], opt['infer'])
+    nNR, nR, nI, cnstit, coef = ut_cnstitsel(tref, opt['rmin']/(24*lor),
+                                             opt['cnstit'], opt['infer'])
 
     # a function we don't need
     # coef.aux.rundescr = ut_rundescr(opt,nNR,nR,nI,t,tgd,uvgd,lat)
@@ -112,7 +113,7 @@ def _solv1(tin, uin, vin, lat, **opts):
 
     e = W*(xraw-xmod)  # Weighted residuals
 
-    nc = nNR+nR
+    nc = nNR + nR
 
     ap = np.hstack((m[:nNR], m[2*nNR:2*nNR+nR]))
     i0 = 2*nNR + nR
@@ -151,7 +152,7 @@ def _solv1(tin, uin, vin, lat, **opts):
 
     if opt['conf_int'] is True:
         coef = _confidence(coef, opt, t, e, tin, tgd, uvgd, elor, xraw, xmod,
-                           W, m, B, nm, nt, nc, Xu, Yu, Xv, Yv)
+                           W, m, B, nc, Xu, Yu, Xv, Yv)
 
     # diagnostics
     if not opt['nodiagn']:
@@ -215,50 +216,51 @@ def _solv1(tin, uin, vin, lat, **opts):
     return coef
 
 
-def _slvinit(tin, uin, vin, **opts):
+def _slvinit(tin, uin, vin, lat, **opts):
 
-    if len(tin) != len(uin):
-        raise ValueError('''solve: vectors of input times and
-               input values must be same size.''')
+    if lat is None:
+        raise ValueError("Latitude must be supplied")
 
-    opt = {}
+    # Supporting only 1-D arrays for now; we can add "group"
+    # support later.
+    if tin.shape != uin.shape or tin.ndim != 1 or uin.ndim != 1:
+        raise ValueError("t and u must be 1-D arrays")
 
+    if vin is not None and vin.shape != uin.shape:
+        raise ValueError("v must have the same shape as u")
+
+    opt = dict(twodim=(vin is not None))
+
+    # Step 1: remove invalid times from tin, uin, vin
     tgd = ~np.isnan(tin)
     uin = uin[tgd]
     tin = tin[tgd]
-
-    if len(vin) == 0:
-        opt['twodim'] = False
-        v = np.array([])
-    else:
-        if len(tin) != len(vin):
-            raise('''solve: vectors of input times and
-                  input values must be same size.''')
-
-        opt['twodim'] = True
+    uvgd = ~np.isnan(uin)
+    if vin is not None:
         vin = vin[tgd]
+        uvgd &= ~np.isnan(vin)
 
-    if opt['twodim']:
-        uvgd = ~np.isnan(uin) & ~np.isnan(vin)
-        v = vin[uvgd]
-    else:
-        uvgd = ~np.isnan(uin)
-
+    # Step 2: generate t, u, v from edited tin, uin, vin
     t = tin[uvgd]
-    nt = len(t)
     u = uin[uvgd]
-    eps = np.finfo(np.float64).eps
+    v = None
+    if vin is not None:
+        v = vin[uvgd]
 
+
+    # Are the times equally spaced?
+    eps = np.finfo(np.float64).eps
     if np.var(np.unique(np.diff(tin))) < eps:
-        opt['equi'] = 1  # based on times; u/v can still have nans ("gappy")
-        lor = (np.max(tin)-np.min(tin))
-        elor = lor*len(tin)/(len(tin)-1)
-        tref = 0.5*(tin[0]+tin[-1])
+        opt['equi'] = True  # based on times; u/v can still have nans ("gappy")
+        lor = np.ptp(tin)
+        ntgood = len(tin)
+        elor = lor*ntgood / (ntgood-1)
+        tref = 0.5*(tin[0] + tin[-1])
     else:
-        opt['equi'] = 1  # based on times; u/v can still have nans ("gappy")
-        lor = (np.max(tin)-np.min(tin))
-        elor = lor*len(tin)/(len(tin)-1)
-        tref = 0.5*(tin[0]+tin[-1])
+        opt['equi'] = False
+        lor = np.ptp(t)
+        elor = lor*nt / (nt-1)
+        tref = 0.5*(t[0]+t[-1])
 
     # Options.
     opt['conf_int'] = True
@@ -285,6 +287,8 @@ def _slvinit(tin, uin, vin, **opts):
     opt['ordercnstit'] = None
     opt['runtimedisp'] = 'yyy'
 
+    # Update the default opt dictionary with the kwargs,
+    # ensuring that every kwarg key matches a key in opt.
     for key, item in opts.items():
         try:
             opt[key] = item
@@ -303,6 +307,6 @@ def _slvinit(tin, uin, vin, **opts):
 
     opt['tunconst'] = opt['tunconst'] / opt['tunrdn']
 
-    return nt, t, u, v, tref, lor, elor, opt, tgd, uvgd
+    return t, u, v, tref, lor, elor, opt, tgd, uvgd
 
 

@@ -28,11 +28,11 @@ def simple_utide_test(debug=True):
     time_series = amp * np.cos((((time-time_origin) * (2*np.pi/period[jj]) *
                                 (24*3600)) - 2 * np.pi * phase / 360))
 
-    speed_coef = solve(time, time_series, time_series, lat, cnstit='auto',
+    speed_coef = solve(time, time_series, time_series, lat=lat, cnstit='auto',
                          notrend=True, rmin=0.95, method='ols',
                          nodiagn=True, linci=True, conf_int=True)
 
-    elev_coef = solve(time, time_series, [], lat, cnstit='auto',
+    elev_coef = solve(time, time_series, lat=lat, cnstit='auto',
                         gwchnone=True, nodsatnone=True, notrend=True,
                         rmin=0.95, method='ols', nodiagn=True, linci=True,
                         conf_int=True)

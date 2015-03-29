@@ -72,9 +72,7 @@ def ut_cnstitsel(tref, minres, incnstit, infer):
     # cnstit.R
     nR = 0
     nI = 0
-    cnstit['R'] = []
-    # FIXME: 'nallc' is assigned to but never used!
-    nallc = nNR + nR + nI
+    cnstit['R'] = []  # Empty because inference is not supported yet.
 
     coef['name'] = cnstit['NR']['name']
     coef['aux'] = {}
