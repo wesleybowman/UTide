@@ -5,7 +5,7 @@ import scipy.io as sio
 
 from .astronomy import ut_astron
 from . import ut_constants
-
+from . import constit_index_dict
 
 def ut_cnstitsel(tref, minres, incnstit, infer):
     """
@@ -55,16 +55,8 @@ def ut_cnstitsel(tref, minres, incnstit, infer):
     if incnstit == 'auto':
         cnstit['NR']['lind'] = np.where(const.df >= minres)[0]
     else:
-        cnstit['NR']['lind'] = np.nan * np.ones((len(incnstit), 1))
-
-        for j, v in enumerate(incnstit):
-
-            temp = np.core.defchararray.replace(const.name, " ", "")
-            v = np.core.defchararray.replace(v, " ", "")
-            lind1 = np.where(temp == v)[0][0]
-            cnstit['NR']['lind'][j] = lind1
-
-        cnstit['NR']['lind'] = cnstit['NR']['lind'].astype(int).flatten()
+        ilist = [constit_index_dict[n] for n in incnstit]
+        cnstit['NR']['lind'] = np.array(ilist, dtype=int)
 
 #        if ordercnstit == 'frq':
 #            seq = const.freq[cnstit['NR']['lind']].argsort()

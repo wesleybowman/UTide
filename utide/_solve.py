@@ -11,6 +11,7 @@ from .diagnostics import ut_diagn
 from .ellipse_params import ut_cs2cep
 from .constituent_selection import ut_cnstitsel
 from .confidence import _confidence
+from . import constit_index_dict
 
 def solve(tin, uin, vin, lat, **opts):
     '''
@@ -38,7 +39,7 @@ def solve(tin, uin, vin, lat, **opts):
     nodiagn=0
     diagnplots=0
     diagnminsnr=2
-    ordercnstit=[]
+    ordercnstit=None
     runtimedisp='yyy'
     '''
 
@@ -68,35 +69,32 @@ def _solv1(tin, uin, vin, lat, **opts):
     ngflgs = [opt['nodsatlint'], opt['nodsatnone'],
               opt['gwchlint'], opt['gwchnone']]
 
+    # Make the model array, starting with the harmonics.
     E = ut_E(t, tref, cnstit['NR']['frq'], cnstit['NR']['lind'],
              lat, ngflgs, opt['prefilt'])
 
-    B = np.hstack((E, E.conj()))
+    # Positive and negative frequencies, and the mean.
+    B = np.hstack((E, E.conj(), np.ones((nt, 1))))
 
-    # more infer stuff
+    if not opt['notrend']:
+        B = np.hstack((B, ((t-tref)/lor)[:, np.newaxis]))
 
-    if opt['notrend']:
-        B = np.hstack((B, np.ones((nt, 1))))
-        nm = 2 * (nNR + nR) + 1
-    else:
-        B = np.hstack((B, np.ones((nt, 1)), ((t-tref)/lor)[:, np.newaxis]))
-        nm = 2*(nNR + nR) + 2
+    nm = B.shape[1]  #  2*(nNR + nR) + 1, plus 1 if trend is included
 
     print('Solution ...')
 
-    xraw = u
-
     if opt['twodim']:
-        # xraw = complex(u,v);
-        xraw = u+v*1j
+        xraw = u + 1j*v
+    else:
+        xraw = u
 
     if opt['method'] == 'ols':
         # m = B\xraw;
-        m = np.linalg.lstsq(B, xraw)[0]
+        m = np.linalg.lstsq(B, xraw)[0]   # model coefficients
         # W = sparse(1:nt,1:nt,1);
         W = np.ones(nt)  # Uniform weighting; we could use a scalar 1, or None
-#    else:
-#        lastwarn('');
+    else:
+        raise NotImplementedError("Only method 'ols' has been implemented")
 #        [m,solnstats] = robustfit(B,ctranspose(xraw),...
 #            opt.method,opt.tunconst,'off');
 #        if isequal(lastwarn,'Iteration limit reached.')
@@ -107,7 +105,7 @@ def _solv1(tin, uin, vin, lat, **opts):
 #            return;
 #        W = sparse(1:nt,1:nt,solnstats.w);
 
-    xmod = np.dot(B, m)
+    xmod = np.dot(B, m)   # model fit
 
     if not opt['twodim']:
         xmod = np.real(xmod)
@@ -115,8 +113,10 @@ def _solv1(tin, uin, vin, lat, **opts):
     e = W*(xraw-xmod)  # Weighted residuals
 
     nc = nNR+nR
-    ap = m[np.hstack((np.arange(nNR), 2*nNR+np.arange(nR)))]
-    am = m[np.hstack((nNR+np.arange(nNR), 2*nNR+nR+np.arange(nR)))]
+
+    ap = np.hstack((m[:nNR], m[2*nNR:2*nNR+nR]))
+    i0 = 2*nNR + nR
+    am = np.hstack((m[nNR:2*nNR], m[i0:i0+nR]))
 
     Xu = np.real(ap + am)
     Yu = -np.imag(ap - am)
@@ -138,15 +138,15 @@ def _solv1(tin, uin, vin, lat, **opts):
             coef['umean'] = np.real(m[-1])
             coef['vmean'] = np.imag(m[-1])
         else:
-            coef['umean'] = np.real(m[-1-1])
-            coef['vmean'] = np.imag(m[-1-1])
+            coef['umean'] = np.real(m[-2])
+            coef['vmean'] = np.imag(m[-2])
             coef['uslope'] = np.real(m[-1])/lor
             coef['vslope'] = np.imag(m[-1])/lor
     else:
         if opt['notrend']:
             coef['mean'] = np.real(m[-1])
         else:
-            coef['mean'] = np.real(m[-1-1])
+            coef['mean'] = np.real(m[-2])
             coef['slope'] = np.real(m[-1])/lor
 
     if opt['conf_int'] is True:
@@ -158,7 +158,7 @@ def _solv1(tin, uin, vin, lat, **opts):
         coef, indPE = ut_diagn(coef, opt)
 
     # re-order constituents
-    if len(opt['ordercnstit']) != 0:
+    if opt['ordercnstit'] is not None:
 
         if opt['ordercnstit'] == 'frq':
             ind = coef['aux']['frq'].argsort()
@@ -178,14 +178,8 @@ def _solv1(tin, uin, vin, lat, **opts):
                 ind = SNR.argsort()[::-1]
 
         else:
-            '''There has to be a better way to do this.'''
-            ind = np.zeros((len(opt['ordercnstit'])))
-            for j, v in enumerate(opt['ordercnstit']):
-                temp = np.core.defchararray.replace(coef['name'], " ", "")
-                v = np.core.defchararray.replace(v, " ", "")
-                lind1 = np.where(temp == v)[0][0]
-                ind[j] = lind1
-            ind = ind.astype(int)
+            ilist = [constit_index_dict[name] for name in opt['ordercnstit']]
+            ind = np.array(ilist, dtype=int)
 
     else:
         if not opt['nodiagn']:
@@ -293,7 +287,7 @@ def _slvinit(tin, uin, vin, **opts):
     opt['nodiagn'] = 0
     opt['diagnplots'] = 0
     opt['diagnminsnr'] = 2
-    opt['ordercnstit'] = []
+    opt['ordercnstit'] = None
     opt['runtimedisp'] = 'yyy'
 
     for key, item in opts.items():
