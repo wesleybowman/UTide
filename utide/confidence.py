@@ -15,7 +15,7 @@ from .periodogram import ut_pdgm
 
 
 def _confidence(coef, opt, t, e, tin, tgd, uvgd, elor, xraw, xmod, W, m, B,
-                  nm, nt, nc, Xu, Yu, Xv, Yv):
+                nc, Xu, Yu, Xv, Yv):
     """
     This confidence interval calculation does not correspond
     to a single ut_ matlab function, but is based on code
@@ -88,24 +88,30 @@ def _confidence(coef, opt, t, e, tin, tgd, uvgd, elor, xraw, xmod, W, m, B,
         # import pdb; pdb.set_trace()
     # varMSM = real((ctranspose(xraw)*W*xraw -
     #                ctranspose(m)*ctranspose(B)*W*xraw)/(nt-nm))
-    # varMSM = np.real((np.conj(xraw).T * W * xraw -
-    #                  np.conj(m).T[:,None] * np.conj(B).T * W * xraw)/(nt-nm))
 
-    varMSM = np.real((np.dot(np.conj(xraw[:, None]).T * W, xraw[:, None]) -
-                      np.dot(np.dot(np.conj(m[:, None]).T, np.conj(B).T) * W,
-                             xraw[:, None]))/(nt-nm))
+    # Make temporaries for quantities needed more than once.
+    _Wx = W * xraw
+    _WB = W[:, np.newaxis] * B
+    # Matlab is recalculating xmod here; but we already have it.
+    # In the 1-D case xmod is only the real part, but in that
+    # case _Wx is real, and we are taking the real part in the
+    # end, so the imaginary part would not contribute anything.
+    nt = len(xraw)
+    nm = B.shape[1]
+    varMSM = np.real(np.dot(xraw.conj(), _Wx) -
+             np.dot(xmod.conj(), _Wx)) / (nt-nm)
 
     # gamC = inv(ctranspose(B)*W*B)*varMSM
-    gamC = np.linalg.inv(np.dot(np.conj(B).T * W, B)) * varMSM
+
+    gamC = np.linalg.inv(np.dot(B.conj().T, _WB)) * varMSM
+
     # gamP = inv(transpose(B)*W*B)*((transpose(xraw)*W*xraw -
     #            transpose(m)*transpose(B)*W*xraw)/(nt-nm))
-    # gamP = np.dot(np.linalg.inv(np.dot(B.T * W, B)),
-    #               ((xraw.T * W * xraw - m.T[:,None] * B.T * W *
-    #                xraw) / (nt-nm)))
 
-    gamP = (np.linalg.inv(np.dot(B.T * W, B)) *
-            (np.dot(xraw[:, None].T * W, xraw[:, None]) -
-             np.dot(np.dot(m[:, None].T, B.T) * W, xraw[:, None])) / (nt-nm))
+    gamP = np.linalg.inv(np.dot(B.T, _WB))
+    gamP *= (np.dot(xraw, _Wx) - np.dot(xmod, _Wx)) / (nt - nm)
+
+    del _Wx, _WB
 
     Gall = gamC + gamP
     Hall = gamC - gamP

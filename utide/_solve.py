@@ -5,15 +5,15 @@ Central module for calculating the tidal amplitudes, phases, etc.
 from __future__ import absolute_import, division
 
 import numpy as np
-import scipy       # This will go away; see FIXME below
 
 from .harmonics import ut_E
 from .diagnostics import ut_diagn
 from .ellipse_params import ut_cs2cep
 from .constituent_selection import ut_cnstitsel
 from .confidence import _confidence
+from . import constit_index_dict
 
-def solve(tin, uin, vin, lat, **opts):
+def solve(tin, uin, vin=None, lat=None, **opts):
     '''
     Need to put in docstring and figure a good way to put in all the optional
     parameters
@@ -39,7 +39,7 @@ def solve(tin, uin, vin, lat, **opts):
     nodiagn=0
     diagnplots=0
     diagnminsnr=2
-    ordercnstit=[]
+    ordercnstit=None
     runtimedisp='yyy'
     '''
 
@@ -51,12 +51,13 @@ def solve(tin, uin, vin, lat, **opts):
 def _solv1(tin, uin, vin, lat, **opts):
 
     print('solve: ')
-    packed = _slvinit(tin, uin, vin, **opts)
-    nt, t, u, v, tref, lor, elor, opt, tgd, uvgd = packed
+    packed = _slvinit(tin, uin, vin, lat, **opts)
+    t, u, v, tref, lor, elor, opt, tgd, uvgd = packed
+    nt = len(t)
 
     # opt['cnstit'] = cnstit
-    [nNR, nR, nI, cnstit, coef] = ut_cnstitsel(tref, opt['rmin']/(24*lor),
-                                               opt['cnstit'], opt['infer'])
+    nNR, nR, nI, cnstit, coef = ut_cnstitsel(tref, opt['rmin']/(24*lor),
+                                             opt['cnstit'], opt['infer'])
 
     # a function we don't need
     # coef.aux.rundescr = ut_rundescr(opt,nNR,nR,nI,t,tgd,uvgd,lat)
@@ -69,35 +70,32 @@ def _solv1(tin, uin, vin, lat, **opts):
     ngflgs = [opt['nodsatlint'], opt['nodsatnone'],
               opt['gwchlint'], opt['gwchnone']]
 
+    # Make the model array, starting with the harmonics.
     E = ut_E(t, tref, cnstit['NR']['frq'], cnstit['NR']['lind'],
              lat, ngflgs, opt['prefilt'])
 
-    B = np.hstack((E, E.conj()))
+    # Positive and negative frequencies, and the mean.
+    B = np.hstack((E, E.conj(), np.ones((nt, 1))))
 
-    # more infer stuff
+    if not opt['notrend']:
+        B = np.hstack((B, ((t-tref)/lor)[:, np.newaxis]))
 
-    if opt['notrend']:
-        B = np.hstack((B, np.ones((nt, 1))))
-        nm = 2 * (nNR + nR) + 1
-    else:
-        B = np.hstack((B, np.ones((nt, 1)), ((t-tref)/lor)[:, np.newaxis]))
-        nm = 2*(nNR + nR) + 2
+    nm = B.shape[1]  #  2*(nNR + nR) + 1, plus 1 if trend is included
 
     print('Solution ...')
 
-    xraw = u
-
     if opt['twodim']:
-        # xraw = complex(u,v);
-        xraw = u+v*1j
+        xraw = u + 1j*v
+    else:
+        xraw = u
 
     if opt['method'] == 'ols':
         # m = B\xraw;
-        m = np.linalg.lstsq(B, xraw)[0]
+        m = np.linalg.lstsq(B, xraw)[0]   # model coefficients
         # W = sparse(1:nt,1:nt,1);
-        W = scipy.sparse.identity(nt)    ## FIXME: we shouldn't need this
-#    else:
-#        lastwarn('');
+        W = np.ones(nt)  # Uniform weighting; we could use a scalar 1, or None
+    else:
+        raise NotImplementedError("Only method 'ols' has been implemented")
 #        [m,solnstats] = robustfit(B,ctranspose(xraw),...
 #            opt.method,opt.tunconst,'off');
 #        if isequal(lastwarn,'Iteration limit reached.')
@@ -108,16 +106,18 @@ def _solv1(tin, uin, vin, lat, **opts):
 #            return;
 #        W = sparse(1:nt,1:nt,solnstats.w);
 
-    xmod = np.dot(B, m)
+    xmod = np.dot(B, m)   # model fit
 
     if not opt['twodim']:
         xmod = np.real(xmod)
 
-    e = W*(xraw-xmod)
+    e = W*(xraw-xmod)  # Weighted residuals
 
-    nc = nNR+nR
-    ap = m[np.hstack((np.arange(nNR), 2*nNR+np.arange(nR)))]
-    am = m[np.hstack((nNR+np.arange(nNR), 2*nNR+nR+np.arange(nR)))]
+    nc = nNR + nR
+
+    ap = np.hstack((m[:nNR], m[2*nNR:2*nNR+nR]))
+    i0 = 2*nNR + nR
+    am = np.hstack((m[nNR:2*nNR], m[i0:i0+nR]))
 
     Xu = np.real(ap + am)
     Yu = -np.imag(ap - am)
@@ -139,27 +139,27 @@ def _solv1(tin, uin, vin, lat, **opts):
             coef['umean'] = np.real(m[-1])
             coef['vmean'] = np.imag(m[-1])
         else:
-            coef['umean'] = np.real(m[-1-1])
-            coef['vmean'] = np.imag(m[-1-1])
+            coef['umean'] = np.real(m[-2])
+            coef['vmean'] = np.imag(m[-2])
             coef['uslope'] = np.real(m[-1])/lor
             coef['vslope'] = np.imag(m[-1])/lor
     else:
         if opt['notrend']:
             coef['mean'] = np.real(m[-1])
         else:
-            coef['mean'] = np.real(m[-1-1])
+            coef['mean'] = np.real(m[-2])
             coef['slope'] = np.real(m[-1])/lor
 
     if opt['conf_int'] is True:
         coef = _confidence(coef, opt, t, e, tin, tgd, uvgd, elor, xraw, xmod,
-                           W, m, B, nm, nt, nc, Xu, Yu, Xv, Yv)
+                           W, m, B, nc, Xu, Yu, Xv, Yv)
 
     # diagnostics
     if not opt['nodiagn']:
         coef, indPE = ut_diagn(coef, opt)
 
     # re-order constituents
-    if len(opt['ordercnstit']) != 0:
+    if opt['ordercnstit'] is not None:
 
         if opt['ordercnstit'] == 'frq':
             ind = coef['aux']['frq'].argsort()
@@ -179,16 +179,10 @@ def _solv1(tin, uin, vin, lat, **opts):
                 ind = SNR.argsort()[::-1]
 
         else:
-            '''There has to be a better way to do this.'''
-            ind = np.zeros((len(opt['ordercnstit'])))
-            for j, v in enumerate(opt['ordercnstit']):
-                temp = np.core.defchararray.replace(coef['name'], " ", "")
-                v = np.core.defchararray.replace(v, " ", "")
-                lind1 = np.where(temp == v)[0][0]
-                ind[j] = lind1
-            ind = ind.astype(int)
+            ilist = [constit_index_dict[name] for name in opt['ordercnstit']]
+            ind = np.array(ilist, dtype=int)
 
-    else:
+    else:    # any other string: order by decreasing energy
         if not opt['nodiagn']:
             ind = indPE
 
@@ -201,23 +195,18 @@ def _solv1(tin, uin, vin, lat, **opts):
 
             ind = PE.argsort()[::-1]
 
-    coef['g'] = coef['g'][ind]
-    coef['name'] = coef['name'][ind]
+    reorderlist = ['g', 'name']
     if opt['twodim']:
-        coef['Lsmaj'] = coef['Lsmaj'][ind]
-        coef['Lsmin'] = coef['Lsmin'][ind]
-        coef['theta'] = coef['theta'][ind]
-        if opt['conf_int'] is True:
-            coef['Lsmaj_ci'] = coef['Lsmaj_ci'][ind]
-            coef['Lsmin_ci'] = coef['Lsmin_ci'][ind]
-            coef['theta_ci'] = coef['theta_ci'][ind]
-            coef['g_ci'] = coef['g_ci'][ind]
-
+        reorderlist += ['Lsmaj', 'Lsmin', 'theta']
+        if opt['conf_int']:
+            reorderlist += ['Lsmaj_ci', 'Lsmin_ci', 'theta_ci', 'g_ci']
     else:
-        coef['A'] = coef['A'][ind]
-        if opt['conf_int'] is True:
-            coef['A_ci'] = coef['A_ci'][ind]
-            coef['g_ci'] = coef['g_ci'][ind]
+        reorderlist += ['A']
+        if opt['conf_int']:
+            reorderlist += ['A_ci']
+
+    for key in reorderlist:
+        coef[key] = coef[key][ind]
 
     coef['aux']['frq'] = coef['aux']['frq'][ind]
     coef['aux']['lind'] = coef['aux']['lind'][ind]
@@ -227,50 +216,51 @@ def _solv1(tin, uin, vin, lat, **opts):
     return coef
 
 
-def _slvinit(tin, uin, vin, **opts):
+def _slvinit(tin, uin, vin, lat, **opts):
 
-    if len(tin) != len(uin):
-        raise ValueError('''solve: vectors of input times and
-               input values must be same size.''')
+    if lat is None:
+        raise ValueError("Latitude must be supplied")
 
-    opt = {}
+    # Supporting only 1-D arrays for now; we can add "group"
+    # support later.
+    if tin.shape != uin.shape or tin.ndim != 1 or uin.ndim != 1:
+        raise ValueError("t and u must be 1-D arrays")
 
+    if vin is not None and vin.shape != uin.shape:
+        raise ValueError("v must have the same shape as u")
+
+    opt = dict(twodim=(vin is not None))
+
+    # Step 1: remove invalid times from tin, uin, vin
     tgd = ~np.isnan(tin)
     uin = uin[tgd]
     tin = tin[tgd]
-
-    if len(vin) == 0:
-        opt['twodim'] = False
-        v = np.array([])
-    else:
-        if len(tin) != len(vin):
-            raise('''solve: vectors of input times and
-                  input values must be same size.''')
-
-        opt['twodim'] = True
+    uvgd = ~np.isnan(uin)
+    if vin is not None:
         vin = vin[tgd]
+        uvgd &= ~np.isnan(vin)
 
-    if opt['twodim']:
-        uvgd = ~np.isnan(uin) & ~np.isnan(vin)
-        v = vin[uvgd]
-    else:
-        uvgd = ~np.isnan(uin)
-
+    # Step 2: generate t, u, v from edited tin, uin, vin
     t = tin[uvgd]
-    nt = len(t)
     u = uin[uvgd]
-    eps = np.finfo(np.float64).eps
+    v = None
+    if vin is not None:
+        v = vin[uvgd]
 
+
+    # Are the times equally spaced?
+    eps = np.finfo(np.float64).eps
     if np.var(np.unique(np.diff(tin))) < eps:
-        opt['equi'] = 1  # based on times; u/v can still have nans ("gappy")
-        lor = (np.max(tin)-np.min(tin))
-        elor = lor*len(tin)/(len(tin)-1)
-        tref = 0.5*(tin[0]+tin[-1])
+        opt['equi'] = True  # based on times; u/v can still have nans ("gappy")
+        lor = np.ptp(tin)
+        ntgood = len(tin)
+        elor = lor*ntgood / (ntgood-1)
+        tref = 0.5*(tin[0] + tin[-1])
     else:
-        opt['equi'] = 1  # based on times; u/v can still have nans ("gappy")
-        lor = (np.max(tin)-np.min(tin))
-        elor = lor*len(tin)/(len(tin)-1)
-        tref = 0.5*(tin[0]+tin[-1])
+        opt['equi'] = False
+        lor = np.ptp(t)
+        elor = lor*nt / (nt-1)
+        tref = 0.5*(t[0]+t[-1])
 
     # Options.
     opt['conf_int'] = True
@@ -294,9 +284,11 @@ def _slvinit(tin, uin, vin, **opts):
     opt['nodiagn'] = 0
     opt['diagnplots'] = 0
     opt['diagnminsnr'] = 2
-    opt['ordercnstit'] = []
+    opt['ordercnstit'] = None
     opt['runtimedisp'] = 'yyy'
 
+    # Update the default opt dictionary with the kwargs,
+    # ensuring that every kwarg key matches a key in opt.
     for key, item in opts.items():
         try:
             opt[key] = item
@@ -315,6 +307,6 @@ def _slvinit(tin, uin, vin, **opts):
 
     opt['tunconst'] = opt['tunconst'] / opt['tunrdn']
 
-    return nt, t, u, v, tref, lor, elor, opt, tgd, uvgd
+    return t, u, v, tref, lor, elor, opt, tgd, uvgd
 
 
