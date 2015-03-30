@@ -1,0 +1,33 @@
+language: python
+
+env:
+    - CONDA="python=2.7"
+    - CONDA="python=3.3"
+    - CONDA="python=3.4"
+
+
+before_install:
+    - URL=http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh
+    - wget $URL -O miniconda.sh
+    - bash miniconda.sh -b -p $HOME/miniconda
+    - export PATH="$HOME/miniconda/bin:$PATH"
+    - hash -r
+    - conda config --set always_yes yes
+    - conda update conda
+    - conda info -a
+    - travis_retry conda create --yes -n test $CONDA --file requirements.txt
+    - source activate test
+    # Testing requirements.
+    - travis_retry conda install pip
+    - travis_retry pip install pytest
+    - travis_retry pip install coveralls
+    - travis_retry pip install pytest-cov
+
+install:
+    - export PYTHONWARNINGS=all
+
+script:
+    py.test
+
+after_success:
+    - coveralls
