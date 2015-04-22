@@ -1,32 +1,38 @@
-from __future__ import absolute_import, division
+"""
+Tests for periodogram module.
+"""
+
+from __future__ import division
 
 import numpy as np
-import scipy.io as sio
-import matplotlib.pyplot as plt
 
 from utide import ut_constants
 from utide import solve
 from utide import reconstruct
 
-
-def simple_utide_test(debug=True):
+def test_roundtrip():
+    # Minimal conversion from simple_utide_test
     ts = 735604
     duration = 35
 
-    time = np.linspace(ts, ts+duration, 841)
-    time_origin = 6.939615e5
+    time = np.linspace(ts, ts+duration, 842)
+    tref = (time[-1] + time[0]) / 2
 
     const = ut_constants.const
 
     amp = 1.0
     phase = 53
     lat = 45.5
-    period = 1 / const.freq * 3600
 
-    jj = 48-1
+    freq_cpd = 24 * const.freq
 
-    time_series = amp * np.cos((((time-time_origin) * (2*np.pi/period[jj]) *
-                                (24*3600)) - 2 * np.pi * phase / 360))
+    jj = 48-1  # Python index for M2
+
+    arg = 2 * np.pi * (time - tref) * freq_cpd[jj] - np.deg2rad(phase)
+    time_series = amp * np.cos(arg)
+
+    # Add a tiny bit of noise to prevent division by zero? Didn't do it.
+    #time_series += 1e-10 * np.random.randn(len(time_series))
 
     speed_coef = solve(time, time_series, time_series, lat=lat, cnstit='auto',
                          notrend=True, rmin=0.95, method='ols',
@@ -43,15 +49,12 @@ def simple_utide_test(debug=True):
 
     u, v = reconstruct(time, speed_coef)
 
-    err = np.sqrt(np.mean((time_series-ts_recon[0])**2))
+    err = np.sqrt(np.mean((time_series-ts_recon)**2))
 
-    ts_fvcom = (elev_coef['A'][0]
-                * np.cos(2*np.pi * ((time-np.mean(time))
-                                    / (period[jj] / (24*3600))
-                                    - elev_coef['g'][0]/360)))
+    print(amp_err, phase_err, err)
+    print(elev_coef['aux']['reftime'], tref)
 
-    if debug:
-        plt.plot(time, ts_recon, label='Reconstruction')
-        plt.plot(time, ts_fvcom, label='Time Series')
-        plt.legend()
-        plt.show()
+    np.testing.assert_almost_equal(amp_err, 0)
+    np.testing.assert_almost_equal(phase_err, 0)
+    np.testing.assert_almost_equal(err, 0)
+

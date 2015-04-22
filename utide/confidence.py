@@ -11,10 +11,10 @@ from __future__ import absolute_import, division
 import numpy as np
 import scipy.interpolate as sip
 
-from .periodogram import ut_pdgm
+from .periodogram import band_psd
 
 
-def _confidence(coef, opt, t, e, tin, tgd, uvgd, elor, xraw, xmod, W, m, B,
+def _confidence(coef, opt, t, e, tin, elor, xraw, xmod, W, m, B,
                 nc, Xu, Yu, Xv, Yv):
     """
     This confidence interval calculation does not correspond
@@ -33,26 +33,17 @@ def _confidence(coef, opt, t, e, tin, tgd, uvgd, elor, xraw, xmod, W, m, B,
     if not opt['white']:
         # Band-averaged (ba) spectral densities.
         if opt['equi']:
-            if np.sum(tgd) > np.sum(uvgd):
-                # efill = np.interp1(t, e, tin(tgd))
-                # efill = np.interp(t, e, tin[tgd])
-                eTemp = sip.interp1d(t, e)
-                efill = eTemp(tin[tgd])
-                # Fill start&/end nans w/ nearest good.
-                if np.any(np.isnan(efill)):
-                    ind = np.where(np.isnan(efill))[0]
-                    # ind2 = ind(ind<find(~isnan(efill),1,'first'))
-                    ind2 = ind[ind < np.where(~np.isnan(efill), 1, 'first')]
-                    efill[ind2] = efill[np.max(ind2) + 1]
-                    ind2 = ind[ind > np.where(~np.isnan(efill), 1, 'last')]
-                    efill[ind2] = efill[np.min(ind2) - 1]
-
-                ba = ut_pdgm(tin[tgd], efill, coef['aux']['frq'], 1, 0)
+            if len(tin) > len(t):
+                efill = np.interp(tin, t, e)
+                ba = band_psd(tin, efill, coef['aux']['frq'],
+                              equi=True)
             else:
-                ba = ut_pdgm(tin[tgd], e, coef['aux']['frq'], 1, 0)
+                ba = band_psd(tin, e, coef['aux']['frq'],
+                              equi=True)
 
         else:
-            ba = ut_pdgm(t, e, coef['aux']['frq'], 0, opt['lsfrqosmp'])
+            ba = band_psd(t, e, coef['aux']['frq'],
+                          equi=False, frqosamp=opt['lsfrqosmp'])
 
         # import pdb; pdb.set_trace()
         # power [ (e units)^2 ] from spectral density [ (e units)^2 / cph ]
