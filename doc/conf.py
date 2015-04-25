@@ -24,7 +24,7 @@ import os
 # -- General configuration ------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
-#needs_sphinx = '1.0'
+needs_sphinx = '1.3'
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
@@ -35,6 +35,8 @@ extensions = [
     'sphinx.ext.todo',
     'sphinx.ext.mathjax',
     'sphinx.ext.viewcode',
+    'sphinx.ext.napoleon', # requires sphinx >= 1.3
+    #'numpydoc',           # napoleon handles numpydoc format
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -78,7 +80,7 @@ exclude_patterns = ['_build']
 
 # The reST default role (used for this markup: `text`) to use for all
 # documents.
-#default_role = None
+default_role = 'py:obj'
 
 # If true, '()' will be appended to :func: etc. cross-reference text.
 #add_function_parentheses = True
@@ -105,7 +107,15 @@ pygments_style = 'sphinx'
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'pyramid'
+html_theme = 'nature' #
+
+# 'nature' looks like one of the most readable options with numpydoc
+#       It's clean, and the width scales well.
+# 'sphinxdoc' works reasonably well.
+# alabaster is a little too pale, but it has comfortable numpydoc formats
+#'pyramid' is ugly with numpydoc
+# sphinx_rtd_theme also works badly with numpydoc
+# 'agogo' by default is too wide, otherwise so-so
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the

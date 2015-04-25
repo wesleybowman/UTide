@@ -5,7 +5,9 @@ In translating the algorithms from Matlab to Python, the
 first step is generating a set of Python functions that
 mimic their Matlab counterparts.  Gradually, however, the
 code evolves to become closer to what might have been done
-if the original implementation had been in Python.
+if the original implementation had been in Python.  This
+evolution will include extensive renaming of variables and
+functions to improve readability.
 
 Array dimension ordering
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -43,9 +45,9 @@ has a leading underscore.
 There is an overwhelming number of options; we might be able
 to find ways of making this interface friendlier.
 
-Options are being held internally in a `dict`.  We might
-switch to using a `Bunch` or similar more flexible
-structure.
+Options are being held internally in a `dict`.  We will
+switch to using a `Bunch` so as to provide both dictionary
+and attribute access syntax.
 
 Time
 ^^^^
@@ -61,10 +63,10 @@ investigate handling whatever Pandas produces.
 
 Missing values
 ^^^^^^^^^^^^^^^
-We will add support for masked array inputs to the public
-functions; the degree to
-which masked arrays will be used internally is open to
-discussion, but most likely their internal use will be at
-most highly localized.
+The `t`, `u`, `v` inputs to `solve` now support any combination
+of nans and masked array inputs to indicate missing values.
+
+The degree to which masked arrays will be used internally is
+unclear, but most likely their use will be highly localized.
 
 

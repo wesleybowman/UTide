@@ -51,8 +51,11 @@ def solve(tin, uin, vin=None, lat=None, **opts):
 def _solv1(tin, uin, vin, lat, **opts):
 
     print('solve: ')
+
+    # The following returns a possibly modified copy of tin (ndarray).
+    # t, u, v are fully edited ndarrays (unless v is None)
     packed = _slvinit(tin, uin, vin, lat, **opts)
-    t, u, v, tref, lor, elor, opt, tgd, uvgd = packed
+    tin, t, u, v, tref, lor, elor, opt = packed
     nt = len(t)
 
     # opt['cnstit'] = cnstit
@@ -151,7 +154,7 @@ def _solv1(tin, uin, vin, lat, **opts):
             coef['slope'] = np.real(m[-1])/lor
 
     if opt['conf_int'] is True:
-        coef = _confidence(coef, opt, t, e, tin, tgd, uvgd, elor, xraw, xmod,
+        coef = _confidence(coef, opt, t, e, tin, elor, xraw, xmod,
                            W, m, B, nc, Xu, Yu, Xv, Yv)
 
     # diagnostics
@@ -232,21 +235,36 @@ def _slvinit(tin, uin, vin, lat, **opts):
     opt = dict(twodim=(vin is not None))
 
     # Step 1: remove invalid times from tin, uin, vin
-    tgd = ~np.isnan(tin)
-    uin = uin[tgd]
-    tin = tin[tgd]
-    uvgd = ~np.isnan(uin)
+    tin = np.ma.masked_invalid(tin)
+    uin = np.ma.masked_invalid(uin)
     if vin is not None:
-        vin = vin[tgd]
-        uvgd &= ~np.isnan(vin)
+        vin = np.ma.masked_invalid(vin)
+    if np.ma.is_masked(tin):
+        mask = np.ma.getmaskarray(tin)
+        uin = uin.compress(mask)
+        if vin is not None:
+            vin = vin.compress(mask)
+
+    tin = tin.compressed() # no longer masked
 
     # Step 2: generate t, u, v from edited tin, uin, vin
-    t = tin[uvgd]
-    u = uin[uvgd]
     v = None
-    if vin is not None:
-        v = vin[uvgd]
+    if np.ma.is_masked(uin) or np.ma.is_masked(vin):
+        mask = np.ma.getmaskarray(uin)
+        if vin is not None:
+            mask = np.ma.mask_or(np.ma.getmaskarray(vin), mask)
+        t = tin.compress(mask)
+        u = uin.compress(mask).filled()
+        if vin is not None:
+            v = vin.compress(mask).filled()
+    else:
+        t = tin
+        u = uin.filled()
+        if vin is not None:
+            v = vin.filled()
 
+    # Now t, u, v, tin are clean ndarrays; uin and vin are masked,
+    # but don't necessarily have masked values.
 
     # Are the times equally spaced?
     eps = np.finfo(np.float64).eps
@@ -307,6 +325,6 @@ def _slvinit(tin, uin, vin, lat, **opts):
 
     opt['tunconst'] = opt['tunconst'] / opt['tunrdn']
 
-    return t, u, v, tref, lor, elor, opt, tgd, uvgd
+    return tin, t, u, v, tref, lor, elor, opt
 
 
