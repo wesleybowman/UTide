@@ -1,7 +1,22 @@
 import os
+import sys
 from setuptools import setup
+from setuptools.command.test import test as TestCommand
 
 rootpath = os.path.abspath(os.path.dirname(__file__))
+
+
+class PyTest(TestCommand):
+    """python setup.py test"""
+    def finalize_options(self):
+        TestCommand.finalize_options(self)
+        self.test_args = ['--strict', '--verbose', '--tb=long', 'tests']
+        self.test_suite = True
+
+    def run_tests(self):
+        import pytest
+        errno = pytest.main(self.test_args)
+        sys.exit(errno)
 
 
 def readme():
@@ -29,6 +44,9 @@ setup(name='UTide',
       author_email='wesley.bowman23@gmail.com',
       maintainer='Wesley Bowman',
       license='MIT',
-      packages=['utide'],
+      packages=['utide', 'utide/tests'],
       package_data={'utide': ['data/*.mat']},
+      tests_require=['pytest'],
+      extras_require=dict(testing=['pytest']),
+      cmdclass=dict(test=PyTest),
       zip_safe=False)
