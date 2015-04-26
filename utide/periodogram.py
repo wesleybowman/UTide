@@ -91,6 +91,41 @@ def fbndavg(P, freq, cfreq=None, fbands=None):
 
     return avP
 
+def _lomb_freqs(t, fbands=None, ofac=1, max_per_band=500):
+    """
+    Calculate uniformly spaced frequencies in each band, with
+    no more than `max_per_band` in any band.
+    """
+
+    if fbands is None:
+        fbands = freq_bands
+
+    # Estimated record length as n delta-t, where delta-t
+    # is the *average* time per sample.
+    n = len(t)
+    delta_t = (t[-1] - t[0]) / (n-1)
+    reclen = n * delta_t
+
+    nf = n * ofac  # number of "Fourier frequencies" based on oversampling
+    # Simplify by ignoring the 0 and Nyquist frequencies.
+    # Divide by reclen to convert cycles/record to cycles/time unit.
+    freq = np.arange(1, nf//2) / reclen
+    nfreq = len(freq)
+
+    freqs = []
+    for k, (f0, f1) in enumerate(fbands):
+        i0, i1 = np.searchsorted(freq, [f0, f1])
+        i1 = min(nfreq, i1+1)
+        inband = slice(i0, i1)
+        if i1 - i0 > max_per_band:
+            band = np.linspace(freq[i0], freq[i1-1], max_per_band)
+        else:
+            band = freq[inband]
+        freqs.append(band)
+
+    return np.hstack(freqs)
+
+
 
 def _psd_lomb(t, x, window=None, freq=None, ofac=1):
     """
@@ -161,7 +196,7 @@ def _psd_lomb(t, x, window=None, freq=None, ofac=1):
         nf = n * ofac  # number of "Fourier frequencies" based on oversampling
         # Simplify by ignoring the 0 and Nyquist frequencies.
         # Divide by reclen to convert cycles/record to cycles/time unit.
-        freq = np.arange(1, n//2) / reclen
+        freq = np.arange(1, nf//2) / reclen
 
     out.F = freq
 
@@ -179,6 +214,9 @@ def _psd_lomb(t, x, window=None, freq=None, ofac=1):
 
     out.Pyy = psdnorm * signal.lombscargle(t, x.imag, freq_radian)
 
+    # If we need to limit memory usage and don't want to use
+    # Cython, we can segment the frequencies and loop over the
+    # segments.  The speed penalty will be minimal.
     out.Pxy = psdnorm * _ls_cross(t, x, freq_radian)
 
     return out
@@ -308,7 +346,8 @@ def band_psd(t, e, cfrq, equi=True, frqosmp=1):
 
     else: # if uneven, lomb-scargle
         # time in hours, for output in CPH and x^2 per CPH
-        ls_spec = _psd_lomb(t * 24, e, window=hn)
+        lfreq = _lomb_freqs(t * 24, fbands=freq_bands, ofac=frqosmp)
+        ls_spec = _psd_lomb(t * 24, e, window=hn, freq=lfreq)
         Puu1s = ls_spec.Pxx
         allfrq = ls_spec.F
 
