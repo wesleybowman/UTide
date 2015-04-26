@@ -103,15 +103,15 @@ def welsch(r):
     return w
 
 
-def test(r):
-    print(andrews(r))
-    print(bisquare(r))
-    print(cauchy(r))
-    print(fair(r))
-    print(huber(r))
-    print(logistic(r))
-    print(talwar(r))
-    print(welsch(r))
+#def test(r):
+#    print(andrews(r))
+#    print(bisquare(r))
+#    print(cauchy(r))
+#    print(fair(r))
+#    print(huber(r))
+#    print(logistic(r))
+#    print(talwar(r))
+#    print(welsch(r))
 
 #        case 'andrews'
 #            wfun = @andrews;
