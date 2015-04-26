@@ -2,13 +2,37 @@ from __future__ import absolute_import, division
 
 import numpy as np
 from .harmonics import ut_E
+from .utilities import Bunch
 
+def reconstruct(t, coef, **opts):
+    """
+    Reconstruct a tidal signal.
 
-def reconstruct(tin, coef, **opts):
+    Parameters
+    ----------
+    t : array_like
+        Time in days since `epoch`.
+    coef : `Bunch`
+        Data structure returned by `utide.solve`
+    epoch : {string, int, `datetime.datetime`}, optional
+        Not implemented yet. It will default to the epoch
+        used for `coef`.
 
-    u, v = _reconstr1(tin, coef, **opts)
+    Returns
+    -------
+    tide : `Bunch`
+        Scalar time series is returned as `tide.h`; a vector
+        series as `tide.u`, `tide.v`.
 
-    return u, v
+    """
+
+    out = Bunch()
+    u, v = _reconstr1(t, coef, **opts)
+    if coef['aux']['opt']['twodim']:
+        out.u, out.v = u, v
+    else:
+        out.h = u
+    return out
 
 
 def _reconstr1(tin, coef, **opts):

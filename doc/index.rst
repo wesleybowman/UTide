@@ -28,6 +28,7 @@ Contents:
    :maxdepth: 2
 
    strategy
+   usage
    internals/index.rst
 
 Indices and tables
