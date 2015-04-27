@@ -272,7 +272,6 @@ def _solv1(tin, uin, vin, lat, **opts):
     else:    # any other string: order by decreasing energy
         if not opt['nodiagn']:
             ind = indPE
-
         else:
             if opt['twodim']:
                 PE = np.sum(coef['Lsmaj']**2 + coef['Lsmin']**2)
@@ -283,14 +282,14 @@ def _solv1(tin, uin, vin, lat, **opts):
             ind = PE.argsort()[::-1]
 
     reorderlist = ['g', 'name']
-    if opt['twodim']:
-        reorderlist += ['Lsmaj', 'Lsmin', 'theta']
-        if opt['conf_int']:
-            reorderlist += ['Lsmaj_ci', 'Lsmin_ci', 'theta_ci', 'g_ci']
+    if opt.twodim:
+        reorderlist.extend(['Lsmaj', 'Lsmin', 'theta'])
+        if opt.conf_int:
+            reorderlist.extend(['Lsmaj_ci', 'Lsmin_ci', 'theta_ci', 'g_ci'])
     else:
-        reorderlist += ['A']
-        if opt['conf_int']:
-            reorderlist += ['A_ci']
+        reorderlist.append('A')
+        if opt.conf_int:
+            reorderlist.extend(['A_ci', 'g_ci'])
 
     for key in reorderlist:
         coef[key] = coef[key][ind]

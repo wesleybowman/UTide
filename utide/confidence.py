@@ -38,16 +38,12 @@ def band_averaged_psd_by_constit(tin, t, e, elor, coef, opt):
         Pvv = np.zeros_like(constits)
         Puv = np.zeros_like(constits)
 
-    print('ba', ba)
-    print('constits', constits)
     for i, (lo, hi) in enumerate(ba.fbnd):
-        print(i, lo, hi)
         inside = (constits >= lo) & (constits <= hi)
         Puu[inside] = ba.Puu[i]
         if opt.twodim:
             Pvv[inside] = ba.Pvv[i]
             Puv[inside] = ba.Puv[i]
-    print(Puu, Pvv, Puv)
     return Puu, Pvv, Puv
 
 def _confidence(coef, opt, t, e, tin, elor, xraw, xmod, W, m, B,
@@ -64,7 +60,6 @@ def _confidence(coef, opt, t, e, tin, elor, xraw, xmod, W, m, B,
     """
 
     # Confidence Intervals.
-    print('conf. int vls... ')
 
     if not opt['white']:
         Puu, Pvv, Puv = band_averaged_psd_by_constit(tin, t, e, elor,
