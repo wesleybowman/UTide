@@ -239,7 +239,7 @@ def _solv1(tin, uin, vin, lat, **opts):
 
     if opt['conf_int'] is True:
         coef = _confidence(coef, opt, t, e, tin, elor, xraw, xmod,
-                           W, m, B, nc, Xu, Yu, Xv, Yv)
+                           W, m, B, Xu, Yu, Xv, Yv)
 
     # diagnostics
     if not opt['nodiagn']:
