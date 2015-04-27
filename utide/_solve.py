@@ -316,7 +316,7 @@ def _slvinit(tin, uin, vin, lat, **opts):
     if vin is not None and vin.shape != uin.shape:
         raise ValueError("v must have the same shape as u")
 
-    opt = dict(twodim=(vin is not None))
+    opt = Bunch(twodim=(vin is not None))
 
     # Step 1: remove invalid times from tin, uin, vin
     tin = np.ma.masked_invalid(tin)

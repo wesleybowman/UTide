@@ -76,12 +76,8 @@ def ut_cnstitsel(tref, minres, incnstit, infer):
     cnstit['R'] = []  # Empty because inference is not supported yet.
 
     coef['name'] = cnstit['NR']['name']
-    coef['aux'] = {}
-    coef['aux']['frq'] = cnstit['NR']['frq']
-    coef['aux']['lind'] = cnstit['NR']['lind']
-
-    # another infer if statement
-
-    coef['aux']['reftime'] = tref
+    coef['aux'] = Bunch(frq=cnstit.NR.frq,
+                        lind=cnstit.NR.lind,
+                        reftime=tref)
 
     return nNR, nR, nI, cnstit, coef

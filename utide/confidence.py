@@ -13,6 +13,39 @@ import scipy.interpolate as sip
 
 from .periodogram import band_psd
 
+def band_averaged_psd_by_constit(tin, t, e, elor, coef, opt):
+    # Band-averaged (ba) spectral densities at each constituent freq.
+    constits = coef.aux.frq
+    if opt.equi:
+        e_ = e
+        if len(tin) > len(t):
+            e_ = np.interp(tin, t, e)
+        ba = band_psd(tin, e, constits, equi=True)
+
+    else:
+        ba = band_psd(t, e, constits,
+                      equi=False, frqosamp=opt.lsfrqosmp)
+
+    # power [ (e units)^2 ] from spectral density [ (e units)^2 / cph ]
+    df = 1 / (elor * 24)  # inverse of record length in hours
+    ba.Puu *= df
+    Puu = np.zeros_like(constits)
+    Pvv = Puv = None
+
+    if opt.twodim:
+        ba.Pvv *= df
+        ba.Puv *=  df
+        Pvv = np.zeros_like(constits)
+        Puv = np.zeros_like(constits)
+
+    for i, (lo, hi) in enumerate(ba.fbnd):
+        inside = (constits >= lo) & (constits <= hi)
+        Puu[inside] = ba.Puu[i]
+        if opt.twodim:
+            Pvv[inside] = ba.Pvv[i]
+            Puv[inside] = ba.Puv[i]
+
+    return Puu, Pvv, Puv
 
 def _confidence(coef, opt, t, e, tin, elor, xraw, xmod, W, m, B,
                 nc, Xu, Yu, Xv, Yv):
@@ -31,54 +64,8 @@ def _confidence(coef, opt, t, e, tin, elor, xraw, xmod, W, m, B,
     print('conf. int vls... ')
 
     if not opt['white']:
-        # Band-averaged (ba) spectral densities.
-        if opt['equi']:
-            if len(tin) > len(t):
-                efill = np.interp(tin, t, e)
-                ba = band_psd(tin, efill, coef['aux']['frq'],
-                              equi=True)
-            else:
-                ba = band_psd(tin, e, coef['aux']['frq'],
-                              equi=True)
-
-        else:
-            ba = band_psd(t, e, coef['aux']['frq'],
-                          equi=False, frqosamp=opt['lsfrqosmp'])
-
-        # import pdb; pdb.set_trace()
-        # power [ (e units)^2 ] from spectral density [ (e units)^2 / cph ]
-        df = 1 / (elor * 24)
-        ba['Puu'] = ba['Puu'] * df
-
-        if opt['twodim']:
-            ba['Pvv'] = ba['Pvv'] * df
-            ba['Puv'] = ba['Puv'] * df
-
-        # Assign band-avg power values to NR & R freqs.
-        Puu = np.zeros(coef['aux']['frq'].shape)
-        if opt['twodim']:
-            Pvv = np.zeros(coef['aux']['frq'].shape)
-            Puv = np.zeros(coef['aux']['frq'].shape)
-            # This was creating a copy of Puu and not a new array, so Puu was
-            # getting overridden
-            # Pvv = Puu
-            # Puv = Pvv
-
-        # import pdb; pdb.set_trace()
-        for i in range(ba['Puu'].shape[0]):
-
-            ind = np.logical_and(coef['aux']['frq'] >= ba['fbnd'][i, 0],
-                                 coef['aux']['frq'] <= ba['fbnd'][i, 1])
-            ind = np.where(ind[0])
-            Puu[ind] = ba['Puu'][i]
-
-            if opt['twodim']:
-                Pvv[ind] = ba['Pvv'][i]
-                Puv[ind] = ba['Puv'][i]
-
-        # import pdb; pdb.set_trace()
-    # varMSM = real((ctranspose(xraw)*W*xraw -
-    #                ctranspose(m)*ctranspose(B)*W*xraw)/(nt-nm))
+        Puu, Pvv, Puv = band_averaged_psd_by_constit(tin, t, e, elor,
+                                                     coef, opt)
 
     # Make temporaries for quantities needed more than once.
     _Wx = W * xraw
