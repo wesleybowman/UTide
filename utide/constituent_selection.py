@@ -6,6 +6,7 @@ import scipy.io as sio
 from .astronomy import ut_astron
 from . import ut_constants
 from . import constit_index_dict
+from .utilities import Bunch
 
 def ut_cnstitsel(tref, minres, incnstit, infer):
     """
@@ -34,8 +35,8 @@ def ut_cnstitsel(tref, minres, incnstit, infer):
     shallow = ut_constants.shallow
     const = ut_constants.const
 
-    cnstit = {}
-    coef = {}
+    cnstit = Bunch()
+    coef = Bunch()
 
     astro, ader = ut_astron(tref)
 
@@ -49,7 +50,7 @@ def ut_cnstitsel(tref, minres, incnstit, infer):
                                shallow.coef[ik])
 
     # cnstit.NR
-    cnstit['NR'] = {}
+    cnstit['NR'] = Bunch()
 
     # if incnstit.lower() == 'auto':
     if incnstit == 'auto':
@@ -75,12 +76,8 @@ def ut_cnstitsel(tref, minres, incnstit, infer):
     cnstit['R'] = []  # Empty because inference is not supported yet.
 
     coef['name'] = cnstit['NR']['name']
-    coef['aux'] = {}
-    coef['aux']['frq'] = cnstit['NR']['frq']
-    coef['aux']['lind'] = cnstit['NR']['lind']
-
-    # another infer if statement
-
-    coef['aux']['reftime'] = tref
+    coef['aux'] = Bunch(frq=cnstit.NR.frq,
+                        lind=cnstit.NR.lind,
+                        reftime=tref)
 
     return nNR, nR, nI, cnstit, coef

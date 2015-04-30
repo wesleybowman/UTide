@@ -34,25 +34,38 @@ def test_roundtrip():
     # Add a tiny bit of noise to prevent division by zero? Didn't do it.
     #time_series += 1e-10 * np.random.randn(len(time_series))
 
-    speed_coef = solve(time, time_series, time_series, lat=lat, cnstit='auto',
-                         notrend=True, rmin=0.95, method='ols',
-                         nodiagn=True, linci=True, conf_int=True)
+#    speed_coef = solve(time, time_series, time_series, lat=lat, cnstit='auto',
+#                         notrend=True, rmin=0.95, method='ols',
+#                         nodiagn=True, linci=True, conf_int=True)
 
-    elev_coef = solve(time, time_series, lat=lat, cnstit='auto',
-                        gwchnone=True, nodsatnone=True, notrend=True,
-                        rmin=0.95, method='ols', nodiagn=True, linci=True,
-                        conf_int=True)
+#    elev_coef = solve(time, time_series, lat=lat, cnstit='auto',
+#                        gwchnone=True, nodsatnone=True, notrend=True,
+#                        rmin=0.95, method='ols', nodiagn=True, linci=True,
+#                        conf_int=True)
+
+    opts = dict(constit='auto',
+                phase='raw',
+                nodal=False,
+                trend=False,
+                method='ols',
+                conf_int='linear',
+                Rayleigh_min=0.95,
+                )
+
+    speed_coef = solve(time, time_series, time_series, lat=lat, **opts)
+    elev_coef = solve(time, time_series, lat=lat, **opts)
 
     amp_err = amp - elev_coef['A'][0]
     phase_err = phase - elev_coef['g'][0]
-    ts_recon, _ = reconstruct(time, elev_coef)
+    ts_recon = reconstruct(time, elev_coef).h
 
-    u, v = reconstruct(time, speed_coef)
+    vel = reconstruct(time, speed_coef)
 
     err = np.sqrt(np.mean((time_series-ts_recon)**2))
 
     print(amp_err, phase_err, err)
     print(elev_coef['aux']['reftime'], tref)
+    print(elev_coef['aux']['opt'])
 
     np.testing.assert_almost_equal(amp_err, 0)
     np.testing.assert_almost_equal(phase_err, 0)

@@ -11,39 +11,123 @@ from .diagnostics import ut_diagn
 from .ellipse_params import ut_cs2cep
 from .constituent_selection import ut_cnstitsel
 from .confidence import _confidence
+from .utilities import Bunch
 from . import constit_index_dict
 
-def solve(tin, uin, vin=None, lat=None, **opts):
-    '''
-    Need to put in docstring and figure a good way to put in all the optional
-    parameters
+default_opts = dict(constit='auto',
+                    conf_int='linear',
+                    method='ols',
+                    trend=True,
+                    phase='Greenwich',
+                    nodal=True,
+                    infer='none',
+                    MC_n=200,
+                    Rayleigh_min=1,
+                    robust_kw=dict(),
+                    white=False,
+                    )
 
-    Keyword Arguments:
-    conf_int=True
-    cnstit='auto'
-    notrend=0
-    prefilt=[]
-    nodsatlint=0
-    nodsatnone=0
-    gwchlint=0
-    gwchnone=0
-    infer=[]
-    inferaprx=0
-    rmin=1
-    method='cauchy'
-    tunrdn=1
-    linci=0
-    white=0
-    nrlzn=200
-    lsfrqosmp=1
-    nodiagn=0
-    diagnplots=0
-    diagnminsnr=2
-    ordercnstit=None
-    runtimedisp='yyy'
-    '''
+def _process_opts(opts):
+    newopts = Bunch(default_opts)
+    newopts.update_values(strict=True, **opts)
+    # TODO: add more validation
+    return newopts
 
-    coef = _solv1(tin, uin, vin, lat, **opts)
+def _translate_opts(opts):
+    # Temporary shim between new-style options and Matlab heritage.
+    oldopts = Bunch()
+    oldopts.cnstit = opts.constit
+    oldopts.conf_int = (opts.conf_int != 'none')
+    if oldopts.conf_int:
+        oldopts.linci = True
+    oldopts.notrend = not opts.trend
+    if opts.nodal:
+        oldopts['nodsatlint'] = True
+    else:
+        oldopts['nodsatnone'] = True
+    if opts.phase == 'Greenwich':
+        oldopts['gwchlint'] = True
+    else:
+        oldopts['gwchnone'] = True
+    oldopts.rmin = opts.Rayleigh_min
+    oldopts.white = opts.white
+    return oldopts
+
+def solve(t, u, v=None, lat=None, **opts):
+    """
+    Calculate amplitude, phase, confidence intervals of tidal constituents.
+
+    Parameters
+    ----------
+    t : array_like
+        Time in days since `epoch`.
+    u : array_like
+        Sea-surface height, velocity component, etc.
+    v : {None, array_like}, optional
+        If `u` is a velocity component, `v` is the orthogonal component.
+    lat : float
+        Latitude in degrees; required.
+    epoch : {string, int, `datetime.datetime`}
+        Not implemented yet.
+    constit : {'auto', array_like}, optional
+        List of strings with standard letter abbreviations of
+        tidal constituents; or 'auto' to let the list be determined
+        based on the time span.
+    conf_int : {'linear', 'MC', 'none'}, optional
+        If not 'none' (string), calculate linearized confidence
+        intervals, or use a Monte-Carlo simulation (not yet
+        implemented).
+    method : {'ols', 'robust'}, optional
+        Solve with ordinary least squares, or with a robust algorithm.
+        If the latter, see `robust_kw` below.  The robust method is
+        not yet implemented.
+    trend : bool, optional
+        True (default) to include a linear trend in the model.
+    phase : {'Greenwich', 'raw'}, optional
+        Give Greenwich-referenced phase lags, or raw lags.
+    nodal : bool, optional
+        True (default) to include nodal/satellite corrections.
+
+
+    Returns
+    -------
+    coef : Bunch
+        Data container with all configuration and solution information:
+
+    Other Parameters
+    ----------------
+    infer : {'none', dict or Bunch}, optional
+        Not yet implemented.
+    MC_n : integer, optional
+        Not yet implemented.
+    Rayleigh_min : float
+        Minimum conventional Rayleigh criterion for automatic
+        constituent selection; default is 1.
+    robust_kw : {dict, Bunch}
+        Keyword arguments for robust solution method.  Not yet
+        implemented.
+    white : bool
+        If False (default), use band-averaged spectra from the
+        residuals in the confidence limit estimates; if True,
+        assume a white background spectrum.
+
+    Note
+    ----
+    `utide.reconstruct` requires the calculation of confidence intervals.
+
+    Notes
+    -----
+
+    To be added: much additional explanation.
+
+    There will also be more "Other Parameters".
+
+    """
+
+    newopts = _process_opts(opts)
+    compat_opts = _translate_opts(newopts)
+
+    coef = _solv1(t, u, v, lat, **compat_opts)
 
     return coef
 
@@ -155,7 +239,7 @@ def _solv1(tin, uin, vin, lat, **opts):
 
     if opt['conf_int'] is True:
         coef = _confidence(coef, opt, t, e, tin, elor, xraw, xmod,
-                           W, m, B, nc, Xu, Yu, Xv, Yv)
+                           W, m, B, Xu, Yu, Xv, Yv)
 
     # diagnostics
     if not opt['nodiagn']:
@@ -188,7 +272,6 @@ def _solv1(tin, uin, vin, lat, **opts):
     else:    # any other string: order by decreasing energy
         if not opt['nodiagn']:
             ind = indPE
-
         else:
             if opt['twodim']:
                 PE = np.sum(coef['Lsmaj']**2 + coef['Lsmin']**2)
@@ -199,14 +282,14 @@ def _solv1(tin, uin, vin, lat, **opts):
             ind = PE.argsort()[::-1]
 
     reorderlist = ['g', 'name']
-    if opt['twodim']:
-        reorderlist += ['Lsmaj', 'Lsmin', 'theta']
-        if opt['conf_int']:
-            reorderlist += ['Lsmaj_ci', 'Lsmin_ci', 'theta_ci', 'g_ci']
+    if opt.twodim:
+        reorderlist.extend(['Lsmaj', 'Lsmin', 'theta'])
+        if opt.conf_int:
+            reorderlist.extend(['Lsmaj_ci', 'Lsmin_ci', 'theta_ci', 'g_ci'])
     else:
-        reorderlist += ['A']
-        if opt['conf_int']:
-            reorderlist += ['A_ci']
+        reorderlist.append('A')
+        if opt.conf_int:
+            reorderlist.extend(['A_ci', 'g_ci'])
 
     for key in reorderlist:
         coef[key] = coef[key][ind]
@@ -232,7 +315,7 @@ def _slvinit(tin, uin, vin, lat, **opts):
     if vin is not None and vin.shape != uin.shape:
         raise ValueError("v must have the same shape as u")
 
-    opt = dict(twodim=(vin is not None))
+    opt = Bunch(twodim=(vin is not None))
 
     # Step 1: remove invalid times from tin, uin, vin
     tin = np.ma.masked_invalid(tin)
