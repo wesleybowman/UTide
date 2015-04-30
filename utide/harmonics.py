@@ -151,7 +151,7 @@ def FUV(t, tref, lind, lat, ngflgs):
         #   for k=find(ii)'
         #       ik=const.ishallow(k)+(0:const.nshallow(k)-1);
         #       const.freq(k)=sum(const.freq(shallow.iname(ik)).*shallow.coef(ik))
-        V = 24*(t-tref)*const.freq(lind).T
+        V = 24*(t-tref)*const.freq[lind].T
     else:
         if ngflgs[3]:  # Linearized times.
             tt = tref
