@@ -35,20 +35,26 @@ def _process_opts(opts):
 
 def _translate_opts(opts):
     # Temporary shim between new-style options and Matlab heritage.
+    # Here or elsewhere, proper validation remains to be added.
     oldopts = Bunch()
     oldopts.cnstit = opts.constit
     oldopts.conf_int = (opts.conf_int != 'none')
     if oldopts.conf_int:
         oldopts.linci = True
     oldopts.notrend = not opts.trend
-    if opts.nodal:
+    oldopts['nodesatlint'] = False
+    oldopts['nodesatnone'] = False
+    oldopts['gwchlint'] = False
+    oldopts['gwchnone'] = False
+    if opts.nodal == 'linear_time':
         oldopts['nodsatlint'] = True
-    else:
+    elif opts.nodal == False:
         oldopts['nodsatnone'] = True
-    if opts.phase == 'Greenwich':
+    if opts.phase == 'linear_time':
         oldopts['gwchlint'] = True
-    else:
+    elif opts.phase == 'raw':
         oldopts['gwchnone'] = True
+    # otherwise it should be default, 'Greenwich'
     oldopts.rmin = opts.Rayleigh_min
     oldopts.white = opts.white
     return oldopts
@@ -67,7 +73,7 @@ def solve(t, u, v=None, lat=None, **opts):
         If `u` is a velocity component, `v` is the orthogonal component.
     lat : float
         Latitude in degrees; required.
-    epoch : {string, int, `datetime.datetime`}
+    epoch : {string, int, float, `datetime.datetime`}
         Not implemented yet.
     constit : {'auto', array_like}, optional
         List of strings with standard letter abbreviations of
@@ -83,10 +89,13 @@ def solve(t, u, v=None, lat=None, **opts):
         not yet implemented.
     trend : bool, optional
         True (default) to include a linear trend in the model.
-    phase : {'Greenwich', 'raw'}, optional
-        Give Greenwich-referenced phase lags, or raw lags.
-    nodal : bool, optional
-        True (default) to include nodal/satellite corrections.
+    phase : {'Greenwich', 'linear_time', 'raw'}, optional
+        Give Greenwich-referenced phase lags, an approximation
+        using linearized times, or raw lags.
+    nodal : {True, False, 'linear_time'}, optional
+        True (default) to include nodal/satellite corrections;
+        'linear_time' to use the linearized time approximation;
+        False to omit nodal corrections.
 
 
     Returns
