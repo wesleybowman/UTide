@@ -369,6 +369,7 @@ def _slvinit(tin, uin, vin, lat, **opts):
     else:
         opt['equi'] = False
         lor = np.ptp(t)
+        nt = len(t)
         elor = lor*nt / (nt-1)
         tref = 0.5*(t[0]+t[-1])
 
