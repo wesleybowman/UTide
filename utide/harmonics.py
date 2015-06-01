@@ -7,8 +7,30 @@ from __future__ import absolute_import, division
 
 import numpy as np
 
-from .astronomy import ut_astron
-from . import ut_constants
+from utide.astronomy import ut_astron
+from utide import ut_constants
+
+
+sat = ut_constants.sat
+const = ut_constants.const
+shallow = ut_constants.shallow
+
+nshallow = np.ma.masked_invalid(const.nshallow).astype(int)
+ishallow = np.ma.masked_invalid(const.ishallow).astype(int) - 1
+not_shallow = ishallow.mask  # True where it was masked.
+nshallow = nshallow.compressed()
+ishallow = ishallow.compressed()
+kshallow = np.nonzero(~not_shallow)[0]
+
+def linearized_freqs(tref):
+    astro, ader = ut_astron(tref)
+    freq = const.freq.copy()
+    freq[not_shallow] = np.dot(const.doodson[not_shallow, :], ader) / 24
+    for i0, nshal, k in zip(ishallow, nshallow, kshallow):
+        ik = i0 + np.arange(nshal)
+        freq[k] = (freq[shallow.iname[ik] - 1] *
+                   shallow.coef[ik]).sum()
+    return freq
 
 
 def ut_E(t, tref, frq, lind, lat, ngflgs, prefilt):
@@ -34,10 +56,7 @@ def ut_E(t, tref, frq, lind, lat, ngflgs, prefilt):
     if ngflgs[1] and ngflgs[3]:
         F = np.ones((nt, nc))
         U = np.zeros((nt, nc))
-        # import pdb; pdb.set_trace()
         V = np.dot(24*(t-tref)[:, None], frq[:, None].T)
-        # V = 24*(t-tref)*frq
-        # V = 24*(t-tref)[:,None]*frq[:,None].T
     else:
         F, U, V = FUV(t, tref, lind, lat, ngflgs)
 
@@ -71,8 +90,10 @@ def FUV(t, tref, lind, lat, ngflgs):
     % (uses parts of t_vuf.m from t_tide, Pawlowicz et al 2002)
     """
 
+    t = np.atleast_1d(t).flatten()
     nt = len(t)
     nc = len(lind)
+
     # nodsat
 
     if ngflgs[1]:
@@ -80,120 +101,86 @@ def FUV(t, tref, lind, lat, ngflgs):
         U = np.zeros((nt, nc))
     else:
         if ngflgs[0]:
-            tt = tref
+            tt = np.array([tref])
         else:
             tt = t
-
         ntt = len(tt)
-
-        sat = ut_constants.sat
-        const = ut_constants.const
-        shallow = ut_constants.shallow
 
         astro, ader = ut_astron(tt)
 
         if abs(lat) < 5:
-            lat = np.sign(lat)*5
+            lat = np.sign(lat) * 5
 
-        slat = np.sin(np.pi * lat/180)
-        rr = sat.amprat
-        j = np.where(sat.ilatfac == 1)[0]
+        slat = np.sin(np.deg2rad(lat))
+        rr = sat.amprat.copy()
 
-        rr[j] = rr[j] * 0.36309 * (1.0-5.0 * slat * slat)/slat
+        j = sat.ilatfac == 1
+        rr[j] *=  0.36309 * (1.0 - 5.0 * slat**2)/slat
 
-        j = np.where(sat.ilatfac == 2)
+        j = sat.ilatfac == 2
+        rr[j] *= 2.59808 * slat
 
-        rr[j] = rr[j]*2.59808 * slat
-
+        # sat.deldood is (162, 3); all other sat vars are (162,)
         uu = np.dot(sat.deldood, astro[3:6, :]) + sat.phcorr[:, None]
-        uu *= np.ones((1, ntt)) % 1
+        np.fmod(uu, 1, out=uu)  # fmod is matlab rem; differs from % op
+        mat = rr[:, None] * np.exp(1j * 2 * np.pi * uu)
 
-        nfreq = len(const.isat)
-        mat = rr[:, None] * np.ones((1, ntt)) * np.exp(1j * 2 * np.pi * uu)
+        nfreq = len(const.isat)  # 162
+        F = np.ones((nfreq, ntt), dtype=complex)
 
-        F = np.ones((nfreq, ntt)) + 0j
-        ind = np.unique(sat.iconst)
+        iconst = sat.iconst - 1
+        ind = np.unique(iconst)
+        for ii in ind:
+            F[ii, :] = 1 + np.sum(mat[iconst == ii], axis=0)
 
-        for i in range(len(ind)):
-            F[ind[i]-1, :] = 1+np.sum(mat[sat.iconst == ind[i], :], axis=0)
-
-        # U = imag(log(F))/(2*pi); % faster than angle(F)
-        U = np.imag(np.log(F)) / (2*np.pi)
+        U = np.angle(F) / (2 * np.pi)  # cycles
         F = np.abs(F)
 
-        for k in np.where(np.isfinite(const.ishallow))[0]:
-            ik = const.ishallow[k] + np.arange(const.nshallow[k])
-            ik = ik.astype(int)
-            j = shallow.iname[ik-1]
-            exp1 = shallow.coef[ik-1]
+        for i0, nshal, k in zip(ishallow, nshallow, kshallow):
+            ik = i0 + np.arange(nshal)
+            j = shallow.iname[ik] - 1
+            exp1 = shallow.coef[ik, None]
             exp2 = np.abs(exp1)
-            temp1 = exp1*np.ones((ntt, 1))
-            temp2 = exp2*np.ones((ntt, 1))
-            temp1 = temp1.T
-            temp2 = temp2.T
-            F[k, :] = np.prod(F[j-1, :]**temp2, axis=0)
-            U[k, :] = np.sum(U[j-1, :] * temp1, axis=0)
+            F[k, :] = np.prod(F[j, :]**exp2, axis=0)
+            U[k, :] = np.sum(U[j, :] * exp1, axis=0)
 
         F = F[lind, :].T
         U = U[lind, :].T
 
-        if ngflgs[1]:  # Nodal/satellite with linearized times.
-            F = F[np.ones((nt, 1)), :]
-            U = U[np.ones((nt, 1)), :]
+        #if ngflgs[0]:  # Nodal/satellite with linearized times.
+        #    F = F[np.ones((nt, 1)), :]
+        #    U = U[np.ones((nt, 1)), :]
+        # Let's try letting broadcasting take care of it.
 
     # gwch (astron arg)
     if ngflgs[3]:  # None (raw phase lags not greenwich phase lags).
-        #   if ~exist('const','var'):
-        #       load('ut_constants.mat','const');
-        #   [~,ader] = ut_astron(tref);
-        #   ii=isfinite(const.ishallow);
-        #   const.freq(~ii) = (const.doodson(~ii,:)*ader)/(24);
-        #   for k=find(ii)'
-        #       ik=const.ishallow(k)+(0:const.nshallow(k)-1);
-        #       const.freq(k)=sum(const.freq(shallow.iname(ik)).*shallow.coef(ik))
-        V = 24*(t-tref)*const.freq[lind].T
+        freq = linearized_freqs(tref)
+        V  = 24 * (t[:, np.newaxis] - tref) * freq[lind];
+
     else:
-        if ngflgs[3]:  # Linearized times.
-            tt = tref
+        if ngflgs[2]:  # Linearized times.
+            tt = np.array([tref])
         else:
             tt = t  # Exact times.
-
         ntt = len(tt)
 
-        sat = ut_constants.sat
-        const = ut_constants.const
-        shallow = ut_constants.shallow
         astro, ader = ut_astron(tt)
 
-        # V = np.dot(const.doodson, astro) + const.semi[:, None]
-        # V *= np.ones((1,ntt)) % 1
         V = np.dot(const.doodson, astro) + const.semi[:, None]
-        V *= np.ones((1, ntt))
-        # V = V % 1
+        np.fmod(V, 1, out=V)
 
-        for k in np.where(np.isfinite(const.ishallow))[0]:
-            ik = const.ishallow[k] + np.arange(const.nshallow[k])
-            ik = ik.astype(int)
-            j = shallow.iname[ik-1]
-            exp1 = shallow.coef[ik-1]
-            temp1 = exp1[:]*np.ones((ntt, 1))
-            temp1 = temp1.T
-
-            V[k, :] = np.sum(V[j-1, :] * temp1, axis=0)
+        for i0, nshal, k in zip(ishallow, nshallow, kshallow):
+            ik = i0 + np.arange(nshal)
+            j = shallow.iname[
+            ik] - 1
+            exp1 = shallow.coef[ik, None]
+            V[k, :] = np.sum(V[j, :] * exp1, axis=0)
 
         V = V[lind, :].T
 
-#        if ngflgs(3) % linearized times
-#            [~,ader] = ut_astron(tref);
-#            ii=isfinite(const.ishallow);
-#            const.freq(~ii) = (const.doodson(~ii,:)*ader)/(24);
-#            for k=find(ii)'
-#                ik=const.ishallow(k)+(0:const.nshallow(k)-1);
-#                const.freq(k)=sum( const.freq(shallow.iname(ik)).* ...
-#                    shallow.coef(ik) );
-#            end
-#            V = V(ones(1,nt),:) + 24*(t-tref)*const.freq(lind)';
-#        end
+        if ngflgs[2]:  # linearized times
+            freq = linearized_freqs(tref)
+            V = V + 24*(t[:, None] - tref) * freq[None, lind];
 
     return F, U, V
 

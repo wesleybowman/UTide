@@ -292,7 +292,7 @@ def _psd(e, window, fs):
     return cs * psdnorm
 
 
-def band_psd(t, e, cfrq, equi=True, frqosmp=1):
+def band_psd(t, e, cfrq, equi=True, frqosamp=1):
     """
     Band-averaged power spectral density in vicinity of tidal constituents
 
@@ -346,7 +346,7 @@ def band_psd(t, e, cfrq, equi=True, frqosmp=1):
 
     else: # if uneven, lomb-scargle
         # time in hours, for output in CPH and x^2 per CPH
-        lfreq = _lomb_freqs(t * 24, fbands=freq_bands, ofac=frqosmp)
+        lfreq = _lomb_freqs(t * 24, fbands=freq_bands, ofac=frqosamp)
         ls_spec = _psd_lomb(t * 24, e, window=hn, freq=lfreq)
         Puu1s = ls_spec.Pxx
         allfrq = ls_spec.F
