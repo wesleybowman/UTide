@@ -13,6 +13,7 @@ from .constituent_selection import ut_cnstitsel
 from .confidence import _confidence
 from .utilities import Bunch
 from . import constit_index_dict
+from .robustfit import robustfit
 
 default_opts = dict(constit='auto',
                     conf_int='linear',
@@ -23,7 +24,7 @@ default_opts = dict(constit='auto',
                     infer='none',
                     MC_n=200,
                     Rayleigh_min=1,
-                    robust_kw=dict(),
+                    robust_kw=dict(weight_function='cauchy'),
                     white=False,
                     )
 
@@ -57,6 +58,7 @@ def _translate_opts(opts):
     # otherwise it should be default, 'Greenwich'
     oldopts.rmin = opts.Rayleigh_min
     oldopts.white = opts.white
+    oldopts.newopts = opts # so we can access new opts via the single "opt"
     return oldopts
 
 def solve(t, u, v=None, lat=None, **opts):
@@ -85,8 +87,6 @@ def solve(t, u, v=None, lat=None, **opts):
         implemented).
     method : {'ols', 'robust'}, optional
         Solve with ordinary least squares, or with a robust algorithm.
-        If the latter, see `robust_kw` below.  The robust method is
-        not yet implemented.
     trend : bool, optional
         True (default) to include a linear trend in the model.
     phase : {'Greenwich', 'linear_time', 'raw'}, optional
@@ -109,12 +109,11 @@ def solve(t, u, v=None, lat=None, **opts):
         Not yet implemented.
     MC_n : integer, optional
         Not yet implemented.
+    robust_kw : dict, optional
+        Keyword arguments for `robustfit`, if `method` is 'robust'.
     Rayleigh_min : float
         Minimum conventional Rayleigh criterion for automatic
         constituent selection; default is 1.
-    robust_kw : {dict, Bunch}
-        Keyword arguments for robust solution method.  Not yet
-        implemented.
     white : bool
         If False (default), use band-averaged spectra from the
         residuals in the confidence limit estimates; if True,
@@ -185,22 +184,15 @@ def _solv1(tin, uin, vin, lat, **opts):
     else:
         xraw = u
 
-    if opt['method'] == 'ols':
-        # m = B\xraw;
+    if opt.newopts.method == 'ols':
         m = np.linalg.lstsq(B, xraw)[0]   # model coefficients
-        # W = sparse(1:nt,1:nt,1);
         W = np.ones(nt)  # Uniform weighting; we could use a scalar 1, or None
     else:
-        raise NotImplementedError("Only method 'ols' has been implemented")
-#        [m,solnstats] = robustfit(B,ctranspose(xraw),...
-#            opt.method,opt.tunconst,'off');
-#        if isequal(lastwarn,'Iteration limit reached.')
-#            # nan-fill, create coef.results, reorder coef fields,
-#            % do runtime display
-#            coef = ut_finish(coef,nNR,nR,nI,elor,cnstit);
-#            % abort remainder of calcs
-#            return;
-#        W = sparse(1:nt,1:nt,solnstats.w);
+        rf = robustfit(B, xraw, **opt.newopts.robust_kw)
+        m = rf.b
+        W = rf.w
+        coef.rf = rf
+    coef.weights = W
 
     xmod = np.dot(B, m)   # model fit
 
@@ -385,7 +377,6 @@ def _slvinit(tin, uin, vin, lat, **opts):
     opt['infer'] = []
     opt['inferaprx'] = 0
     opt['rmin'] = 1
-    # opt['method'] = 'cauchy'
     opt['method'] = 'ols'
     opt['tunrdn'] = 1
     opt['linci'] = 0
@@ -405,18 +396,6 @@ def _slvinit(tin, uin, vin, lat, **opts):
             opt[key] = item
         except KeyError:
             print('solve: unrecognized input: {0}'.format(key))
-
-    allmethods = ['ols', 'andrews', 'bisquare', 'fair', 'huber',
-                  'logistic', 'talwar', 'welsch']
-
-    if opt['method'] != 'cauchy':
-        ind = np.argwhere(opt['method'] in allmethods)[0][0]
-        allconst = [np.nan, 1.339, 4.685, 1.400, 1.345, 1.205, 2.795, 2.985]
-        opt['tunconst'] = allconst[ind]
-    else:
-        opt['tunconst'] = 2.385
-
-    opt['tunconst'] = opt['tunconst'] / opt['tunrdn']
 
     return tin, t, u, v, tref, lor, elor, opt
 
