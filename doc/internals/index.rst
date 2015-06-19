@@ -6,3 +6,5 @@ Internal details
    :maxdepth: 1
 
    periodogram.rst
+   robustfit.rst
+
