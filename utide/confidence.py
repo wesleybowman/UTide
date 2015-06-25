@@ -57,11 +57,69 @@ def cluster(x, ang=360):
     y = (x+ofs)%ang - ofs
     return y
 
-def ut_nearposdef(cov,maxit=1000):
-     """
-     TO DO
-     """
-     return cov
+def _is_PD(A):
+    """
+    Helper for nearestSPD.  Testing PD via the cholesky call is
+    much faster than testing for negative eigenvalues.
+    """
+    try:
+        np.linalg.cholesky(A)
+        return True
+    except np.linalg.LinAlgError:
+        return False
+
+
+def nearestSPD(A):
+    """
+    Nearest Symmetric Positive Definite matrix to A.
+
+    The Frobenius norm is used: the rms difference of the elements.
+
+    Parameters
+    ----------
+    A : ndarray, 2-D
+        Matrix that should be SPD, but might not be, perhaps because
+        of floating point arithmetic, or limitations in the data
+        available to estimate its elements.
+
+    Returns
+    -------
+    Ahat : ndarray, 2-D
+        Nearest positive definite matrix to A
+
+    Notes
+    -----
+    From Higham: "The nearest symmetric positive semidefinite matrix in the
+    Frobenius norm to an arbitrary real matrix A is shown to be (B + H)/2,
+    where H is the symmetric polar factor of B=(A + A')/2."
+    http://www.sciencedirect.com/science/article/pii/0024379588902236
+
+    Code and docstring are based on the Matlab m-file by  John D'Errico:
+    http://www.mathworks.com/matlabcentral/fileexchange/42885-nearestspd
+    """
+
+    # Ensure symmetry:
+    B = (A + A.T) / 2
+
+    # Symmetric polar factor:
+    U, S, V = np.linalg.svd(B)
+    H = np.dot(V.T * S, V)
+
+    Ahat = (B + H) / 2
+
+    Ahat = (Ahat + Ahat.T) / 2
+
+    # Test Ahat, and adjust it slightly if necessary.
+
+    n = A.shape[0]
+    k = 0
+    while not _is_PD(Ahat):
+        k += 1
+        mineig = np.linalg.eigvals(Ahat).min()
+        Ahat[np.diag_indices(n)] += (-mineig * k**2 + np.spacing(mineig))
+
+    return Ahat
+
 
 def _confidence(coef, opt, t, e, tin, elor, xraw, xmod, W, m, B,
                 Xu, Yu, Xv, Yv):
@@ -177,7 +235,7 @@ def _confidence(coef, opt, t, e, tin, elor, xraw, xmod, W, m, B,
 
             if not opt.twodim:
                 if not opt.white:
-                    varcov_mCc[c, :, :] = ut_nearposdef(varcov_mCc[c, :, :])
+                    varcov_mCc[c, :, :] = nearestSPD(varcov_mCc[c, :, :])
                     mCall = np.random.multivariate_normal((Xu[c], Yu[c]),
                                     varcov_mCc[c], opt.nrlzn)
                 else:
@@ -213,7 +271,7 @@ def _confidence(coef, opt, t, e, tin, elor, xraw, xmod, W, m, B,
                         varcov_mCc[c, :2, 2:] = 0
                         varcov_mCc[c, 2:, :2] = 0
 
-                    varcov_mCc[c] = ut_nearposdef(varcov_mCc[c])
+                    varcov_mCc[c] = nearestSPD(varcov_mCc[c])
                     mCall = np.random.multivariate_normal((Xu[c], Yu[c], Xv[c],
                                             Yv[c]), varcov_mCc[c], opt.nrlzn)
                 else:
