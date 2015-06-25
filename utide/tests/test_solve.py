@@ -1,6 +1,11 @@
 """
-Tests for periodogram module.
+Smoke testing--just see if the system runs.
+
 """
+
+# These tests are quick and crude.
+# TODO: extend the tests by cycling through various combinations
+#       of configuration and data input.
 
 from __future__ import division
 
@@ -30,18 +35,6 @@ def test_roundtrip():
 
     arg = 2 * np.pi * (time - tref) * freq_cpd[jj] - np.deg2rad(phase)
     time_series = amp * np.cos(arg)
-
-    # Add a tiny bit of noise to prevent division by zero? Didn't do it.
-    #time_series += 1e-10 * np.random.randn(len(time_series))
-
-#    speed_coef = solve(time, time_series, time_series, lat=lat, cnstit='auto',
-#                         notrend=True, rmin=0.95, method='ols',
-#                         nodiagn=True, linci=True, conf_int=True)
-
-#    elev_coef = solve(time, time_series, lat=lat, cnstit='auto',
-#                        gwchnone=True, nodsatnone=True, notrend=True,
-#                        rmin=0.95, method='ols', nodiagn=True, linci=True,
-#                        conf_int=True)
 
     opts = dict(constit='auto',
                 phase='raw',
@@ -119,4 +112,64 @@ def test_robust():
 
     print(speed_coef.weights, elev_coef.weights)
     print(speed_coef.rf, elev_coef.rf)
+
+def test_MC():
+    ts = 735604
+    duration = 35
+
+    time = np.linspace(ts, ts+duration, 842)
+    tref = (time[-1] + time[0]) / 2
+
+    const = ut_constants.const
+
+    amp = 1.0
+    phase = 53
+    lat = 45.5
+
+    freq_cpd = 24 * const.freq
+
+    jj = 48-1  # Python index for M2
+
+    arg = 2 * np.pi * (time - tref) * freq_cpd[jj] - np.deg2rad(phase)
+    time_series = amp * np.cos(arg)
+
+    # Add noise
+    np.random.seed(1)
+    time_series +=  0.01 * np.random.randn(len(time_series))
+
+    opts = dict(constit='auto',
+                phase='raw',
+                nodal=False,
+                trend=False,
+                method='ols',
+                conf_int='MC',
+                white=False,
+                Rayleigh_min=0.95,
+                )
+
+    speed_coef = solve(time, time_series,  time_series, lat=lat, **opts)
+    elev_coef = solve(time, time_series, lat=lat, **opts)
+
+    for name, AA, AA_ci, gg, gg_ci in zip(elev_coef.name,
+                                          elev_coef.A,
+                                          elev_coef.A_ci,
+                                          elev_coef.g,
+                                          elev_coef.g_ci):
+        print('%5s %10.4g %10.4g  %10.4g %10.4g' %
+               (name, AA, AA_ci, gg, gg_ci))
+
+    for (name, Lsmaj, Lsmaj_ci, Lsmin, Lsmin_ci,
+          theta, theta_ci, gg, gg_ci) in zip(speed_coef.name,
+                                             speed_coef.Lsmaj,
+                                             speed_coef.Lsmaj_ci,
+                                             speed_coef.Lsmin,
+                                             speed_coef.Lsmin_ci,
+                                             speed_coef.theta,
+                                             speed_coef.theta_ci,
+                                             speed_coef.g,
+                                             speed_coef.g_ci):
+        print('%5s %10.4g %10.4g  %10.4g %10.4g  %10.4g %10.4g  %10.4g %10.4g' %
+               (name, Lsmaj, Lsmaj_ci, Lsmin, Lsmin_ci,
+                theta, theta_ci, gg, gg_ci))
+
 

@@ -14,24 +14,36 @@ def ut_cs2cep(Xu, Yu=None, Xv=None, Yv=None):
     """
     Compute ellipse parameters from cosine and sine coefficients.
 
-    For the 2-D case (currents), Xu, Yu are the cosine and sine
-    coefficients of the zonal component, and Xv and Yv of the
-    meridional component.
+    Parameters
+    ----------
+    Xu : ndarray
+        1-D array with cosine coefficients; or 2-D, (n,2) or (n,4)
+        with columns being cosine and sine coefficients of height,
+        or of velocity components.
 
-    For the 1-D case (height), Xv and Yv are None (default).
+    Yu, Xv, Yv : ndarray, 1-D, optional
+        If Xu is 1-D, these will have the sine coefficients of
+        the first variable (height or U velocity component), and
+        potentially the cosine and sin coefficients of a second
+        variable (V velocity component).
 
-    Returns:
-        Lsmaj, Lsmin: semi-major and semi-minor axes
-        theta: major axis orientation, degrees ccw from x-axis, 0-180
-        g: phase, degrees, 0-360
+    Returns
+    -------
+        Lsmaj, Lsmin : ndarray
+             semi-major and semi-minor axes
+        theta : ndarray
+             major axis orientation, degrees ccw from x-axis, 0-180
+        g : ndarray
+            phase, degrees, 0-360
 
-    1-D case: Lsmin and theta are zero
+    In the single-variable case (height): Lsmin and theta are zero
 
-    Note: Following the matlab, Lsmin can be negative.
+    Notes
+    -----
+    Following the matlab version, Lsmin can be negative.
 
-    % UTide v1p0 9/2011 d.codiga@gso.uri.edu
+    Based on UTide v1p0 9/2011 d.codiga@gso.uri.edu
     """
-    Xv = None
 
     if Yu is None:
         ndim = Xu.shape[-1]
