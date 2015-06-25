@@ -8,10 +8,12 @@ of ellipse parameter uncertainties.
 
 from __future__ import absolute_import, division
 
+import warnings
+
 import numpy as np
 
-from .periodogram import band_psd
-from .ellipse_params import ut_cs2cep
+from utide.periodogram import band_psd
+from utide.ellipse_params import ut_cs2cep
 
 def band_averaged_psd_by_constit(tin, t, e, elor, coef, opt):
     # Band-averaged (ba) spectral densities at each constituent freq.
@@ -85,7 +87,7 @@ def nearestSPD(A):
     Returns
     -------
     Ahat : ndarray, 2-D
-        Nearest positive definite matrix to A
+        (Almost) nearest positive definite matrix to A
 
     Notes
     -----
@@ -96,12 +98,18 @@ def nearestSPD(A):
 
     Code and docstring are based on the Matlab m-file by  John D'Errico:
     http://www.mathworks.com/matlabcentral/fileexchange/42885-nearestspd
+
+    The tweaking method was changed to be more robust in the common
+    pathological case, where more than one eigenvalue is near zero, and
+    when one eigenvalue is exactly zero.  To be conservative, we are
+    always nudging the diagonal to larger values.
     """
 
     # Ensure symmetry:
     B = (A + A.T) / 2
 
-    # Symmetric polar factor:
+
+    # Symmetric polar factor, H: (in numpy svd, B = U S V, not U S V')
     U, S, V = np.linalg.svd(B)
     H = np.dot(V.T * S, V)
 
@@ -109,15 +117,28 @@ def nearestSPD(A):
 
     Ahat = (Ahat + Ahat.T) / 2
 
-    # Test Ahat, and adjust it slightly if necessary.
+    # At this point, given floating point errors and differences
+    # among algorithms, Ahat might be on the PD boundary, or too
+    # close to it for some numerical operations. Adjust it:
 
     n = A.shape[0]
     k = 0
-    while not _is_PD(Ahat):
+    # The "k == 0" is included to avoid a warning from
+    # np.random.multivariate_normal, which seems to have a PD-detection
+    # algorithm that occasionally fails on matrices that pass the
+    # cholesky test.
+    while k == 0 or not _is_PD(Ahat):
         k += 1
-        mineig = np.linalg.eigvals(Ahat).min()
-        Ahat[np.diag_indices(n)] += (-mineig * k**2 + np.spacing(mineig))
-
+        # Tweaking strategy differs from D'Errico version.  It
+        # is still a very small adjustment, but much larger than
+        # his.
+        maxeig = np.linalg.eigvals(Ahat).max()
+        Ahat[np.diag_indices(n)] += np.spacing(maxeig)
+        # Normally no more than one adjustment will be needed.
+        if k > 100:
+            warnings.warn('adjustment in nearestSPD did not converge; '
+                          'returning diagonal')
+            return np.diag(np.diag(A))
     return Ahat
 
 
