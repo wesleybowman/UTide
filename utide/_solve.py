@@ -39,9 +39,17 @@ def _translate_opts(opts):
     # Here or elsewhere, proper validation remains to be added.
     oldopts = Bunch()
     oldopts.cnstit = opts.constit
-    oldopts.conf_int = (opts.conf_int != 'none')
-    if oldopts.conf_int:
+
+    oldopts.conf_int = True
+    if opts.conf_int == 'linear':
         oldopts.linci = True
+    elif opts.conf_int == 'MC':
+        oldopts.linci = False
+    elif opts.conf_int == 'none':
+        oldopts.conf_int = False
+    else:
+        raise ValueError("'conf_int' must be 'linear', 'MC', or 'none'")
+
     oldopts.notrend = not opts.trend
     oldopts['nodesatlint'] = False
     oldopts['nodesatnone'] = False

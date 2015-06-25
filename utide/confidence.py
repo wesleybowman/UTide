@@ -9,9 +9,9 @@ of ellipse parameter uncertainties.
 from __future__ import absolute_import, division
 
 import numpy as np
-import scipy.interpolate as sip
 
 from .periodogram import band_psd
+from .ellipse_params import ut_cs2cep
 
 def band_averaged_psd_by_constit(tin, t, e, elor, coef, opt):
     # Band-averaged (ba) spectral densities at each constituent freq.
@@ -20,7 +20,7 @@ def band_averaged_psd_by_constit(tin, t, e, elor, coef, opt):
         e_ = e
         if len(tin) > len(t):
             e_ = np.interp(tin, t, e)
-        ba = band_psd(tin, e, constits, equi=True)
+        ba = band_psd(tin, e_, constits, equi=True)
 
     else:
         ba = band_psd(t, e, constits,
@@ -45,6 +45,23 @@ def band_averaged_psd_by_constit(tin, t, e, elor, coef, opt):
             Pvv[inside] = ba.Pvv[i]
             Puv[inside] = ba.Puv[i]
     return Puu, Pvv, Puv
+
+def cluster(x, ang=360):
+    """
+    Wrapping the values of x to +- ang/2 of x[0]
+    """
+
+    x = np.array(x)
+    ha = ang/2
+    ofs = - x[0] + ha
+    y = (x+ofs)%ang - ofs
+    return y
+
+def ut_nearposdef(cov,maxit=1000):
+     """
+     TO DO
+     """
+     return cov
 
 def _confidence(coef, opt, t, e, tin, elor, xraw, xmod, W, m, B,
                 Xu, Yu, Xv, Yv):
@@ -110,9 +127,9 @@ def _confidence(coef, opt, t, e, tin, elor, xraw, xmod, W, m, B,
 
     for c in range(nc):
         G = np.array([[Gall[c, c], Gall[c, c+nc]],
-                      [Gall[c+nc, c], Gall[c+nc, c+nc]]])
+                      [Gall[c + nc, c], Gall[c+nc, c+nc]]])
         H = np.array([[Hall[c, c], Hall[c, c+nc]],
-                      [Hall[c+nc, c], Hall[c+nc, c+nc]]])
+                      [Hall[c + nc, c], Hall[c+nc, c+nc]]])
         varXu = np.real(G[0, 0] + G[1, 1] + 2 * G[0, 1]) / 2
         varYu = np.real(H[0, 0] + H[1, 1] - 2 * H[0, 1]) / 2
 
@@ -125,13 +142,13 @@ def _confidence(coef, opt, t, e, tin, elor, xraw, xmod, W, m, B,
                 varcov_mCw[c, :, :] = np.diag(np.array([varXu, varYu]))
                 if not opt['white']:
                     den = varXu + varYu
-                    varXu = Puu[c]*varXu/den
-                    varYu = Puu[c]*varYu/den
+                    varXu = Puu[c] * varXu / den
+                    varYu = Puu[c] * varYu / den
                     varcov_mCc[c, :, :] = np.diag(np.array([varXu, varYu]))
                 sig1, sig2 = ut_linci(Xu[c], Yu[c], np.sqrt(varXu),
                                       np.sqrt(varYu))
-                coef['A_ci'][c] = 1.96*sig1
-                coef['g_ci'][c] = 1.96*sig2
+                coef['A_ci'][c] = 1.96 * sig1
+                coef['g_ci'][c] = 1.96 * sig2
             else:
                 varcov_mCw[c, :, :] = np.diag(np.array([varXu, varYu,
                                                         varXv, varYv]))
@@ -144,13 +161,77 @@ def _confidence(coef, opt, t, e, tin, elor, xraw, xmod, W, m, B,
                 sig1, sig2 = ut_linci(Xu[c] + 1j * Xv[c], Yu[c] + 1j * Yv[c],
                                       np.sqrt(varXu) + 1j * np.sqrt(varXv),
                                       np.sqrt(varYu) + 1j * np.sqrt(varYv))
-                coef['Lsmaj_ci'][c] = 1.96*np.real(sig1)
-                coef['Lsmin_ci'][c] = 1.96*np.imag(sig1)
-                coef['g_ci'][c] = 1.96*np.real(sig2)
-                coef['theta_ci'][c] = 1.96*np.imag(sig2)
+                coef['Lsmaj_ci'][c] = 1.96 * np.real(sig1)
+                coef['Lsmin_ci'][c] = 1.96 * np.imag(sig1)
+                coef['g_ci'][c] = 1.96 * np.real(sig2)
+                coef['theta_ci'][c] = 1.96 * np.imag(sig2)
 
-        else:  # TODO: Monte Carlo.
-            pass
+        else:  # Monte Carlo.
+            covXuYu = np.imag(H[0,0] - H[0,1] + H[1,0] - H[1,1]) / 2
+            Duu = np.array([[varXu, covXuYu], [covXuYu, varYu]])
+            varcov_mCw[c, :2, :2] = Duu
+
+            if not opt.white:
+                Duu = Puu[c] * Duu / np.trace(Duu)
+                varcov_mCc[c, :2, :2] = Duu
+
+            if not opt.twodim:
+                if not opt.white:
+                    varcov_mCc[c, :, :] = ut_nearposdef(varcov_mCc[c, :, :])
+                    mCall = np.random.multivariate_normal((Xu[c], Yu[c]),
+                                    varcov_mCc[c], opt.nrlzn)
+                else:
+                    mCall = np.random.multivariate_normal((Xu[c], Yu[c]),
+                                    varcov_mCw[c], opt.nrlzn)
+                A,_,_,g = ut_cs2cep(mCall)
+                coef.A_ci[c] = 1.96 * np.median(np.abs(A - np.median(A))) / 0.6745
+                g[0] = coef.g[c]
+                g = cluster(g, 360)
+                coef.g_ci[c] = 1.96 * np.median(np.abs(g - np.median(g))) / 0.6745
+            else:
+                covXvYv = np.imag(G[0,0] - G[0,1] + G[1,0] - G[1,1]) / 2
+                Dvv = np.array([[varXv, covXvYv], [covXvYv, varYv]])
+                varcov_mCw[c, 2:, 2:] = Dvv
+
+                if not opt.white:
+                    Dvv = Pvv[c] * Dvv / np.trace(Dvv)
+                    varcov_mCc[c, 2:, 2:] = Dvv
+                covXuXv = np.imag(- H[0, 0] - H[0, 1] - H[1, 0] - H[1, 1]) / 2
+                covXuYv = np.real(G[0, 0] - G[1,1]) / 2
+                covYuXv = np.real(- H[0, 0] + H[1, 1]) / 2
+                covYuYv = np.imag(- G[0, 0] + G[0, 1] + G[1, 0] - G[1, 1]) / 2
+                Duv = np.array([[covXuXv, covXuYv], [covYuXv, covYuYv]])
+                varcov_mCw[c, :2, 2:] = Duv
+                varcov_mCw[c, 2:, :2] = Duv.T
+
+                if not opt.white:
+                    if np.abs(Duv).sum() > 0:
+                        Duv = Puv[c] * Duv / np.abs(Duv).sum()
+                        varcov_mCc[c, :2, 2:] = Duv
+                        varcov_mCc[c, 2:, :2] = Duv.T
+                    else:
+                        varcov_mCc[c, :2, 2:] = 0
+                        varcov_mCc[c, 2:, :2] = 0
+
+                    varcov_mCc[c] = ut_nearposdef(varcov_mCc[c])
+                    mCall = np.random.multivariate_normal((Xu[c], Yu[c], Xv[c],
+                                            Yv[c]), varcov_mCc[c], opt.nrlzn)
+                else:
+                    mCall = np.random.multivariate_normal((Xu[c], Yu[c], Xv[c],
+                                            Yv[c]), varcov_mCw[c], opt.nrlzn)
+                Lsmaj, Lsmin, theta, g = ut_cs2cep(mCall)
+                coef.Lsmaj_ci[c] = 1.96 * np.median(np.abs(Lsmaj -
+                                            np.median(Lsmaj))) / 0.6745
+                coef.Lsmin_ci[c] = 1.96 * np.median(np.abs(Lsmin -
+                                            np.median(Lsmin))) / 0.6745
+                theta[0] = coef.theta[c]
+                theta = cluster(theta, 360)
+                coef.theta_ci[c] = 1.96 * np.median(np.abs(theta -
+                                            np.median(theta))) / 0.6745
+                g[0] = coef.g[c]
+                g = cluster(g, 360)
+                coef.g_ci[c] = 1.96 * np.median(np.abs(g -
+                                            np.median(g))) / 0.6745
 
     return coef
 

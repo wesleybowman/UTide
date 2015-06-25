@@ -10,7 +10,7 @@ from __future__ import absolute_import, division
 import numpy as np
 
 
-def ut_cs2cep(Xu, Yu, Xv=None, Yv=None):
+def ut_cs2cep(Xu, Yu=None, Xv=None, Yv=None):
     """
     Compute ellipse parameters from cosine and sine coefficients.
 
@@ -31,9 +31,19 @@ def ut_cs2cep(Xu, Yu, Xv=None, Yv=None):
 
     % UTide v1p0 9/2011 d.codiga@gso.uri.edu
     """
+    Xv = None
+
+    if Yu is None:
+        ndim = Xu.shape[-1]
+        if not (ndim == 2 or ndim == 4):
+            raise ValueError("invalid arguments")
+        Yu = Xu[:,1]
+        if ndim == 4:
+            Xv,Yv = Xu[:,2:].T
+        Xu = Xu[:,0]
 
     if Xv is None:
-        ap = (Xu - 1j*Yu)
+        ap = Xu - 1j*Yu
         Lsmaj = np.abs(ap)
         Lsmin = np.zeros_like(Xu)
         theta = np.zeros_like(Xu)
@@ -41,12 +51,12 @@ def ut_cs2cep(Xu, Yu, Xv=None, Yv=None):
         return Lsmaj, Lsmin, theta, g
 
     # 2-D case
-    ap = ((Xu+Yv) + 1j*(Xv-Yu))/2
-    am = ((Xu-Yv) + 1j*(Xv+Yu))/2
+    ap = ((Xu+Yv) + 1j * (Xv-Yu))/2
+    am = ((Xu-Yv) + 1j * (Xv+Yu))/2
     Ap = np.abs(ap)
     Am = np.abs(am)
-    Lsmaj = Ap+Am
-    Lsmin = Ap-Am
+    Lsmaj = Ap + Am
+    Lsmin = Ap - Am
     epsp = np.angle(ap, deg=True)
     epsm = np.angle(am, deg=True)
 
