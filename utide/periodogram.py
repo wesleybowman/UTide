@@ -21,7 +21,7 @@ from scipy import signal
 from utide.utilities import Bunch
 
 
-#__all__ = ['freq_bands', 'band_psd']
+# __all__ = ['freq_bands', 'band_psd']
 
 # Frequency bands in cycles per hour for
 # estimating background noise levels.
@@ -65,7 +65,6 @@ def fbndavg(P, freq, cfreq=None, fbands=None):
     if fbands is None:
         fbands = freq_bands
 
-    df = freq[2] - freq[1]
     nfreq = len(freq)
 
     if cfreq is not None:
@@ -90,6 +89,7 @@ def fbndavg(P, freq, cfreq=None, fbands=None):
     avP = avP.filled(np.nan)
 
     return avP
+
 
 def _lomb_freqs(t, fbands=None, ofac=1, max_per_band=500):
     """
@@ -124,7 +124,6 @@ def _lomb_freqs(t, fbands=None, ofac=1, max_per_band=500):
         freqs.append(band)
 
     return np.hstack(freqs)
-
 
 
 def _psd_lomb(t, x, window=None, freq=None, ofac=1):
@@ -221,6 +220,7 @@ def _psd_lomb(t, x, window=None, freq=None, ofac=1):
 
     return out
 
+
 def _ls_cross(t, x, fr):
     """
     Cross spectral counterpart of signal.lombscargle.
@@ -276,9 +276,8 @@ def _psd(e, window, fs):
     Returns PSD in cycles per time unit.
     """
 
-    nt = len(e)
-    #iny = nt//2 +1
-    # detrending: just remove the mean
+    # iny = nt//2 +1
+    # Detrending: just remove the mean.
     e = e - e.mean()
     e *= window
     if e.dtype.kind == 'c':
@@ -286,9 +285,9 @@ def _psd(e, window, fs):
     else:
         cs = np.abs(np.fft.rfft(e.real))**2
 
-    #cs = cs[:iny]
+    # cs = cs[:iny]
     cs[1:-1] *= 2
-    psdnorm = (1/fs) * (1/(window**2).sum())  #  dt / sum of win squared
+    psdnorm = (1/fs) * (1/(window**2).sum())  # dt / sum of win squared.
     return cs * psdnorm
 
 
@@ -336,7 +335,7 @@ def band_psd(t, e, cfrq, equi=True, frqosamp=1):
     hn = signal.hanning(nt, sym=False)
 
     # on real component
-    if equi: # if even sampling, fft
+    if equi:  # If even sampling, FFT.
         # sample interval in hours; t is in days
         dt = 24 * (t[1] - t[0])
 
@@ -344,7 +343,7 @@ def band_psd(t, e, cfrq, equi=True, frqosamp=1):
         Puu1s = _psd(np.real(e), hn, fs)
         allfrq = np.arange(nt//2 + 1) / (nt * dt)
 
-    else: # if uneven, lomb-scargle
+    else:  # If uneven, Lomb-scargle.
         # time in hours, for output in CPH and x^2 per CPH
         lfreq = _lomb_freqs(t * 24, fbands=freq_bands, ofac=frqosamp)
         ls_spec = _psd_lomb(t * 24, e, window=hn, freq=lfreq)
@@ -356,11 +355,11 @@ def band_psd(t, e, cfrq, equi=True, frqosamp=1):
     # If e is complex, handle imaginary part.
     if e.dtype.kind == 'c':
 
-        if equi: # if even sampling, welch
+        if equi:  # If even sampling, Welch.
             Pvv1s = _psd(e.imag, hn, fs)
             Puv1s = _psd(e, hn, fs)       # complex cross-periodogram
 
-        else: # if uneven, lomscargle
+        else:  # If uneven, lomscargle.
             Pvv1s = ls_spec.Pyy
             Puv1s = ls_spec.Pxy
 
@@ -376,4 +375,3 @@ def band_psd(t, e, cfrq, equi=True, frqosamp=1):
         # P.Puv = np.abs(P.Puv)
 
     return P
-
