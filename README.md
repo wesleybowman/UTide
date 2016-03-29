@@ -1,9 +1,14 @@
 UTide
 =====
 
-Python implementation of the MatLab package UTide
+Python re-implementation of the Matlab package UTide.
 
 Still in heavy development--everything is subject to change.
+
+Note: the user interface differs from the Matlab version, so
+consult the Python function docstrings to see how to specify
+parameters.  Some functionality from the Matlab version is
+not yet available.
 
 % For more information see:
 % Codiga, D.L., 2011. Unified Tidal Analysis and Prediction Using the
@@ -15,12 +20,14 @@ Still in heavy development--everything is subject to change.
 % UTide v1p0 9/2011 d.codiga@gso.uri.edu
 % http://www.po.gso.uri.edu/~codiga/utide/utide.htm
 
-***Added Experimental branch, where all code for a pull request should be submitted for testing.***
 
 Installation
 ============
 
-Download the zip file and unzip it.
+Download the zip file and unzip it; or, much better,
+clone the git repository.  In either case, change
+your directory to the newly-created `utide` distribution
+directory.
 
 ```
 python setup.py install
@@ -29,103 +36,50 @@ or
 ```
 python setup.py install --user
 ```
-if the user doesn't have access to all files.
+if you don't want a system-wide installation.
 
 If you want to work on developing the package, then
 ```
 python setup.py develop
 ```
-is the way to go. The public functions can then be imported using
+will allow you to test without reinstalling after making
+a modification.
+
+Another option is to use
+```
+pip install .
+```
+
+If you are using conda and will not be developing the code,
+you can install from the IOOS channel.  See
+https://github.com/ioos/conda-recipes/wiki.
+
+The public functions can be imported using
 ```
 from utide import solve, reconstruct
 ```
 
-To test and make sure that the package has been installed and imported correctly, run:
+To test and make sure that the package has been installed
+and imported correctly, run:
 ```
-from utide import simple_utide_test
-simple_utide_test.simple_utide_test()
+from utide.tests.test_solve import test_roundtrip
+test_roundtrip()
 ```
 
-
-**Under Construction**
-----
-The only method that is currently implemented is 'ols.' For the rest to work,
-we need to supply a suitable robust fit routine.
-
-Diagnostics is still under work (and a lot of functions within it).
-It will not run diagntable or the diagnplots.
-
-Functions that aren't finished (there may be more that I overlooked):
-ut_finish
-ut_diagnfigs
-ut_diagnrcn
-ut_diagntable
-ut_cluster
-ut_nearposdef
-ut_lmbscgc (could use scipy.signal.lombscargle)
-ut_lmbscga
-ut_rundescr
+If you have the pytest package installed, you can execute `py.test`
+from within the source directory to run all tests.
 
 A sample call would be
 ```
 from utide import solve
-coef = solve(time, time_series_u, time_series_v, lat, cnstit='auto',
-               notrend=True, rmin=0.95, method='ols',
-               nodiagn=True, linci=True, conf_int=True)
+
+coef = solve(time, time_series_u, time_series_v,
+             lat=30,
+             cnstit='auto',
+             nodal=False,
+             trend=False,
+             method='ols',
+             conf_int='linear',
+             Rayleigh_min=095,)
 ```
-
-
-**Optional Keywords**
-----
-These can be supplied to **solve**, to change the default values, which are
-indicated.
-
-    conf_int=True
-    cnstit='auto'
-    notrend=0
-    prefilt=[]
-    nodsatlint=0
-    nodsatnone=0
-    gwchlint=0
-    gwchnone=0
-    infer=[]
-    inferaprx=0
-    rmin=1
-    method='cauchy'
-    tunrdn=1
-    linci=0
-    white=0
-    nrlzn=200
-    lsfrqosmp=1
-    nodiagn=0
-    diagnplots=0
-    diagnminsnr=2
-    ordercnstit=[]
-    runtimedisp='yyy'
-
-These can be supplied to **reconstruct** to change the
-default values, which are indicated.
-
-    cnstit = []
-    minsnr = 2
-    minpe = 0
-
-
-**File Structure for locating functions**
-----
-When changes are made to file structure, please update.
-
-- _solve.py: solve, _solve1, _slvinit
-- _reconstruct.py: reconstruct, _reconstr1, _rcinit
-- astronomy.py: ut_astron
-- band_average.py: ut_fbndavg
-- confidence.py: _confidence, ut_linci
-- constituent_selection.py: ut_cnstitsel
-- diagnostics.py: ut_diagn
-- ellipse_params.py: ut_cs2cep
-- harmonics.py: ut_E, ut_FUV
-- periodogram.py: ut_pdgm
-- utilities.py: Bunch, showmatbunch, loadmatbunch
-- simple_utide_test.py: simple_utide_test
-- data/ut_constants.mat
 
