@@ -3,15 +3,11 @@ import sys
 from setuptools import setup
 from setuptools.command.test import test as TestCommand
 
-rootpath = os.path.abspath(os.path.dirname(__file__))
-
 
 class PyTest(TestCommand):
-    """python setup.py test"""
     def finalize_options(self):
         TestCommand.finalize_options(self)
-        self.test_args = ['--strict', '--verbose', '--tb=long', 'tests']
-        self.test_suite = True
+        self.verbose = True
 
     def run_tests(self):
         import pytest
@@ -19,34 +15,55 @@ class PyTest(TestCommand):
         sys.exit(errno)
 
 
-def readme():
-    with open('README.md') as f:
-        return f.read()
-
-
-def extract_version():
+def extract_version(module='utide'):
     version = None
-    fname = os.path.join(rootpath, 'utide', '__init__.py')
-    with open(fname) as f:
-        for line in f:
+    fdir = os.path.dirname(__file__)
+    fnme = os.path.join(fdir, module, '__init__.py')
+    with open(fnme) as fd:
+        for line in fd:
             if (line.startswith('__version__')):
                 _, version = line.split('=')
-                version = version.strip()[1:-1]  # Remove quotation characters
+                # Remove quotation characters.
+                version = version.strip()[1:-1]
                 break
     return version
 
+rootpath = os.path.abspath(os.path.dirname(__file__))
+
+
+def read(*parts):
+    return open(os.path.join(rootpath, *parts), 'r').read()
+
+long_description = '{}\n{}'.format(read('README.rst'), read('LICENSE.txt'))
+
+with open('requirements.txt') as f:
+    require = f.readlines()
+install_requires = [r.strip() for r in require]
+
 setup(name='UTide',
       version=extract_version(),
-      description='Python distribution of the MatLab package UTide.',
-      long_description=readme(),
-      url='https://github.com/wesleybowman/UTide',
-      author='Wesley Bowman',
-      author_email='wesley.bowman23@gmail.com',
-      maintainer='Wesley Bowman',
       license='MIT',
-      packages=['utide', 'utide/tests'],
-      package_data={'utide': ['data/*.mat']},
+      long_description=long_description,
+      classifiers=['Development Status :: 5 - Production/Stable',
+                   'Environment :: Console',
+                   'Intended Audience :: Science/Research',
+                   'Intended Audience :: Developers',
+                   'Intended Audience :: Education',
+                   'License :: OSI Approved :: MIT',
+                   'Operating System :: OS Independent',
+                   'Programming Language :: Python',
+                   'Topic :: Scientific/Engineering',
+                   'Topic :: Education',
+                   ],
+      description='Python distribution of the MatLab package UTide.',
+      url='https://github.com/wesleybowman/UTide',
+      platforms='any',
+      keywords=['oceanography', 'tides'],
+      install_requires=install_requires,
+      packages=['utide'],
+      package_data={'utide': ['data/*.npz']},
       tests_require=['pytest'],
-      extras_require=dict(testing=['pytest']),
       cmdclass=dict(test=PyTest),
+      author=['Wesley Bowman'],
+      author_email='wesley.bowman23@gmail.com',
       zip_safe=False)

@@ -6,22 +6,21 @@ modification of ut_FUV extracted from ut_solv.m.  The
 data-generating script is make_FUV_data.py.
 """
 
-from __future__ import division
+from __future__ import (absolute_import, division, print_function)
 
 import os
 
-import numpy as np
 from numpy.testing import assert_array_almost_equal
-from scipy.io.matlab import loadmat
 
 from utide.harmonics import FUV
-from utide.utilities import Bunch
+from utide.utilities import loadbunch
 from utide import _base_dir
 
-fname = os.path.join(_base_dir, 'FUV0.mat')
+fname = os.path.join(_base_dir, 'FUV0.npz')
+
 
 def test_FUV():
-    x = Bunch(loadmat(fname, squeeze_me=True))
+    x = loadbunch(fname, masked=False)
     for i, flag in enumerate(x.flags):
         F, U, V = FUV(x.t, x.t0, x.lind-1, x.lat, flag)
         print('i:', i, "ngflgs:", flag)
@@ -41,5 +40,3 @@ def test_FUV():
         else:
             sub = (i,)
         assert_array_almost_equal(V, x.Vo[sub])
-
-

@@ -7,7 +7,7 @@ Smoke testing--just see if the system runs.
 # TODO: extend the tests by cycling through various combinations
 #       of configuration and data input.
 
-from __future__ import division
+from __future__ import (absolute_import, division, print_function)
 
 import numpy as np
 
@@ -15,8 +15,9 @@ from utide import ut_constants
 from utide import solve
 from utide import reconstruct
 
+
 def test_roundtrip():
-    # Minimal conversion from simple_utide_test
+    """Minimal conversion from simple_utide_test."""
     ts = 735604
     duration = 35
 
@@ -45,14 +46,14 @@ def test_roundtrip():
                 Rayleigh_min=0.95,
                 )
 
-    speed_coef = solve(time, time_series, time_series, lat=lat, **opts)
+    # speed_coef = solve(time, time_series, time_series, lat=lat, **opts)
     elev_coef = solve(time, time_series, lat=lat, **opts)
 
     amp_err = amp - elev_coef['A'][0]
     phase_err = phase - elev_coef['g'][0]
     ts_recon = reconstruct(time, elev_coef).h
 
-    vel = reconstruct(time, speed_coef)
+    # vel = reconstruct(time, speed_coef)
 
     err = np.sqrt(np.mean((time_series-ts_recon)**2))
 
@@ -66,11 +67,14 @@ def test_roundtrip():
 
 
 def test_robust():
-    # Quick check that method='robust' works; no real checking
-    # of results, other than by using "py.test -s" and noting that
-    # the results are reasonable, and the weights for the outliers
-    # are very small.
-    # Minimal conversion from simple_utide_test
+    """
+    Quick check that method='robust' works; no real checking
+    of results, other than by using "py.test -s" and noting that
+    the results are reasonable, and the weights for the outliers
+    are very small.
+    Minimal conversion from simple_utide_test
+
+    """
     ts = 735604
     duration = 35
 
@@ -92,7 +96,7 @@ def test_robust():
 
     # Add noise
     np.random.seed(1)
-    time_series +=  0.01 * np.random.randn(len(time_series))
+    time_series += 0.01 * np.random.randn(len(time_series))
 
     # Add wild points
     time_series[:5] = 10
@@ -112,6 +116,7 @@ def test_robust():
 
     print(speed_coef.weights, elev_coef.weights)
     print(speed_coef.rf, elev_coef.rf)
+
 
 def test_MC():
     ts = 735604
@@ -135,7 +140,7 @@ def test_MC():
 
     # Add noise
     np.random.seed(1)
-    time_series +=  0.01 * np.random.randn(len(time_series))
+    time_series += 0.01 * np.random.randn(len(time_series))
 
     opts = dict(constit='auto',
                 phase='raw',
@@ -156,20 +161,17 @@ def test_MC():
                                           elev_coef.g,
                                           elev_coef.g_ci):
         print('%5s %10.4g %10.4g  %10.4g %10.4g' %
-               (name, AA, AA_ci, gg, gg_ci))
+              (name, AA, AA_ci, gg, gg_ci))
 
     for (name, Lsmaj, Lsmaj_ci, Lsmin, Lsmin_ci,
-          theta, theta_ci, gg, gg_ci) in zip(speed_coef.name,
-                                             speed_coef.Lsmaj,
-                                             speed_coef.Lsmaj_ci,
-                                             speed_coef.Lsmin,
-                                             speed_coef.Lsmin_ci,
-                                             speed_coef.theta,
-                                             speed_coef.theta_ci,
-                                             speed_coef.g,
-                                             speed_coef.g_ci):
+         theta, theta_ci, gg, gg_ci) in zip(speed_coef.name,
+                                            speed_coef.Lsmaj,
+                                            speed_coef.Lsmaj_ci,
+                                            speed_coef.Lsmin,
+                                            speed_coef.Lsmin_ci,
+                                            speed_coef.theta,
+                                            speed_coef.theta_ci,
+                                            speed_coef.g,
+                                            speed_coef.g_ci):
         print('%5s %10.4g %10.4g  %10.4g %10.4g  %10.4g %10.4g  %10.4g %10.4g' %
-               (name, Lsmaj, Lsmaj_ci, Lsmin, Lsmin_ci,
-                theta, theta_ci, gg, gg_ci))
-
-
+              (name, Lsmaj, Lsmaj_ci, Lsmin, Lsmin_ci, theta, theta_ci, gg, gg_ci))

@@ -3,14 +3,14 @@ Robust MLR via iteratively reweighted least squares.
 
 """
 
-from __future__ import absolute_import, division, print_function
+from __future__ import (absolute_import, division, print_function)
 
 import numpy as np
 
 from utide.utilities import Bunch
 
-# Weighting functions:
 
+# Weighting functions:
 def andrews(r):
     r = np.abs(r)
     r = max(np.sqrt(np.spacing(1)), r)
@@ -72,8 +72,6 @@ wfuncdict = dict(andrews=andrews,
                  talwar=talwar,
                  welsch=welsch)
 
-
-
 tune_defaults = {'andrews': 1.339,
                  'bisquare': 4.685,
                  'cauchy': 2.385,
@@ -83,6 +81,7 @@ tune_defaults = {'andrews': 1.339,
                  'ols': 1,
                  'talwar': 2.795,
                  'welsch': 2.985}
+
 
 def sigma_hat(x):
     """
@@ -204,7 +203,7 @@ def robustfit(X, y, weight_function='bisquare', tune=None,
         rmeansq = rsumsq / w.sum()
 
         if oldrsumsq is not None:
-            #improvement = (oldrsumsq - rsumsq) / oldrsumsq
+            # improvement = (oldrsumsq - rsumsq) / oldrsumsq
             improvement = (oldrmeansq - rmeansq) / oldrmeansq
             # print("improvement:", improvement)
 
@@ -228,11 +227,11 @@ def robustfit(X, y, weight_function='bisquare', tune=None,
         # Residuals (unweighted) from latest fit:
         resid = y - np.dot(X, b)
 
-        # update weights based on these residuals
+        # Update weights based on these residuals.
         w = _wfunc(r_normed(resid, rfac))
 
     if iterations == 0:
-        iterations = maxit  # did not converge
+        iterations = maxit  # Did not converge.
 
     rms_resid = np.sqrt(np.mean(np.abs(resid)**2))
 
@@ -269,20 +268,19 @@ if __name__ == '__main__':
     c = np.linalg.lstsq(A, y)
     print('OLS:', c[0])
 
-    rf1  = robustfit(A, y)
+    rf1 = robustfit(A, y)
 
     print('robust:', rf1.b)
-
     print('another test: a very short real series')
 
-    x = np.arange(1,21, dtype=float)
+    x = np.arange(1, 21, dtype=float)
     x0 = np.ones_like(x)
     xx = np.vstack((x0, x)).T
 
-    # signal for the model: linear trend
+    # Signal for the model: linear trend.
     y = 2 * x
 
-    # some outliers
+    # Some outliers.
     y[0] = 1.5
     y[2] = -2
     y[4] = 9.6
@@ -293,4 +291,3 @@ if __name__ == '__main__':
     rf2 = robustfit(xx, y)
     print(np.linalg.lstsq(xx, y)[0])
     print(rf2.b)
-

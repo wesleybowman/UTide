@@ -1,5 +1,6 @@
-include *.md
-include LICENSE
+include README.rst
+include LICENSE.txt
+include requirements.txt
 
 recursive-include utide *.py
-recursive-include utide *.mat
+recursive-include utide *.npz

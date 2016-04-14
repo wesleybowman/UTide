@@ -2,7 +2,7 @@
 Central module for calculating the tidal amplitudes, phases, etc.
 """
 
-from __future__ import absolute_import, division
+from __future__ import (absolute_import, division, print_function)
 
 import numpy as np
 
@@ -28,11 +28,13 @@ default_opts = dict(constit='auto',
                     white=False,
                     )
 
+
 def _process_opts(opts):
     newopts = Bunch(default_opts)
     newopts.update_values(strict=True, **opts)
-    # TODO: add more validation
+    # TODO: add more validations.
     return newopts
+
 
 def _translate_opts(opts):
     # Temporary shim between new-style options and Matlab heritage.
@@ -57,17 +59,18 @@ def _translate_opts(opts):
     oldopts['gwchnone'] = False
     if opts.nodal == 'linear_time':
         oldopts['nodsatlint'] = True
-    elif opts.nodal == False:
+    elif not opts.nodal:
         oldopts['nodsatnone'] = True
     if opts.phase == 'linear_time':
         oldopts['gwchlint'] = True
     elif opts.phase == 'raw':
         oldopts['gwchnone'] = True
-    # otherwise it should be default, 'Greenwich'
+    # Otherwise it should be default, 'Greenwich.'
     oldopts.rmin = opts.Rayleigh_min
     oldopts.white = opts.white
-    oldopts.newopts = opts # so we can access new opts via the single "opt"
+    oldopts.newopts = opts  # So we can access new opts via the single "opt."
     return oldopts
+
 
 def solve(t, u, v=None, lat=None, **opts):
     """
@@ -104,7 +107,6 @@ def solve(t, u, v=None, lat=None, **opts):
         True (default) to include nodal/satellite corrections;
         'linear_time' to use the linearized time approximation;
         False to omit nodal corrections.
-
 
     Returns
     -------
@@ -153,7 +155,7 @@ def _solv1(tin, uin, vin, lat, **opts):
     print('solve: ')
 
     # The following returns a possibly modified copy of tin (ndarray).
-    # t, u, v are fully edited ndarrays (unless v is None)
+    # t, u, v are fully edited ndarrays (unless v is None).
     packed = _slvinit(tin, uin, vin, lat, **opts)
     tin, t, u, v, tref, lor, elor, opt = packed
     nt = len(t)
@@ -183,7 +185,7 @@ def _solv1(tin, uin, vin, lat, **opts):
     if not opt['notrend']:
         B = np.hstack((B, ((t-tref)/lor)[:, np.newaxis]))
 
-    nm = B.shape[1]  #  2*(nNR + nR) + 1, plus 1 if trend is included
+    # nm = B.shape[1]  # 2*(nNR + nR) + 1, plus 1 if trend is included.
 
     print('Solution ...')
 
@@ -193,8 +195,8 @@ def _solv1(tin, uin, vin, lat, **opts):
         xraw = u
 
     if opt.newopts.method == 'ols':
-        m = np.linalg.lstsq(B, xraw)[0]   # model coefficients
-        W = np.ones(nt)  # Uniform weighting; we could use a scalar 1, or None
+        m = np.linalg.lstsq(B, xraw)[0]  # Model coefficients.
+        W = np.ones(nt)  # Uniform weighting; we could use a scalar 1, or None.
     else:
         rf = robustfit(B, xraw, **opt.newopts.robust_kw)
         m = rf.b
@@ -202,14 +204,14 @@ def _solv1(tin, uin, vin, lat, **opts):
         coef.rf = rf
     coef.weights = W
 
-    xmod = np.dot(B, m)   # model fit
+    xmod = np.dot(B, m)  # Model fit.
 
     if not opt['twodim']:
         xmod = np.real(xmod)
 
-    e = W*(xraw-xmod)  # Weighted residuals
+    e = W*(xraw-xmod)  # Weighted residuals.
 
-    nc = nNR + nR
+    # nc = nNR + nR
 
     ap = np.hstack((m[:nNR], m[2*nNR:2*nNR+nR]))
     i0 = 2*nNR + nR
@@ -229,7 +231,7 @@ def _solv1(tin, uin, vin, lat, **opts):
         packed = ut_cs2cep(Xu, Yu, Xv, Yv)
         coef['Lsmaj'], coef['Lsmin'], coef['theta'], coef['g'] = packed
 
-    # mean and trend
+    # Mean and trend.
     if opt['twodim']:
         if opt['notrend']:
             coef['umean'] = np.real(m[-1])
@@ -250,11 +252,11 @@ def _solv1(tin, uin, vin, lat, **opts):
         coef = _confidence(coef, opt, t, e, tin, elor, xraw, xmod,
                            W, m, B, Xu, Yu, Xv, Yv)
 
-    # diagnostics
+    # Diagnostics.
     if not opt['nodiagn']:
         coef, indPE = ut_diagn(coef, opt)
 
-    # re-order constituents
+    # Re-order constituents.
     if opt['ordercnstit'] is not None:
 
         if opt['ordercnstit'] == 'frq':
@@ -278,7 +280,7 @@ def _solv1(tin, uin, vin, lat, **opts):
             ilist = [constit_index_dict[name] for name in opt['ordercnstit']]
             ind = np.array(ilist, dtype=int)
 
-    else:    # any other string: order by decreasing energy
+    else:  # Any other string: order by decreasing energy.
         if not opt['nodiagn']:
             ind = indPE
         else:
@@ -337,9 +339,9 @@ def _slvinit(tin, uin, vin, lat, **opts):
         if vin is not None:
             vin = vin.compress(mask)
 
-    tin = tin.compressed() # no longer masked
+    tin = tin.compressed()  # No longer masked.
 
-    # Step 2: generate t, u, v from edited tin, uin, vin
+    # Step 2: generate t, u, v from edited tin, uin, vin.
     v = None
     if np.ma.is_masked(uin) or np.ma.is_masked(vin):
         mask = np.ma.getmaskarray(uin)
@@ -406,5 +408,3 @@ def _slvinit(tin, uin, vin, lat, **opts):
             print('solve: unrecognized input: {0}'.format(key))
 
     return tin, t, u, v, tref, lor, elor, opt
-
-
