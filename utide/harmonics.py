@@ -3,7 +3,7 @@ Function ut_E() returns complex exponential basis functions
 for a given set of frequencies.
 """
 
-from __future__ import absolute_import, division
+from __future__ import (absolute_import, division, print_function)
 
 import numpy as np
 
@@ -22,6 +22,7 @@ nshallow = nshallow.compressed()
 ishallow = ishallow.compressed()
 kshallow = np.nonzero(~not_shallow)[0]
 
+
 def linearized_freqs(tref):
     astro, ader = ut_astron(tref)
     freq = const.freq.copy()
@@ -35,20 +36,20 @@ def linearized_freqs(tref):
 
 def ut_E(t, tref, frq, lind, lat, ngflgs, prefilt):
     """
-    % UT_E()
-    % compute complex exponential basis function
-    % inputs
-    %   t = times [datenum UTC] (nt x 1)
-    %   tref = reference time [datenum UTC] (1 x 1)
-    %   frq = frequencies [cph] (nc x 1)
-    %   lind = list indices of constituents in ut_constants.mat (nc x 1)
-    %   lat = latitude [deg N] (1 x 1)
-    %   ngflgs = [NodsatLint NodsatNone GwchLint GwchNone] each 0/1
-    %       ([0 1 0 1] case not allowed, and not needed, in ut_E)
-    %   prefilt = 'prefilt' input to ut_solv
-    % output
-    %   E = complex exponential basis function [unitless] (nt x nc)
-    % UTide v1p0 9/2011 d.codiga@gso.uri.edu
+    UT_E()
+    compute complex exponential basis function
+    inputs
+      t = times [datenum UTC] (nt x 1)
+      tref = reference time [datenum UTC] (1 x 1)
+      frq = frequencies [cph] (nc x 1)
+      lind = list indices of constituents in ut_constants.mat (nc x 1)
+      lat = latitude [deg N] (1 x 1)
+      ngflgs = [NodsatLint NodsatNone GwchLint GwchNone] each 0/1
+          ([0 1 0 1] case not allowed, and not needed, in ut_E)
+      prefilt = 'prefilt' input to ut_solv
+    output
+      E = complex exponential basis function [unitless] (nt x nc)
+    UTide v1p0 9/2011 d.codiga@gso.uri.edu
     """
 
     nt = len(t)
@@ -71,23 +72,22 @@ def ut_E(t, tref, frq, lind, lat, ngflgs, prefilt):
     return E
 
 
-
 def FUV(t, tref, lind, lat, ngflgs):
     """
-    % UT_FUV()
-    % compute nodal/satellite correction factors and astronomical argument
-    % inputs
-    %   t = times [datenum UTC] (nt x 1)
-    %   tref = reference time [datenum UTC] (1 x 1)
-    %   lind = list indices of constituents in ut_constants.mat (nc x 1)
-    %   lat = latitude [deg N] (1 x 1)
-    %   ngflgs = [NodsatLint NodsatNone GwchLint GwchNone] each 0/1
-    % output
-    %   F = real nodsat correction to amplitude [unitless] (nt x nc)
-    %   U = nodsat correction to phase [cycles] (nt x nc)
-    %   V = astronomical argument [cycles] (nt x nc)
-    % UTide v1p0 9/2011 d.codiga@gso.uri.edu
-    % (uses parts of t_vuf.m from t_tide, Pawlowicz et al 2002)
+    UT_FUV()
+    compute nodal/satellite correction factors and astronomical argument
+    inputs
+      t = times [datenum UTC] (nt x 1)
+      tref = reference time [datenum UTC] (1 x 1)
+      lind = list indices of constituents in ut_constants.mat (nc x 1)
+      lat = latitude [deg N] (1 x 1)
+      ngflgs = [NodsatLint NodsatNone GwchLint GwchNone] each 0/1
+    output
+      F = real nodsat correction to amplitude [unitless] (nt x nc)
+      U = nodsat correction to phase [cycles] (nt x nc)
+      V = astronomical argument [cycles] (nt x nc)
+    UTide v1p0 9/2011 d.codiga@gso.uri.edu
+    (uses parts of t_vuf.m from t_tide, Pawlowicz et al 2002)
     """
 
     t = np.atleast_1d(t).flatten()
@@ -115,7 +115,7 @@ def FUV(t, tref, lind, lat, ngflgs):
         rr = sat.amprat.copy()
 
         j = sat.ilatfac == 1
-        rr[j] *=  0.36309 * (1.0 - 5.0 * slat**2)/slat
+        rr[j] *= 0.36309 * (1.0 - 5.0 * slat**2)/slat
 
         j = sat.ilatfac == 2
         rr[j] *= 2.59808 * slat
@@ -147,15 +147,15 @@ def FUV(t, tref, lind, lat, ngflgs):
         F = F[lind, :].T
         U = U[lind, :].T
 
-        #if ngflgs[0]:  # Nodal/satellite with linearized times.
+        # if ngflgs[0]:  # Nodal/satellite with linearized times.
         #    F = F[np.ones((nt, 1)), :]
         #    U = U[np.ones((nt, 1)), :]
         # Let's try letting broadcasting take care of it.
 
     # gwch (astron arg)
-    if ngflgs[3]:  # None (raw phase lags not greenwich phase lags).
+    if ngflgs[3]:  # None (raw phase lags not Greenwich phase lags).
         freq = linearized_freqs(tref)
-        V  = 24 * (t[:, np.newaxis] - tref) * freq[lind];
+        V = 24 * (t[:, np.newaxis] - tref) * freq[lind]
 
     else:
         if ngflgs[2]:  # Linearized times.
@@ -171,8 +171,7 @@ def FUV(t, tref, lind, lat, ngflgs):
 
         for i0, nshal, k in zip(ishallow, nshallow, kshallow):
             ik = i0 + np.arange(nshal)
-            j = shallow.iname[
-            ik] - 1
+            j = shallow.iname[ik] - 1
             exp1 = shallow.coef[ik, None]
             V[k, :] = np.sum(V[j, :] * exp1, axis=0)
 
@@ -180,7 +179,6 @@ def FUV(t, tref, lind, lat, ngflgs):
 
         if ngflgs[2]:  # linearized times
             freq = linearized_freqs(tref)
-            V = V + 24*(t[:, None] - tref) * freq[None, lind];
+            V = V + 24*(t[:, None] - tref) * freq[None, lind]
 
     return F, U, V
-

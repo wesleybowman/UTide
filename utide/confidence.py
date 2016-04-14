@@ -6,7 +6,7 @@ a more general ut_linci() function for linearized estimates
 of ellipse parameter uncertainties.
 """
 
-from __future__ import absolute_import, division
+from __future__ import (absolute_import, division, print_function)
 
 import warnings
 
@@ -14,6 +14,7 @@ import numpy as np
 
 from utide.periodogram import band_psd
 from utide.ellipse_params import ut_cs2cep
+
 
 def band_averaged_psd_by_constit(tin, t, e, elor, coef, opt):
     # Band-averaged (ba) spectral densities at each constituent freq.
@@ -36,7 +37,7 @@ def band_averaged_psd_by_constit(tin, t, e, elor, coef, opt):
 
     if opt.twodim:
         ba.Pvv *= df
-        ba.Puv *=  df
+        ba.Puv *= df
         Pvv = np.zeros_like(constits)
         Puv = np.zeros_like(constits)
 
@@ -48,16 +49,18 @@ def band_averaged_psd_by_constit(tin, t, e, elor, coef, opt):
             Puv[inside] = ba.Puv[i]
     return Puu, Pvv, Puv
 
+
 def cluster(x, ang=360):
     """
-    Wrapping the values of x to +- ang/2 of x[0]
+    Wrapping the values of x to +- ang/2 of x[0].
     """
 
     x = np.array(x)
     ha = ang/2
     ofs = - x[0] + ha
-    y = (x+ofs)%ang - ofs
+    y = (x+ofs) % ang - ofs
     return y
+
 
 def _is_PD(A):
     """
@@ -108,8 +111,7 @@ def nearestSPD(A):
     # Ensure symmetry:
     B = (A + A.T) / 2
 
-
-    # Symmetric polar factor, H: (in numpy svd, B = U S V, not U S V')
+    # Symmetric polar factor, H: (in numpy svd, B = U S V, not U S V').
     U, S, V = np.linalg.svd(B)
     H = np.dot(V.T * S, V)
 
@@ -156,10 +158,8 @@ def _confidence(coef, opt, t, e, tin, elor, xraw, xmod, W, m, B,
     """
 
     # Confidence Intervals.
-
     if not opt['white']:
-        Puu, Pvv, Puv = band_averaged_psd_by_constit(tin, t, e, elor,
-                                                     coef, opt)
+        Puu, Pvv, Puv = band_averaged_psd_by_constit(tin, t, e, elor, coef, opt)  # noqa
 
     # Make temporaries for quantities needed more than once.
     _Wx = W * xraw
@@ -172,21 +172,20 @@ def _confidence(coef, opt, t, e, tin, elor, xraw, xmod, W, m, B,
     nt = len(xraw)
     nm = B.shape[1]
 
-    # Mean Square Misfit: Eq. 52 (mean squared error)
+    # Mean Square Misfit: Eq. 52 (mean squared error).
     varMSM = np.real(np.dot(xraw.conj(), _Wx) -
-             np.dot(xmod.conj(), _Wx)) / (nt-nm)
+                     np.dot(xmod.conj(), _Wx)) / (nt-nm)
 
-    # Gamma_C: covariance Eq. 54
+    # Gamma_C: covariance Eq. 54.
     gamC = np.linalg.inv(np.dot(B.conj().T, _WB)) * varMSM
 
-
-    # Gamma_P: pseudo-covariance Eq. 54
+    # Gamma_P: pseudo-covariance Eq. 54.
     gamP = np.linalg.inv(np.dot(B.T, _WB))
     gamP *= (np.dot(xraw, _Wx) - np.dot(xmod, _Wx)) / (nt - nm)
 
     del _Wx, _WB
 
-    # Eq. 55; convenient intermediate variables; see Eq. 51
+    # Eq. 55; convenient intermediate variables; see Eq. 51.
     Gall = gamC + gamP
     Hall = gamC - gamP
 
@@ -246,7 +245,7 @@ def _confidence(coef, opt, t, e, tin, elor, xraw, xmod, W, m, B,
                 coef['theta_ci'][c] = 1.96 * np.imag(sig2)
 
         else:  # Monte Carlo.
-            covXuYu = np.imag(H[0,0] - H[0,1] + H[1,0] - H[1,1]) / 2
+            covXuYu = np.imag(H[0, 0] - H[0, 1] + H[1, 0] - H[1, 1]) / 2
             Duu = np.array([[varXu, covXuYu], [covXuYu, varYu]])
             varcov_mCw[c, :2, :2] = Duu
 
@@ -258,17 +257,19 @@ def _confidence(coef, opt, t, e, tin, elor, xraw, xmod, W, m, B,
                 if not opt.white:
                     varcov_mCc[c, :, :] = nearestSPD(varcov_mCc[c, :, :])
                     mCall = np.random.multivariate_normal((Xu[c], Yu[c]),
-                                    varcov_mCc[c], opt.nrlzn)
+                                                          varcov_mCc[c],
+                                                          opt.nrlzn)
                 else:
                     mCall = np.random.multivariate_normal((Xu[c], Yu[c]),
-                                    varcov_mCw[c], opt.nrlzn)
-                A,_,_,g = ut_cs2cep(mCall)
-                coef.A_ci[c] = 1.96 * np.median(np.abs(A - np.median(A))) / 0.6745
+                                                          varcov_mCw[c],
+                                                          opt.nrlzn)
+                A, _, _, g = ut_cs2cep(mCall)
+                coef.A_ci[c] = 1.96 * np.median(np.abs(A - np.median(A))) / 0.6745  # noqa
                 g[0] = coef.g[c]
                 g = cluster(g, 360)
-                coef.g_ci[c] = 1.96 * np.median(np.abs(g - np.median(g))) / 0.6745
+                coef.g_ci[c] = 1.96 * np.median(np.abs(g - np.median(g))) / 0.6745  # noqa
             else:
-                covXvYv = np.imag(G[0,0] - G[0,1] + G[1,0] - G[1,1]) / 2
+                covXvYv = np.imag(G[0, 0] - G[0, 1] + G[1, 0] - G[1, 1]) / 2
                 Dvv = np.array([[varXv, covXvYv], [covXvYv, varYv]])
                 varcov_mCw[c, 2:, 2:] = Dvv
 
@@ -276,7 +277,7 @@ def _confidence(coef, opt, t, e, tin, elor, xraw, xmod, W, m, B,
                     Dvv = Pvv[c] * Dvv / np.trace(Dvv)
                     varcov_mCc[c, 2:, 2:] = Dvv
                 covXuXv = np.imag(- H[0, 0] - H[0, 1] - H[1, 0] - H[1, 1]) / 2
-                covXuYv = np.real(G[0, 0] - G[1,1]) / 2
+                covXuYv = np.real(G[0, 0] - G[1, 1]) / 2
                 covYuXv = np.real(- H[0, 0] + H[1, 1]) / 2
                 covYuYv = np.imag(- G[0, 0] + G[0, 1] + G[1, 0] - G[1, 1]) / 2
                 Duv = np.array([[covXuXv, covXuYv], [covYuXv, covYuYv]])
@@ -293,24 +294,18 @@ def _confidence(coef, opt, t, e, tin, elor, xraw, xmod, W, m, B,
                         varcov_mCc[c, 2:, :2] = 0
 
                     varcov_mCc[c] = nearestSPD(varcov_mCc[c])
-                    mCall = np.random.multivariate_normal((Xu[c], Yu[c], Xv[c],
-                                            Yv[c]), varcov_mCc[c], opt.nrlzn)
+                    mCall = np.random.multivariate_normal((Xu[c], Yu[c], Xv[c], Yv[c]), varcov_mCc[c], opt.nrlzn)  # noqa
                 else:
-                    mCall = np.random.multivariate_normal((Xu[c], Yu[c], Xv[c],
-                                            Yv[c]), varcov_mCw[c], opt.nrlzn)
+                    mCall = np.random.multivariate_normal((Xu[c], Yu[c], Xv[c], Yv[c]), varcov_mCw[c], opt.nrlzn)  # noqa
                 Lsmaj, Lsmin, theta, g = ut_cs2cep(mCall)
-                coef.Lsmaj_ci[c] = 1.96 * np.median(np.abs(Lsmaj -
-                                            np.median(Lsmaj))) / 0.6745
-                coef.Lsmin_ci[c] = 1.96 * np.median(np.abs(Lsmin -
-                                            np.median(Lsmin))) / 0.6745
+                coef.Lsmaj_ci[c] = 1.96 * np.median(np.abs(Lsmaj - np.median(Lsmaj))) / 0.6745  # noqa
+                coef.Lsmin_ci[c] = 1.96 * np.median(np.abs(Lsmin - np.median(Lsmin))) / 0.6745  # noqa
                 theta[0] = coef.theta[c]
                 theta = cluster(theta, 360)
-                coef.theta_ci[c] = 1.96 * np.median(np.abs(theta -
-                                            np.median(theta))) / 0.6745
+                coef.theta_ci[c] = 1.96 * np.median(np.abs(theta - np.median(theta))) / 0.6745  # noqa
                 g[0] = coef.g[c]
                 g = cluster(g, 360)
-                coef.g_ci[c] = 1.96 * np.median(np.abs(g -
-                                            np.median(g))) / 0.6745
+                coef.g_ci[c] = 1.96 * np.median(np.abs(g - np.median(g))) / 0.6745  # noqa
 
     return coef
 
@@ -405,5 +400,3 @@ def ut_linci(X, Y, sigX, sigY):
                                                dXv2 * sigXv2 + dYv2 * sigYv2)
 
     return sig1, sig2
-
-

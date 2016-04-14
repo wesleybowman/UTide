@@ -5,7 +5,7 @@ This will probably end up being consolidated in another
 module.
 """
 
-from __future__ import absolute_import, division
+from __future__ import (absolute_import, division, print_function)
 
 import numpy as np
 
@@ -49,10 +49,10 @@ def ut_cs2cep(Xu, Yu=None, Xv=None, Yv=None):
         ndim = Xu.shape[-1]
         if not (ndim == 2 or ndim == 4):
             raise ValueError("invalid arguments")
-        Yu = Xu[:,1]
+        Yu = Xu[:, 1]
         if ndim == 4:
-            Xv,Yv = Xu[:,2:].T
-        Xu = Xu[:,0]
+            Xv, Yv = Xu[:, 2:].T
+        Xu = Xu[:, 0]
 
     if Xv is None:
         ap = Xu - 1j*Yu
@@ -76,4 +76,3 @@ def ut_cs2cep(Xu, Yu=None, Xv=None, Yv=None):
     g = (-epsp+theta) % 360
 
     return Lsmaj, Lsmin, theta, g
-

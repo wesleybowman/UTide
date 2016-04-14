@@ -1,8 +1,9 @@
-from __future__ import absolute_import, division
+from __future__ import (absolute_import, division, print_function)
 
 import numpy as np
 from .harmonics import ut_E
 from .utilities import Bunch
+
 
 def reconstruct(t, coef, **opts):
     """
@@ -39,10 +40,10 @@ def _reconstr1(tin, coef, **opts):
 
     print('reconstruct:')
 
-    # parse inputs and options
+    # Parse inputs and options.
     t, opt = _rcninit(tin, **opts)
 
-    # determine constituents to include
+    # Determine constituents to include.
     # if ~isempty(opt.cnstit)
     # if not np.empty(opt['cnstit']):
     if opt['cnstit']:
@@ -82,7 +83,7 @@ def _reconstr1(tin, coef, **opts):
         ap = 0.5 * coef['A'][ind] * np.exp(-1j*coef['g'][ind] * rpd)
         am = np.conj(ap)
 
-    # exponentials
+    # Exponentials.
 
     ngflgs = [coef['aux']['opt']['nodsatlint'],
               coef['aux']['opt']['nodsatnone'],
@@ -96,11 +97,11 @@ def _reconstr1(tin, coef, **opts):
              coef['aux']['lind'][ind], coef['aux']['lat'], ngflgs,
              coef['aux']['opt']['prefilt'])
 
-    # fit
+    # Fit.
     # fit = E*ap + np.conj(E)*am
     fit = np.dot(E, ap) + np.dot(np.conj(E), am)
 
-    # mean (& trend)
+    # Mean (& trend).
     u = np.nan * np.ones(tin.shape)
     whr = ~np.isnan(tin)
     if coef['aux']['opt']['twodim']:
@@ -126,6 +127,7 @@ def _reconstr1(tin, coef, **opts):
     print('Done.\n')
 
     return u, v
+
 
 def _rcninit(tin, **opts):
 
@@ -167,5 +169,3 @@ def _rcninit(tin, **opts):
 #    end
 
     return t, opt
-
-

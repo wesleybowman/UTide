@@ -1,33 +1,26 @@
 language: python
 
+sudo: false
+
 env:
     - CONDA="python=2.7"
-    - CONDA="python=3.3"
     - CONDA="python=3.4"
+    - CONDA="python=3.5"
 
 
 before_install:
-    - URL=http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh
-    - wget $URL -O miniconda.sh
+    - wget http://bit.ly/miniconda -O miniconda.sh
     - bash miniconda.sh -b -p $HOME/miniconda
     - export PATH="$HOME/miniconda/bin:$PATH"
-    - hash -r
-    - conda config --set always_yes yes
-    - conda update conda
-    - conda info -a
-    - travis_retry conda create --yes -n test $CONDA --file requirements.txt
-    - source activate test
-    # Testing requirements.
-    - travis_retry conda install pip
-    - travis_retry pip install pytest
-    - travis_retry pip install coveralls
-    - travis_retry pip install pytest-cov
+    - conda update --yes conda
+    - travis_retry conda create --yes -n TEST $CONDA --file requirements.txt
+    - source activate TEST
+    - travis_retry pip install -r requirements-dev.txt
+    - travis_retry conda install --yes pytest
 
 install:
     - export PYTHONWARNINGS=all
 
 script:
-    py.test
-
-after_success:
-    - coveralls
+    - python setup.py test
+    - find . -type f -name "*.py" ! -name 'conf.py' | xargs flake8 --max-line-length=100

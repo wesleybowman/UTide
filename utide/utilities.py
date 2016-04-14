@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import division
-
-import os
+from __future__ import (absolute_import, division, print_function)
 
 import numpy as np
 from scipy.io import loadmat
@@ -12,6 +10,7 @@ from scipy.io import loadmat
 # Based on Robert Kern's Bunch; taken from
 # http://currents.soest.hawaii.edu/hgstage/pycurrents/
 # pycurrents/system/utilities.py
+
 
 class Bunch(dict):
     """
@@ -83,7 +82,8 @@ class Bunch(dict):
 
         klen = min(20, max(klens))
         vlen = min(40, max(vlens))
-        slist = [fmt.format(k, v, klen=klen, vlen=vlen) for k, v in items]
+        slist = [fmt.format(key, value, klen=klen, vlen=vlen) for
+                 key, value in items]
         return ''.join(slist)
 
     def from_pyfile(self, filename):
@@ -138,7 +138,7 @@ class Bunch(dict):
         newkw.update(kw)
         self._check_strict(strict, newkw)
         dsub = dict([(k, v) for (k, v) in newkw.items()
-                                if k in self and self[k] is None])
+                     if k in self and self[k] is None])
         self.update(dsub)
 
     def _check_strict(self, strict, kw):
@@ -153,7 +153,7 @@ class Bunch(dict):
                     "Update keys %s don't match existing keys %s" % (bk, ek))
 
 
-# The following functions ending with loadmatbunch() and showmatbunch()
+# The following functions ending with loadbunch() and showmatbunch()
 # are taken from the repo
 #     http://currents.soest.hawaii.edu/hgstage/pycurrents/,
 # pycurrents/file/matfile.py.
@@ -170,15 +170,16 @@ def _crunch(arr, masked=True):
     # we might want to make it optional.
     arr = arr.squeeze()
 
-    if masked and arr.dtype.kind == 'f':  # check for complex also
+    if masked and arr.dtype.kind == 'f':  # Check for complex also.
         arrm = np.ma.masked_invalid(arr)
         if arrm.count() < arrm.size:
             arr = arrm
         else:
-            arr = np.array(arr) # copy to force a read
+            arr = np.array(arr)  # Copy to force a read.
     else:
         arr = np.array(arr)
     return arr
+
 
 def _structured_to_bunch(arr, masked=True):
     """
@@ -189,14 +190,15 @@ def _structured_to_bunch(arr, masked=True):
     # A single "void" object comes from a Matlab structure.
     # Each Matlab structure field corresponds to a field in
     # a numpy structured dtype.
-    if arr.dtype.kind == 'V' and arr.shape == (1,1):
+    if arr.dtype.kind == 'V' and arr.shape == (1, 1):
         b = Bunch()
-        x = arr[0,0]
+        x = arr[0, 0]
         for name in x.dtype.names:
             b[name] = _structured_to_bunch(x[name], masked=masked)
         return b
 
     return _crunch(arr, masked=masked)
+
 
 def _showmatbunch(b, elements=None, origin=None):
     if elements is None:
@@ -226,17 +228,18 @@ def _showmatbunch(b, elements=None, origin=None):
     elements.sort()
     return elements
 
+
 def showmatbunch(b):
     """
     Show the contents of a matfile as it has been, or would be, loaded
-    by loadmatbunch.
+    by loadbunch.
 
-    *b* can be either the name of a matfile or the output of loadmatbunch.
+    *b* can be either the name of a matfile or the output of loadbunch.
 
     Returns a multi-line string suitable for printing.
     """
     if isinstance(b, str):
-        b = loadmatbunch(b)
+        b = loadbunch(b)
     elist = _showmatbunch(b)
     names = [n for n, v in elist]
     namelen = min(40, max([len(n) for n in names]))
@@ -245,18 +248,21 @@ def showmatbunch(b):
     return ''.join(strlist)
 
 
-def loadmatbunch(fname, masked=True):
+def loadbunch(fname, masked=True):
     """
     Wrapper for loadmat that dereferences (1,1) object arrays,
     converts floating point arrays to masked arrays, and uses
     nested Bunch objects in place of the matlab structures.
     """
     out = Bunch()
-    fobj = open(fname, 'rb')
-    xx = loadmat(fobj)
+    if fname.endswith('.mat'):
+        with open(fname, 'rb') as fobj:
+            xx = loadmat(fobj)
+    elif fname.endswith('.npz'):
+        xx = np.load(fname, encoding='latin1')
+    else:
+        raise ValueError('Unrecognized file {}'.format(fname))
     keys = [k for k in xx.keys() if not k.startswith("__")]
     for k in keys:
         out[k] = _structured_to_bunch(xx[k], masked=masked)
-    fobj.close()
     return out
-

@@ -38,7 +38,6 @@ for ilind, lind in enumerate(linds):
     Uo = Fo.copy()
     Vo = Fo.copy()
 
-
     flags = [[0, 0, 0, 0],
              [0, 1, 0, 0],
              [0, 0, 0, 1],
@@ -58,9 +57,8 @@ for ilind, lind in enumerate(linds):
             print('failed')
 
     save_args = dict(t=t, t0=t0, lat=lat, lind=lind, flags=flags,
-             Fo=Fo, Uo=Uo, Vo=Vo)
+                     Fo=Fo, Uo=Uo, Vo=Vo)
 
     np.savez('FUV%d.npz' % ilind, **save_args)
 
     savemat('FUV%d.mat' % ilind, save_args)
-
