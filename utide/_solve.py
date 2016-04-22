@@ -26,6 +26,7 @@ default_opts = dict(constit='auto',
                     Rayleigh_min=1,
                     robust_kw=dict(weight_function='cauchy'),
                     white=False,
+                    verbose=True
                     )
 
 
@@ -69,6 +70,7 @@ def _translate_opts(opts):
     oldopts.rmin = opts.Rayleigh_min
     oldopts.white = opts.white
     oldopts.newopts = opts  # So we can access new opts via the single "opt."
+    oldopts['RunTimeDisp'] = opts.verbose
     return oldopts
 
 
@@ -128,6 +130,8 @@ def solve(t, u, v=None, lat=None, **opts):
         If False (default), use band-averaged spectra from the
         residuals in the confidence limit estimates; if True,
         assume a white background spectrum.
+    verbose : {True, False}, optional
+        True (default) turns on verbose output. False omits no messages.
 
     Note
     ----
@@ -152,13 +156,14 @@ def solve(t, u, v=None, lat=None, **opts):
 
 def _solv1(tin, uin, vin, lat, **opts):
 
-    print('solve: ')
-
     # The following returns a possibly modified copy of tin (ndarray).
     # t, u, v are fully edited ndarrays (unless v is None).
     packed = _slvinit(tin, uin, vin, lat, **opts)
     tin, t, u, v, tref, lor, elor, opt = packed
     nt = len(t)
+
+    if opt['RunTimeDisp']:
+        print('solve: ', end='')
 
     # opt['cnstit'] = cnstit
     nNR, nR, nI, cnstit, coef = ut_cnstitsel(tref, opt['rmin']/(24*lor),
@@ -170,7 +175,8 @@ def _solv1(tin, uin, vin, lat, **opts):
     coef['aux']['opt'] = opt
     coef['aux']['lat'] = lat
 
-    print('matrix prep ... ')
+    if opt['RunTimeDisp']:
+        print('matrix prep ... ', end='')
 
     ngflgs = [opt['nodsatlint'], opt['nodsatnone'],
               opt['gwchlint'], opt['gwchnone']]
@@ -187,7 +193,8 @@ def _solv1(tin, uin, vin, lat, **opts):
 
     # nm = B.shape[1]  # 2*(nNR + nR) + 1, plus 1 if trend is included.
 
-    print('Solution ...')
+    if opt['RunTimeDisp']:
+        print('solution ... ', end='')
 
     if opt['twodim']:
         xraw = u + 1j*v
@@ -308,7 +315,8 @@ def _solv1(tin, uin, vin, lat, **opts):
     coef['aux']['frq'] = coef['aux']['frq'][ind]
     coef['aux']['lind'] = coef['aux']['lind'][ind]
 
-    print("Done.\n")
+    if opt['RunTimeDisp']:
+        print("done.")
 
     return coef
 

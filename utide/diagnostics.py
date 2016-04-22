@@ -5,7 +5,8 @@ import numpy as np
 
 def ut_diagn(coef, opt):
 
-    print('diagnostics...')
+    if opt['RunTimeDisp']:
+        print('diagnostics ... ', end='')
     coef['diagn'] = {}
 
     if opt['twodim']:

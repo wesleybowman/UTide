@@ -18,6 +18,9 @@ def reconstruct(t, coef, **opts):
     epoch : {string, int, `datetime.datetime`}, optional
         Not implemented yet. It will default to the epoch
         used for `coef`.
+    verbose : {True, False}, optional
+        True to enable output message (default). False turns off all
+        messages.
 
     Returns
     -------
@@ -38,10 +41,11 @@ def reconstruct(t, coef, **opts):
 
 def _reconstr1(tin, coef, **opts):
 
-    print('reconstruct:')
-
     # Parse inputs and options.
     t, opt = _rcninit(tin, **opts)
+
+    if opt['RunTimeDisp']:
+        print('reconstruct:', end='')
 
     # Determine constituents to include.
     # if ~isempty(opt.cnstit)
@@ -90,7 +94,8 @@ def _reconstr1(tin, coef, **opts):
               coef['aux']['opt']['gwchlint'],
               coef['aux']['opt']['gwchnone']]
 
-    print('prep/calcs...')
+    if opt['RunTimeDisp']:
+        print('prep/calcs ... ', end='')
 
     E = ut_E(t,
              coef['aux']['reftime'], coef['aux']['frq'][ind],
@@ -124,7 +129,8 @@ def _reconstr1(tin, coef, **opts):
 
         v = []
 
-    print('Done.\n')
+    if opt['RunTimeDisp']:
+        print('done.')
 
     return u, v
 
@@ -140,8 +146,13 @@ def _rcninit(tin, **opts):
     opt['cnstit'] = False
     opt['minsnr'] = 2
     opt['minpe'] = 0
+    opt['RunTimeDisp'] = True
 
     for key, item in opts.items():
+        # Be backward compatible with the MATLAB package syntax.
+        if key == 'verbose':
+            opt['RunTimeDisp'] = item
+
         try:
             opt[key] = item
         except KeyError:
