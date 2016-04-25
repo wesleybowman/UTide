@@ -14,6 +14,7 @@ from .confidence import _confidence
 from .utilities import Bunch
 from . import constit_index_dict
 from .robustfit import robustfit
+from ._time_conversion import _normalize_time
 
 default_opts = dict(constit='auto',
                     conf_int='linear',
@@ -26,7 +27,8 @@ default_opts = dict(constit='auto',
                     Rayleigh_min=1,
                     robust_kw=dict(weight_function='cauchy'),
                     white=False,
-                    verbose=True
+                    verbose=True,
+                    epoch='python',
                     )
 
 
@@ -71,6 +73,7 @@ def _translate_opts(opts):
     oldopts.white = opts.white
     oldopts.newopts = opts  # So we can access new opts via the single "opt."
     oldopts['RunTimeDisp'] = opts.verbose
+    oldopts.epoch = opts.epoch
     return oldopts
 
 
@@ -88,8 +91,12 @@ def solve(t, u, v=None, lat=None, **opts):
         If `u` is a velocity component, `v` is the orthogonal component.
     lat : float
         Latitude in degrees; required.
-    epoch : {string, int, float, `datetime.datetime`}
-        Not implemented yet.
+    epoch : {string, `datetime.date`, `datetime.datetime`}, optional
+        Valid strings are 'python' (default); 'matlab' if `t` is
+        an array of Matlab datenums; or an arbitrary date in the
+        form 'YYYY-MM-DD'.  The default corresponds to the Python
+        standard library `datetime` proleptic Gregorian calendar,
+        starting with 1 on January 1 of year 1.
     constit : {'auto', array_like}, optional
         List of strings with standard letter abbreviations of
         tidal constituents; or 'auto' to let the list be determined
@@ -131,7 +138,7 @@ def solve(t, u, v=None, lat=None, **opts):
         residuals in the confidence limit estimates; if True,
         assume a white background spectrum.
     verbose : {True, False}, optional
-        True (default) turns on verbose output. False omits no messages.
+        True (default) turns on verbose output. False emits no messages.
 
     Note
     ----
@@ -335,6 +342,9 @@ def _slvinit(tin, uin, vin, lat, **opts):
         raise ValueError("v must have the same shape as u")
 
     opt = Bunch(twodim=(vin is not None))
+
+    # Step 0: apply epoch to time.
+    tin = _normalize_time(tin, opts['epoch'])
 
     # Step 1: remove invalid times from tin, uin, vin
     tin = np.ma.masked_invalid(tin)

@@ -21,7 +21,9 @@ def ut_astron(jd):
     Parameters
     ----------
     jd : float, scalar or sequence
-        Time (UTC) in days since the Matlab datenum epoch.
+        Time (UTC) in days starting with 1 on 1 Jan. of the year 1
+        in the proleptic Gregorian calendar as in
+        `datetime.date.toordinal`.
 
     Returns
     -------
@@ -56,8 +58,10 @@ def ut_astron(jd):
 
     jd = np.atleast_1d(jd).flatten()
 
-    # datenum(1899,12,31,12,0,0)
-    daten = 693961.500000000
+    # Shift epoch to 1899-12-31 at noon:
+    # daten = 693961.500000000  Matlab datenum version
+
+    daten = 693595.5  # Python epoch is 366 days later than Matlab's
 
     d = jd - daten
     D = d / 10000

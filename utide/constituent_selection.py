@@ -41,7 +41,7 @@ def ut_cnstitsel(tref, minres, incnstit, infer):
     astro, ader = ut_astron(tref)
 
     ii = np.isfinite(const.ishallow)
-    const.freq[~ii] = np.dot(const.doodson[~ii, :], ader) / 24
+    const.freq[~ii] = np.dot(const.doodson[~ii, :], ader[:, 0]) / 24
 
     for k in ii.nonzero()[0]:
         ik = const.ishallow[k]+np.arange(const.nshallow[k])
