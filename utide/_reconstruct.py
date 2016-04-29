@@ -3,9 +3,10 @@ from __future__ import (absolute_import, division, print_function)
 import numpy as np
 from .harmonics import ut_E
 from .utilities import Bunch
+from ._time_conversion import _normalize_time
 
 
-def reconstruct(t, coef, **opts):
+def reconstruct(t, coef, epoch='python', verbose=True, **opts):
     """
     Reconstruct a tidal signal.
 
@@ -15,9 +16,12 @@ def reconstruct(t, coef, **opts):
         Time in days since `epoch`.
     coef : `Bunch`
         Data structure returned by `utide.solve`
-    epoch : {string, int, `datetime.datetime`}, optional
-        Not implemented yet. It will default to the epoch
-        used for `coef`.
+    epoch : {string, `datetime.date`, `datetime.datetime`}, optional
+        Valid strings are 'python' (default); 'matlab' if `t` is
+        an array of Matlab datenums; or an arbitrary date in the
+        form 'YYYY-MM-DD'.  The default corresponds to the Python
+        standard library `datetime` proleptic Gregorian calendar,
+        starting with 1 on January 1 of year 1.
     verbose : {True, False}, optional
         True to enable output message (default). False turns off all
         messages.
@@ -31,7 +35,7 @@ def reconstruct(t, coef, **opts):
     """
 
     out = Bunch()
-    u, v = _reconstr1(t, coef, **opts)
+    u, v = _reconstr1(t, coef, epoch=epoch, verbose=verbose, **opts)
     if coef['aux']['opt']['twodim']:
         out.u, out.v = u, v
     else:
@@ -42,7 +46,7 @@ def reconstruct(t, coef, **opts):
 def _reconstr1(tin, coef, **opts):
 
     # Parse inputs and options.
-    t, opt = _rcninit(tin, **opts)
+    t, goodmask, opt = _rcninit(tin, **opts)
 
     if opt['RunTimeDisp']:
         print('reconstruct:', end='')
@@ -108,7 +112,7 @@ def _reconstr1(tin, coef, **opts):
 
     # Mean (& trend).
     u = np.nan * np.ones(tin.shape)
-    whr = ~np.isnan(tin)
+    whr = goodmask
     if coef['aux']['opt']['twodim']:
         v = np.nan * np.ones(tin.shape)
         if coef['aux']['opt']['notrend']:
@@ -127,7 +131,7 @@ def _reconstr1(tin, coef, **opts):
             u[whr] = np.real(fit) + coef['mean']
             u[whr] += coef['slope'] * (t-coef['aux']['reftime'])
 
-        v = []
+        v = None
 
     if opt['RunTimeDisp']:
         print('done.')
@@ -139,14 +143,24 @@ def _rcninit(tin, **opts):
 
     t = tin[:]
 
-    t[np.isnan(t)] = []
-    # t(isnan(t)) = []
+    # Supporting only 1-D arrays for now; we can add "group"
+    # support later.
+    if tin.ndim != 1:
+        raise ValueError("t must be a 1-D array")
+
+    # Step 0: apply epoch to time.
+    t = _normalize_time(tin, opts['epoch'])
+
+    # Step 1: remove invalid times from tin
+    t = np.ma.masked_invalid(t)
+    goodmask = ~np.ma.getmaskarray(t)
+    t = t.compressed()
+
     opt = {}
 
     opt['cnstit'] = False
     opt['minsnr'] = 2
     opt['minpe'] = 0
-    opt['RunTimeDisp'] = True
 
     for key, item in opts.items():
         # Be backward compatible with the MATLAB package syntax.
@@ -158,25 +172,4 @@ def _rcninit(tin, **opts):
         except KeyError:
             print('reconstruct: unrecognized input: {0}'.format(key))
 
-    # args = list(args)
-    # args = [string.lower() for string in args]
-
-    # Need an example of the args
-
-#    while ~isempty(args)
-#        switch(lower(args{1}))
-#            case 'cnstit'
-#                opt.cnstit = args{2};
-#                args(1:2) = [];
-#            case 'minsnr'
-#                opt.minsnr = args{2};
-#                args(1:2) = [];
-#            case 'minpe'
-#                opt.minpe = args{2};
-#                args(1:2) = [];
-#            otherwise
-#                error(['reconstruct: unrecognized input: ' args{1}]);
-#        end
-#    end
-
-    return t, opt
+    return t, goodmask, opt

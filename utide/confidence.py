@@ -134,7 +134,8 @@ def nearestSPD(A):
         # Tweaking strategy differs from D'Errico version.  It
         # is still a very small adjustment, but much larger than
         # his.
-        maxeig = np.linalg.eigvals(Ahat).max()
+        # Eigvals are or can be complex dtype, so take abs().
+        maxeig = np.abs(np.linalg.eigvals(Ahat)).max()
         Ahat[np.diag_indices(n)] += np.spacing(maxeig)
         # Normally no more than one adjustment will be needed.
         if k > 100:

@@ -17,7 +17,9 @@ from utide.astronomy import ut_astron
 
 
 def test_astron():
-    dns = [694086.000000000, 736094.552430556]
+    # Switch from Matlab epoch to python epoch.
+    dns = [t - 366 for t in [694086.000000000, 736094.552430556]]
+
     a_expected = np.array([[-0.190238223090586, -0.181487296022524],
                            [0.308043143259513, 0.867328798490917],
                            [0.117804920168928, 0.133410946894728],

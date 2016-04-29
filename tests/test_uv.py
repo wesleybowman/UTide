@@ -32,6 +32,7 @@ def fake_tide(t, M2amp, M2phase):
 @pytest.fixture
 def make_data():
     N = 500
+    np.random.seed(1234)
     t = date_range(start='2016-03-29', periods=N, freq='H')
     # Signal + some noise.
     u = fake_tide(np.arange(N), M2amp=2, M2phase=0) + np.random.randn(N)

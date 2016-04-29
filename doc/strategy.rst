@@ -38,32 +38,35 @@ Public interface
 The package is called `utide`, and presently has a very
 simple interface, with two function: `solve` and
 `reconstruct`.  These are simply English spellings of their
-slightly shortened Matlab counterparts.  Everything else
+Matlab counterparts.  Everything else
 should be considered to be private, regardless of whether it
 has a leading underscore.
 
-There is an overwhelming number of options; we might be able
-to find ways of making this interface friendlier.
+There is an overwhelming number of options, and many of the
+Matlab names are rather cryptic.  We have made some changes
+in the way options are specified, but the process is not
+complete.
 
-Options are being held internally in a `dict`.  We will
-switch to using a `Bunch` so as to provide both dictionary
-and attribute access syntax.
+Options are being held internally in a `Bunch` so as to
+provide both dictionary and attribute access syntax.
 
 Time
 ^^^^
-Presently, time inputs are assumed to be Matlab `datenum`
-arrays.  We need to make this more flexible, at the very
-least including the ability to handle time in days since a
-specified epoch. An array of Python datetime objects could
-be supported, but this is not top priority. At some point
-we will presumably handle the numpy datetime64 dtype, but we
-can wait until it has been reworked and is no longer in a
-semi-broken experimental state.  We will also need to
-investigate handling whatever Pandas produces.
+Time inputs are arrays of time in days relative to the epoch
+given in the `epoch` keyword argument.  In the Matlab version
+of utide these would be Matlab datenums; in the python version,
+using Matlab datenums requires `epoch = 'matlab'`.  The default is
+`epoch = 'python'`, corresponding to the `matplotlib` date
+numbers.  Any other epoch can be specified using either a
+string, like `'2015-01-01'`, or a Python standard library
+`datetime.datetime` or `datetime.date` instance.  The numpy
+`datetime64` dtype is not yet supported, nor are any Pandas
+constructs.
 
 Missing values
 ^^^^^^^^^^^^^^^
-The `t`, `u`, `v` inputs to `solve` now support any combination
+The `t`, `u`, `v` inputs to `solve` and the `t` input to `
+reconstruct` now support any combination
 of nans and masked array inputs to indicate missing values.
 
 The degree to which masked arrays will be used internally is
