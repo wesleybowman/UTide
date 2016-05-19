@@ -97,5 +97,5 @@ A sample call would be
 
 
 For more examples see the
-`notebooks <http://nbviewer.jupyter.org/github/wesleybowman/UTide/tree/npz/notebooks/>`__
+`notebooks <https://nbviewer.jupyter.org/github/wesleybowman/UTide/tree/master/notebooks/>`__
 folder.
