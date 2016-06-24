@@ -22,7 +22,7 @@ default_opts = dict(constit='auto',
                     trend=True,
                     phase='Greenwich',
                     nodal=True,
-                    infer='none',
+                    infer=None,
                     MC_n=200,
                     Rayleigh_min=1,
                     robust_kw=dict(weight_function='cauchy'),
@@ -32,11 +32,15 @@ default_opts = dict(constit='auto',
                     )
 
 
-def _process_opts(opts):
+def _process_opts(opts, is_2D):
     newopts = Bunch(default_opts)
     newopts.update_values(strict=True, **opts)
     # TODO: add more validations.
-    return newopts
+    newopts.infer = validate_infer(newopts.infer, is_2D)
+
+    compat_opts = _translate_opts(newopts)
+
+    return compat_opts
 
 
 def _translate_opts(opts):
@@ -44,6 +48,7 @@ def _translate_opts(opts):
     # Here or elsewhere, proper validation remains to be added.
     oldopts = Bunch()
     oldopts.cnstit = opts.constit
+    oldopts.infer = opts.infer     # we will not use the matlab names, though
 
     oldopts.conf_int = True
     if opts.conf_int == 'linear':
@@ -76,6 +81,26 @@ def _translate_opts(opts):
     oldopts.epoch = opts.epoch
     return oldopts
 
+def validate_infer(infer, is_2D):
+    if infer is None or infer == 'none':
+        return None
+    required_keys = {'inferred_names', 'reference_names', 'amp_ratios',
+                'phase_offsets'}
+    keys = set(infer.keys())
+    if keys < required_keys:
+        raise ValueError("infer option must include %s" % required_keys)
+    nI = len(infer.inferred_names)
+    if len(infer.reference_names) != nI:
+        raise ValueError("inferred_names must be same"
+                         "  length as reference_names")
+    nratios = 2 * nI if is_2D else nI
+    if (len(infer.amp_ratios) != nratios or
+        len(infer.phase_offsets) != nratios):
+        raise ValueError("ratios and offsets need to have length %d" %
+                         nratios)
+    if 'approximate' not in infer:
+        infer.approximate = False
+    return infer
 
 def solve(t, u, v=None, lat=None, **opts):
     """
@@ -124,8 +149,23 @@ def solve(t, u, v=None, lat=None, **opts):
 
     Other Parameters
     ----------------
-    infer : {'none', dict or Bunch}, optional
-        Not yet implemented.
+    infer : {None, dict or Bunch}, optional; default is None.
+        If not None, the items are:
+
+        **inferred_names** : {sequence of N strings}
+            inferred constituent names
+        **reference_names** : {sequence of N strings}
+            reference constituent names
+        **amp_ratios** : {sequence, N or 2N floats}
+            amplitude ratios (unitless)
+        **phase_offsets** : {sequence, N or 2N floats}
+            phase offsets (degrees)
+        **approximate** : {bool, optional (default is False)}
+            use approximate method
+
+        amp_ratios and phase_offsets have length N for a scalar
+        time series, or 2N for a vector series.
+
     MC_n : integer, optional
         Not yet implemented.
     robust_kw : dict, optional
@@ -153,8 +193,7 @@ def solve(t, u, v=None, lat=None, **opts):
 
     """
 
-    newopts = _process_opts(opts)
-    compat_opts = _translate_opts(newopts)
+    compat_opts = _process_opts(opts, v is not None)
 
     coef = _solv1(t, u, v, lat, **compat_opts)
 
@@ -402,7 +441,7 @@ def _slvinit(tin, uin, vin, lat, **opts):
     opt['nodsatnone'] = 0
     opt['gwchlint'] = 0
     opt['gwchnone'] = 0
-    opt['infer'] = []
+    opt['infer'] = None
     opt['inferaprx'] = 0
     opt['rmin'] = 1
     opt['method'] = 'ols'
