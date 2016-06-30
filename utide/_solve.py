@@ -81,11 +81,12 @@ def _translate_opts(opts):
     oldopts.epoch = opts.epoch
     return oldopts
 
+
 def validate_infer(infer, is_2D):
     if infer is None or infer == 'none':
         return None
     required_keys = {'inferred_names', 'reference_names', 'amp_ratios',
-                'phase_offsets'}
+                     'phase_offsets'}
     keys = set(infer.keys())
     if keys < required_keys:
         raise ValueError("infer option must include %s" % required_keys)
@@ -95,12 +96,13 @@ def validate_infer(infer, is_2D):
                          "  length as reference_names")
     nratios = 2 * nI if is_2D else nI
     if (len(infer.amp_ratios) != nratios or
-        len(infer.phase_offsets) != nratios):
+            len(infer.phase_offsets) != nratios):
         raise ValueError("ratios and offsets need to have length %d" %
                          nratios)
     if 'approximate' not in infer:
         infer.approximate = False
     return infer
+
 
 def solve(t, u, v=None, lat=None, **opts):
     """
@@ -212,14 +214,14 @@ def _solv1(tin, uin, vin, lat, **opts):
         print('solve: ', end='')
 
     # opt['cnstit'] = cnstit
-    nNR, nR, nI, cnstit, coef = ut_cnstitsel(tref, opt['rmin']/(24*lor),
-                                             opt['cnstit'], opt['infer'])
+    cnstit, coef = ut_cnstitsel(tref, opt['rmin']/(24*lor),
+                                opt['cnstit'], opt['infer'])
 
     # a function we don't need
     # coef.aux.rundescr = ut_rundescr(opt,nNR,nR,nI,t,tgd,uvgd,lat)
 
-    coef['aux']['opt'] = opt
-    coef['aux']['lat'] = lat
+    coef.aux.opt = opt
+    coef.aux.lat = lat
 
     if opt['RunTimeDisp']:
         print('matrix prep ... ', end='')
@@ -264,7 +266,7 @@ def _solv1(tin, uin, vin, lat, **opts):
 
     e = W*(xraw-xmod)  # Weighted residuals.
 
-    # nc = nNR + nR
+    nR, nNR = coef.nR, coef.nNR
 
     ap = np.hstack((m[:nNR], m[2*nNR:2*nNR+nR]))
     i0 = 2*nNR + nR
@@ -333,7 +335,7 @@ def _solv1(tin, uin, vin, lat, **opts):
             ilist = [constit_index_dict[name] for name in opt['ordercnstit']]
             ind = np.array(ilist, dtype=int)
 
-    else:  # Any other string: order by decreasing energy.
+    else:  # Default: order by decreasing energy.
         if not opt['nodiagn']:
             ind = indPE
         else:
