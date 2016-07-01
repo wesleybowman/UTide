@@ -300,7 +300,7 @@ def _solv1(tin, uin, vin, lat, **opts):
 
     e = W*(xraw-xmod)  # Weighted residuals.
 
-    nR, nNR = coef.nR, coef.nNR
+    nI, nR, nNR = coef.nI, coef.nR, coef.nNR
 
     ap = np.hstack((m[:nNR], m[2*nNR:2*nNR+nR]))
     i0 = 2*nNR + nR
@@ -337,8 +337,35 @@ def _solv1(tin, uin, vin, lat, **opts):
             coef['mean'] = np.real(m[-2])
             coef['slope'] = np.real(m[-1])/lor
 
+    if opt.infer:
+        # complex coefficients
+        apI = np.empty((nI,), dtype = complex)
+        amI = np.empty((nI,), dtype = complex)
+        ind = 0
+
+        for k, ref in enumerate(cnstit.R):
+            apI[ind:ind + ref.nI] = ref.I.Rp * ap[nNR + k]
+            amI[ind:ind + ref.nI] = ref.I.Rp * am[nNR + k]
+            ind += ref.nI
+
+        XuI = np.conj(apI + amI).real
+        YuI = -np.conj(apI - amI).imag
+
+        if not opt.twodim:
+            A, _, _, g = ut_cs2cep(XuI, YuI)
+            coef.A = np.hstack((coef.A, A))
+            coef.g = np.hstack((coef.g, g))
+        else:
+            XvI = np.conj(apI + amI).imag
+            YvI = np.conj(apI - amI).real
+            Lsmaj, Lsmin, theta, g = ut_cs2cep(XuI, YuI, XvI, YvI)
+            coef.Lsmaj = np.hstack((coef.Lsmaj, Lsmaj))
+            coef.Lsmin = np.hstack((coef.Lsmin, Lsmin))
+            coef.theta = np.hstack((coef.theta, theta))
+            coef.g = np.hstack((coef.g, g))
+
     if opt['conf_int'] is True:
-        coef = _confidence(coef, opt, t, e, tin, elor, xraw, xmod,
+        coef = _confidence(coef, cnstit, opt, t, e, tin, elor, xraw, xmod,
                            W, m, B, Xu, Yu, Xv, Yv)
 
     # Diagnostics.

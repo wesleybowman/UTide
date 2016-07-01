@@ -145,7 +145,7 @@ def nearestSPD(A):
     return Ahat
 
 
-def _confidence(coef, opt, t, e, tin, elor, xraw, xmod, W, m, B,
+def _confidence(coef, cnstit, opt, t, e, tin, elor, xraw, xmod, W, m, B,
                 Xu, Yu, Xv, Yv):
     """
     This confidence interval calculation does not correspond
@@ -307,6 +307,44 @@ def _confidence(coef, opt, t, e, tin, elor, xraw, xmod, W, m, B,
                 g[0] = coef.g[c]
                 g = cluster(g, 360)
                 coef.g_ci[c] = 1.96 * np.median(np.abs(g - np.median(g))) / 0.6745  # noqa
+
+    nNR = coef.nNR
+
+    if opt.infer:
+        if opt.linci:
+            for k, ref in enumerate(cnstit.R):
+                varcov = varcov_mCw if opt.white else varcov_mCc
+                varReap = 0.25 * varcov[nNR + k, 0, 0]
+                varImap = 0.25 * varcov[nNR + k, 1, 1]
+                if opt.twodim:
+                    varReap += 0.25 * varcov[nNR + k, 3, 3]
+                    varImap += 0.25 * varcov[nNR + k, 2, 2]
+                rp = ref.I.Rp
+                rm = ref.I.Rm
+                varXuHH = ((rp.real**2 + rm.real**2) * varReap +
+                           (rp.imag**2 + rm.imag**2) * varImap)
+                varYuHH = ((rp.real**2 + rm.real**2) * varImap +
+                           (rp.imag**2 + rm.imag**2) * varReap)
+                for varX, varY in zip(varXuHH, varYuHH):
+                    if not opt.twodim:
+                        sig1, sig2 = ut_linci(Xu[nNR + k], Yu[nNR + k],
+                                              np.sqrt(varX), np.sqrt(varY))
+                        coef.A_ci = np.hstack(coef.A_ci, 1.96 * sig1)
+                        coef.g_ci = np.hstack(coef.g_ci, 1.96 * sig2)
+                    else:
+                        sig1, sig2 = ut_linci(Xu[nNR + k] + 1j * Xv[nNR + k],
+                                              Yu[nNR + k] + 1j * Yv[nNR + k],
+                                              np.sqrt(varX) + 1j *
+                                              np.sqrt(varY),
+                                              np.sqrt(varY) + 1j *
+                                              np.sqrt(varX))
+                        coef.Lsmaj_ci = np.hstack(coef.Lsmaj_ci,
+                                                  1.96 * sig1.real)
+                        coef.Lsmin_ci = np.hstack(coef.Lsmin_ci,
+                                                  1.96 * sig1.imag)
+                        coef.g_ci = np.hstack(coef.g_ci, 1.96 * sig2.real)
+                        coef.theta_ci = np.hstack(coef.theta_ci,
+                                                  1.96 * sig2.imag)
 
     return coef
 
