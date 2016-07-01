@@ -229,12 +229,36 @@ def _solv1(tin, uin, vin, lat, **opts):
     ngflgs = [opt['nodsatlint'], opt['nodsatnone'],
               opt['gwchlint'], opt['gwchnone']]
 
-    # Make the model array, starting with the harmonics.
-    E = ut_E(t, tref, cnstit['NR']['frq'], cnstit['NR']['lind'],
-             lat, ngflgs, opt['prefilt'])
+    E_args = (lat, ngflgs, opt.prefilt)
 
-    # Positive and negative frequencies, and the mean.
-    B = np.hstack((E, E.conj(), np.ones((nt, 1))))
+    # Make the model array, starting with the harmonics.
+    E = ut_E(t, tref, cnstit.NR.frq, cnstit.NR.lind, *E_args)
+
+    # Positive and negative frequencies
+    B = np.hstack((E, E.conj()))
+
+    if opt['infer']:
+
+        # The approximate inference method is not yet implemented
+
+        Etilp = np.empty(nt, coef.nR, dtype=complex)
+        Etilm = np.empty(nt, coef.nR, dtype=complex)
+        Q = np.empty(1, coef.nR, dtype=float)
+        beta = np.empty(1, coef.nR, dtype=float)
+
+        for k, ref in enumerate(cnstit.R):
+            E = ut_E(t, tref, ref.frq, ref.lind, *E_args)
+            Etilp[:, k] = E
+            Etilm[:, k] = E
+            Q[k] = (ut_E(tref, tref, ref.I.frq, ref.I.lind, *E_args).real /
+                    ut_E(tref, tref, ref.frq, ref.lind, *E_args).real)
+            arg = np.pi*lor*24*(ref.I.frq - ref.frq)*(nt+1) / nt
+            beta[k] = np.sin(arg) / arg
+
+        B = np.hstack((B, Etilp, np.conj(Etilm)))
+
+    # add the mean
+    B = np.hstack((B, np.ones(nt, 1)))
 
     if not opt['notrend']:
         B = np.hstack((B, ((t-tref)/lor)[:, np.newaxis]))
