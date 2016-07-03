@@ -2,7 +2,7 @@ from __future__ import (absolute_import, division, print_function)
 
 import os
 
-from utide.utilities import loadbunch
+from utide.utilities import loadbunch, convert_unicode_arrays
 
 __version__ = '0.1.0'
 
@@ -12,9 +12,9 @@ _ut_constants_fname = os.path.join(_base_dir, 'ut_constants.npz')
 
 # At least for now, use NaNs rather than masked arrays.
 ut_constants = loadbunch(_ut_constants_fname, masked=False)
+ut_constants = convert_unicode_arrays(ut_constants)
 
-# A list of strings is much easier to work with.
-constit_names = [n.strip() for n in ut_constants.const.name]
+constit_names = list(ut_constants.const.name)
 
 # Make a dictionary for index lookups.
 constit_index_dict = dict([(name, i) for (i, name) in
