@@ -237,28 +237,38 @@ def _solv1(tin, uin, vin, lat, **opts):
     # Positive and negative frequencies
     B = np.hstack((E, E.conj()))
 
-    if opt['infer']:
+    if opt.infer is not None:
 
-        # The approximate inference method is not yet implemented
+        Etilp = np.empty((nt, coef.nR), dtype=complex)
+        Etilm = np.empty((nt, coef.nR), dtype=complex)
 
-        Etilp = np.empty(nt, coef.nR, dtype=complex)
-        Etilm = np.empty(nt, coef.nR, dtype=complex)
-        Q = np.empty(1, coef.nR, dtype=float)
-        beta = np.empty(1, coef.nR, dtype=float)
+        if not opt.infer.approximate:
+            for k, ref in enumerate(cnstit.R):
+                E = ut_E(t, tref, ref.frq, ref.lind, *E_args)
+                Q = ut_E(t, tref, ref.I.frq, ref.I.lind, *E_args) / E
+                Qsum_p = (Q * ref.I.Rp).sum(axis=1)
+                Etilp[:, k] = E[:, 0] * (1 + Qsum_p)
+                Qsum_m = (Q * np.conj(ref.I.Rm)).sum(axis=1)
+                Etilm[:, k] = E[:, 0] * (1 + Qsum_m)
 
-        for k, ref in enumerate(cnstit.R):
-            E = ut_E(t, tref, ref.frq, ref.lind, *E_args)
-            Etilp[:, k] = E
-            Etilm[:, k] = E
-            Q[k] = (ut_E(tref, tref, ref.I.frq, ref.I.lind, *E_args).real /
-                    ut_E(tref, tref, ref.frq, ref.lind, *E_args).real)
-            arg = np.pi*lor*24*(ref.I.frq - ref.frq)*(nt+1) / nt
-            beta[k] = np.sin(arg) / arg
+        else:
+            # Approximate inference.
+            Q = np.empty((coef.nR,), dtype=float)
+            beta = np.empty((coef.nR,), dtype=float)
+
+            for k, ref in enumerate(cnstit.R):
+                E = ut_E(t, tref, ref.frq, ref.lind, *E_args)[:, 0]
+                Etilp[:, k] = E
+                Etilm[:, k] = E
+                Q[k] = ((ut_E(tref, tref, ref.I.frq, ref.I.lind, *E_args).real /
+                        ut_E(tref, tref, ref.frq, ref.lind, *E_args).real))[0, 0]
+                arg = np.pi*lor*24*(ref.I.frq - ref.frq)*(nt+1) / nt
+                beta[k] = np.sin(arg) / arg
 
         B = np.hstack((B, Etilp, np.conj(Etilm)))
 
     # add the mean
-    B = np.hstack((B, np.ones(nt, 1)))
+    B = np.hstack((B, np.ones((nt, 1))))
 
     if not opt['notrend']:
         B = np.hstack((B, ((t-tref)/lor)[:, np.newaxis]))

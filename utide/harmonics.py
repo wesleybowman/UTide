@@ -36,24 +36,37 @@ def linearized_freqs(tref):
 
 def ut_E(t, tref, frq, lind, lat, ngflgs, prefilt):
     """
-    UT_E()
-    compute complex exponential basis function
-    inputs
-      t = times [datenum UTC] (nt x 1)
-      tref = reference time [datenum UTC] (1 x 1)
-      frq = frequencies [cph] (nc x 1)
-      lind = list indices of constituents in ut_constants.mat (nc x 1)
-      lat = latitude [deg N] (1 x 1)
-      ngflgs = [NodsatLint NodsatNone GwchLint GwchNone] each 0/1
-          ([0 1 0 1] case not allowed, and not needed, in ut_E)
-      prefilt = 'prefilt' input to ut_solv
-    output
-      E = complex exponential basis function [unitless] (nt x nc)
-    UTide v1p0 9/2011 d.codiga@gso.uri.edu
+    Compute complex exponential basis function.
+
+    Parameters
+    ----------
+    t : array_like or float (nt,)
+        time in days
+    tref : float
+        reference time in days
+    frq : array_like or float (nc,)
+        frequencies in cph
+    lind : array_like or int (nc,)
+        indices of constituents
+    lat : float
+        latitude, degrees N
+    nflgs : array_like, bool
+        [NodsatLint NodsatNone GwchLint GwchNone]
+    prefilt: Bunch
+        not implemented
+
+    Returns
+    -------
+    E : array (nt, nc)
+        complex exponential basis function; always returned as 2-D array
     """
 
+    t = np.atleast_1d(t)
+    frq = np.atleast_1d(frq)
+    lind = np.atleast_1d(lind)
     nt = len(t)
-    nc = len(lind)
+    nc = len(frq)
+
     if ngflgs[1] and ngflgs[3]:
         F = np.ones((nt, nc))
         U = np.zeros((nt, nc))

@@ -89,39 +89,50 @@ def ut_cnstitsel(tref, minres, incnstit, infer):
             ind = [i for i, rname in enumerate(infer.reference_names)
                    if name == rname]
             refstruct.nI = len(ind)
-            refstruct.I = Bunch(Rp=[], Rm=[], lind=[], frq=[])
+            refstruct.I = Bunch(Rp=[], Rm=[], name=[], lind=[], frq=[])
             for lk, ilk in enumerate(ind):
-                refstruct.I.Rp[lk] = (infer.amp_ratios[ilk] *
+                refstruct.I.Rp.append(infer.amp_ratios[ilk] *
                                       np.exp(1j * infer.phase_offsets[ilk]) *
                                       np.pi/180)
                 if len(infer.amp_ratios) > nI:
-                    refstruct.I.Rm[lk] = (infer.amp_ratios[ilk + nI] *
+                    refstruct.I.Rm.append(infer.amp_ratios[ilk + nI] *
                                           np.exp(-1j *
                                           infer.phase_offsets[ilk + nI] *
                                           np.pi / 180))
                 else:
-                    refstruct.I.Rm[lk] = np.conj(refstruct.I.Rp[lk])
-                refstruct.I.name[lk] = infer.inferred_names[ilk]
-                refstruct.I.lind[lk] = constit_index_dict[refstruct.I.name[lk]]
-                refstruct.I.frq[lk] = const.freq[refstruct.I.lind[lk]]
+                    refstruct.I.Rm.append(np.conj(refstruct.I.Rp[lk]))
+
+                iname = infer.inferred_names[ilk]
+                refstruct.I.name.append(iname)
+                lind = constit_index_dict[iname]
+                refstruct.I.lind.append(lind)
+                refstruct.I.frq.append(const.freq[lind])
+
+            refstruct.I.Rp = np.array(refstruct.I.Rp)
+            refstruct.I.Rm = np.array(refstruct.I.Rm)
             cnstit.R.append(refstruct)
 
-    coef.name = cnstit.NR.name[:]         # new list; we will append to it
-    coef.aux = Bunch(frq=cnstit.NR.frq[:],  # why aren't names in parallel?
-                     lind=cnstit.NR.lind[:],
+    coef.name = list(cnstit.NR.name[:])
+    coef.aux = Bunch(frq=list(cnstit.NR.frq[:]),
+                     lind=list(cnstit.NR.lind[:]),
                      reftime=tref)
 
     if infer is not None:
         # Append reference values, and then inferred values, to the lists.
         coef.name.extend(allrefs)
-        coef.aux.frq.extend([refstruct.frq for refstruct in cnstit.R])
-        coef.aux.lind.extend([refstruct.lind for refstruct in cnstit.R])
-        for refstruct in cnstit.R:
-            coef.name.extend(refstruct.I.name)
-            coef.aux.frq.extend(refstruct.I.frq)
-            coef.aux.lind.extend(refstruct.I.lind)
-        coef.nR = nR
-        coef.nNR = nNR
-        coef.nI = nI
+        coef.aux.frq.extend([_ref.frq for _ref in cnstit.R])
+        coef.aux.lind.extend([_ref.lind for _ref in cnstit.R])
+        for ref in cnstit.R:
+            coef.name.extend(ref.I.name)
+            coef.aux.frq.extend(ref.I.frq)
+            coef.aux.lind.extend(ref.I.lind)
+
+    coef.name = np.array(coef.name, dtype=object)
+    coef.aux.frq = np.array(coef.aux.frq, dtype=float)
+    coef.aux.lind = np.array(coef.aux.lind, dtype=int)
+
+    coef.nR = nR
+    coef.nNR = nNR
+    coef.nI = nI
 
     return cnstit, coef
