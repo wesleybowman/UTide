@@ -1,12 +1,16 @@
 import os
 
+import pytest
+
 import numpy as np
+from numpy.testing import assert_array_almost_equal, assert_array_equal
 
 import utide
-from utide.utilities import Bunch
+from utide.utilities import Bunch, loadbunch, convert_unicode_arrays
 
 thisdir = os.path.dirname(__file__)
-HNL_path = os.path.join(thisdir, 'data', 'HNL2010.asc')
+datapath = os.path.join(thisdir, 'data')
+HNL_path = os.path.join(datapath, 'HNL2010.asc')
 
 t, h = np.loadtxt(HNL_path, unpack=True)
 
@@ -36,3 +40,18 @@ for ref, inf in zip(infer.reference_names, infer.inferred_names):
     infer.phase_offsets.append(coef_month.g[iref] - coef_month.g[iinf])
 
 coef_week_inf = utide.solve(t[sl_week], h[sl_week], infer=infer, **solve_kw)
+
+runs = [(coef_all, 'HNL2010.mat'),
+        (coef_month, 'HNL2010_Jan.mat'),
+        (coef_week, 'HNL2010_Jan_week1.mat'),
+        # (coef_week_inf, 'HNL2010_Jan_week1_infer_S2.mat'),
+        ]
+
+
+@pytest.mark.parametrize('coef,matfile', runs)
+def test_name_A_g(coef, matfile):
+    coef_mat = loadbunch(os.path.join(datapath, matfile)).coef
+    coef_mat = convert_unicode_arrays(coef_mat)
+    assert_array_equal(coef.name, coef_mat.name)
+    assert_array_almost_equal(coef.A, coef_mat.A)
+    assert_array_almost_equal(coef.g, coef_mat.g)
