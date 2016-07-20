@@ -44,7 +44,7 @@ coef_week_inf = utide.solve(t[sl_week], h[sl_week], infer=infer, **solve_kw)
 runs = [(coef_all, 'HNL2010.mat'),
         (coef_month, 'HNL2010_Jan.mat'),
         (coef_week, 'HNL2010_Jan_week1.mat'),
-        # (coef_week_inf, 'HNL2010_Jan_week1_infer_S2.mat'),
+       # (coef_week_inf, 'HNL2010_Jan_week1_infer_S2.mat'),
         ]
 
 

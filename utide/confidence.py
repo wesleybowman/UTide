@@ -193,12 +193,12 @@ def _confidence(coef, cnstit, opt, t, e, tin, elor, xraw, xmod, W, m, B,
     nc = len(Xu)
     coef.g_ci = np.nan * np.ones_like(coef.g)
     if opt['twodim']:
-        coef['Lsmaj_ci'] = coef.g_ci.copy()
-        coef['Lsmin_ci'] = coef.g_ci.copy()
-        coef['theta_ci'] = coef.g_ci.copy()
+        coef.Lsmaj_ci = coef.g_ci.copy()
+        coef.Lsmin_ci = coef.g_ci.copy()
+        coef.theta_ci = coef.g_ci.copy()
         varcov_mCw = np.nan * np.ones((nc, 4, 4))
     else:
-        coef['A_ci'] = coef.g_ci.copy()
+        coef.A_ci = coef.g_ci.copy()
         varcov_mCw = np.nan * np.ones((nc, 2, 2))
 
     if not opt['white']:
@@ -311,6 +311,7 @@ def _confidence(coef, cnstit, opt, t, e, tin, elor, xraw, xmod, W, m, B,
     nNR = coef.nNR
 
     if opt.infer:
+        ind = nc
         if opt.linci:
             for k, ref in enumerate(cnstit.R):
                 varcov = varcov_mCw if opt.white else varcov_mCc
@@ -329,8 +330,8 @@ def _confidence(coef, cnstit, opt, t, e, tin, elor, xraw, xmod, W, m, B,
                     if not opt.twodim:
                         sig1, sig2 = ut_linci(Xu[nNR + k], Yu[nNR + k],
                                               np.sqrt(varX), np.sqrt(varY))
-                        coef.A_ci = np.hstack(coef.A_ci, 1.96 * sig1)
-                        coef.g_ci = np.hstack(coef.g_ci, 1.96 * sig2)
+                        coef.A_ci[ind] = 1.96 * sig1
+                        coef.g_ci[ind] = 1.96 * sig2
                     else:
                         sig1, sig2 = ut_linci(Xu[nNR + k] + 1j * Xv[nNR + k],
                                               Yu[nNR + k] + 1j * Yv[nNR + k],
@@ -338,13 +339,13 @@ def _confidence(coef, cnstit, opt, t, e, tin, elor, xraw, xmod, W, m, B,
                                               np.sqrt(varY),
                                               np.sqrt(varY) + 1j *
                                               np.sqrt(varX))
-                        coef.Lsmaj_ci = np.hstack(coef.Lsmaj_ci,
-                                                  1.96 * sig1.real)
-                        coef.Lsmin_ci = np.hstack(coef.Lsmin_ci,
-                                                  1.96 * sig1.imag)
-                        coef.g_ci = np.hstack(coef.g_ci, 1.96 * sig2.real)
-                        coef.theta_ci = np.hstack(coef.theta_ci,
-                                                  1.96 * sig2.imag)
+                        coef.Lsmaj_ci[ind] = 1.96 * sig1.real
+                        coef.Lsmin_ci[ind] = 1.96 * sig1.imag
+                        coef.g_ci[ind] = 1.96 * sig2.real
+                        coef.theta_ci[ind] = 1.96 * sig2.imag
+                    ind += 1
+        else:
+            raise NotImplementedError("Monte Carlo inference not implemented")
 
     return coef
 
