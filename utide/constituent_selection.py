@@ -92,8 +92,8 @@ def ut_cnstitsel(tref, minres, incnstit, infer):
             refstruct.I = Bunch(Rp=[], Rm=[], name=[], lind=[], frq=[])
             for lk, ilk in enumerate(ind):
                 refstruct.I.Rp.append(infer.amp_ratios[ilk] *
-                                      np.exp(1j * infer.phase_offsets[ilk]) *
-                                      np.pi/180)
+                                      np.exp(1j * infer.phase_offsets[ilk] *
+                                      np.pi/180))
                 if len(infer.amp_ratios) > nI:
                     refstruct.I.Rm.append(infer.amp_ratios[ilk + nI] *
                                           np.exp(-1j *

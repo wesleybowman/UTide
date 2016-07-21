@@ -245,7 +245,9 @@ def _solv1(tin, uin, vin, lat, **opts):
         if not opt.infer.approximate:
             for k, ref in enumerate(cnstit.R):
                 E = ut_E(t, tref, ref.frq, ref.lind, *E_args)
+                # (nt,1)
                 Q = ut_E(t, tref, ref.I.frq, ref.I.lind, *E_args) / E
+                # (nt,ni)
                 Qsum_p = (Q * ref.I.Rp).sum(axis=1)
                 Etilp[:, k] = E[:, 0] * (1 + Qsum_p)
                 Qsum_m = (Q * np.conj(ref.I.Rm)).sum(axis=1)
@@ -345,19 +347,19 @@ def _solv1(tin, uin, vin, lat, **opts):
 
         for k, ref in enumerate(cnstit.R):
             apI[ind:ind + ref.nI] = ref.I.Rp * ap[nNR + k]
-            amI[ind:ind + ref.nI] = ref.I.Rp * am[nNR + k]
+            amI[ind:ind + ref.nI] = ref.I.Rm * am[nNR + k]
             ind += ref.nI
 
-        XuI = np.conj(apI + amI).real
-        YuI = -np.conj(apI - amI).imag
+        XuI = (apI + amI).real
+        YuI = -(apI - amI).imag
 
         if not opt.twodim:
             A, _, _, g = ut_cs2cep(XuI, YuI)
             coef.A = np.hstack((coef.A, A))
             coef.g = np.hstack((coef.g, g))
         else:
-            XvI = np.conj(apI + amI).imag
-            YvI = np.conj(apI - amI).real
+            XvI = (apI + amI).imag
+            YvI = (apI - amI).real
             Lsmaj, Lsmin, theta, g = ut_cs2cep(XuI, YuI, XvI, YvI)
             coef.Lsmaj = np.hstack((coef.Lsmaj, Lsmaj))
             coef.Lsmin = np.hstack((coef.Lsmin, Lsmin))
