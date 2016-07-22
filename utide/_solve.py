@@ -245,7 +245,9 @@ def _solv1(tin, uin, vin, lat, **opts):
         if not opt.infer.approximate:
             for k, ref in enumerate(cnstit.R):
                 E = ut_E(t, tref, ref.frq, ref.lind, *E_args)
+                # (nt,1)
                 Q = ut_E(t, tref, ref.I.frq, ref.I.lind, *E_args) / E
+                # (nt,ni)
                 Qsum_p = (Q * ref.I.Rp).sum(axis=1)
                 Etilp[:, k] = E[:, 0] * (1 + Qsum_p)
                 Qsum_m = (Q * np.conj(ref.I.Rm)).sum(axis=1)
@@ -260,8 +262,9 @@ def _solv1(tin, uin, vin, lat, **opts):
                 E = ut_E(t, tref, ref.frq, ref.lind, *E_args)[:, 0]
                 Etilp[:, k] = E
                 Etilm[:, k] = E
-                Q[k] = ((ut_E(tref, tref, ref.I.frq, ref.I.lind, *E_args).real /
-                        ut_E(tref, tref, ref.frq, ref.lind, *E_args).real))[0, 0]
+                num = ut_E(tref, tref, ref.I.frq, ref.I.lind, *E_args).real
+                den = ut_E(tref, tref, ref.frq, ref.lind, *E_args).real
+                Q[k] = ((num/den))[0, 0]
                 arg = np.pi*lor*24*(ref.I.frq - ref.frq)*(nt+1) / nt
                 beta[k] = np.sin(arg) / arg
 
@@ -300,7 +303,7 @@ def _solv1(tin, uin, vin, lat, **opts):
 
     e = W*(xraw-xmod)  # Weighted residuals.
 
-    nR, nNR = coef.nR, coef.nNR
+    nI, nR, nNR = coef.nI, coef.nR, coef.nNR
 
     ap = np.hstack((m[:nNR], m[2*nNR:2*nNR+nR]))
     i0 = 2*nNR + nR
@@ -337,8 +340,35 @@ def _solv1(tin, uin, vin, lat, **opts):
             coef['mean'] = np.real(m[-2])
             coef['slope'] = np.real(m[-1])/lor
 
+    if opt.infer:
+        # complex coefficients
+        apI = np.empty((nI,), dtype=complex)
+        amI = np.empty((nI,), dtype=complex)
+        ind = 0
+
+        for k, ref in enumerate(cnstit.R):
+            apI[ind:ind + ref.nI] = ref.I.Rp * ap[nNR + k]
+            amI[ind:ind + ref.nI] = ref.I.Rm * am[nNR + k]
+            ind += ref.nI
+
+        XuI = (apI + amI).real
+        YuI = -(apI - amI).imag
+
+        if not opt.twodim:
+            A, _, _, g = ut_cs2cep(XuI, YuI)
+            coef.A = np.hstack((coef.A, A))
+            coef.g = np.hstack((coef.g, g))
+        else:
+            XvI = (apI + amI).imag
+            YvI = (apI - amI).real
+            Lsmaj, Lsmin, theta, g = ut_cs2cep(XuI, YuI, XvI, YvI)
+            coef.Lsmaj = np.hstack((coef.Lsmaj, Lsmaj))
+            coef.Lsmin = np.hstack((coef.Lsmin, Lsmin))
+            coef.theta = np.hstack((coef.theta, theta))
+            coef.g = np.hstack((coef.g, g))
+
     if opt['conf_int'] is True:
-        coef = _confidence(coef, opt, t, e, tin, elor, xraw, xmod,
+        coef = _confidence(coef, cnstit, opt, t, e, tin, elor, xraw, xmod,
                            W, m, B, Xu, Yu, Xv, Yv)
 
     # Diagnostics.
