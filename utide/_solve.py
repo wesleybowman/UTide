@@ -260,8 +260,9 @@ def _solv1(tin, uin, vin, lat, **opts):
                 E = ut_E(t, tref, ref.frq, ref.lind, *E_args)[:, 0]
                 Etilp[:, k] = E
                 Etilm[:, k] = E
-                Q[k] = ((ut_E(tref, tref, ref.I.frq, ref.I.lind, *E_args).real /
-                        ut_E(tref, tref, ref.frq, ref.lind, *E_args).real))[0, 0]
+                num = ut_E(tref, tref, ref.I.frq, ref.I.lind, *E_args).real
+                den = ut_E(tref, tref, ref.frq, ref.lind, *E_args).real
+                Q[k] = ((num/den))[0, 0]
                 arg = np.pi*lor*24*(ref.I.frq - ref.frq)*(nt+1) / nt
                 beta[k] = np.sin(arg) / arg
 
@@ -339,8 +340,8 @@ def _solv1(tin, uin, vin, lat, **opts):
 
     if opt.infer:
         # complex coefficients
-        apI = np.empty((nI,), dtype = complex)
-        amI = np.empty((nI,), dtype = complex)
+        apI = np.empty((nI,), dtype=complex)
+        amI = np.empty((nI,), dtype=complex)
         ind = 0
 
         for k, ref in enumerate(cnstit.R):
