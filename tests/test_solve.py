@@ -46,15 +46,26 @@ def test_roundtrip():
                 Rayleigh_min=0.95,
                 )
 
-    # speed_coef = solve(time, time_series, time_series, lat=lat, **opts)
+    speed_coef = solve(time, time_series, time_series, lat=lat, **opts)
     elev_coef = solve(time, time_series, lat=lat, **opts)
 
     amp_err = amp - elev_coef['A'][0]
     phase_err = phase - elev_coef['g'][0]
     ts_recon = reconstruct(time, elev_coef).h
 
-    # vel = reconstruct(time, speed_coef)
+    # pure smoke testing of reconstruct
+    vel = reconstruct(time, speed_coef)
+    vel = reconstruct(time, speed_coef, constit=('M2', 'S2'))
+    htmp = reconstruct(time, elev_coef, constit=('M2', 'S2'))
+    vel = reconstruct(time, speed_coef, min_SNR=3)
+    htmp = reconstruct(time, elev_coef, min_SNR=3)
+    vel = reconstruct(time, speed_coef, min_PE=10)
+    htmp = reconstruct(time, elev_coef, min_PE=10)
+    vel = reconstruct(time, speed_coef, min_SNR=0)
+    htmp = reconstruct(time, elev_coef, min_SNR=0)
 
+
+    # Now the round-trip check, just for the elevation.
     err = np.sqrt(np.mean((time_series-ts_recon)**2))
 
     print(amp_err, phase_err, err)
