@@ -28,11 +28,13 @@ def extract_version(module='utide'):
                 break
     return version
 
+
 rootpath = os.path.abspath(os.path.dirname(__file__))
 
 
 def read(*parts):
     return open(os.path.join(rootpath, *parts), 'r').read()
+
 
 long_description = '{}\n{}'.format(read('README.rst'), read('LICENSE.txt'))
 

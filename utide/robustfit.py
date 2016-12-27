@@ -62,6 +62,7 @@ def welsch(r):
     w = np.exp(-(r**2))
     return w
 
+
 wfuncdict = dict(andrews=andrews,
                  bisquare=bisquare,
                  cauchy=cauchy,

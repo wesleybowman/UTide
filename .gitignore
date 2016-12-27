@@ -55,7 +55,7 @@ doc/_build/
 
 *.zip
 # *.mat   # we might want other .mat files for tests
-*.m
+# *.m     # and we want .m files for generating test data
 *.p
 
 # Editor temporary/working/backup files #

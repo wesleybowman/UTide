@@ -44,10 +44,18 @@ class Bunch(dict):
         or add key, value pairs.
         """
         dict.__init__(self)
-        self.__dict__ = self
         for arg in args:
             self.update(arg)
         self.update(kwargs)
+
+    def __getattr__(self, name):
+        try:
+            return self[name]
+        except KeyError:
+            raise AttributeError("'Bunch' object has no attribute '%s'" % name)
+
+    def __setattr__(self, name, value):
+        self[name] = value
 
     def __str__(self):
         return self.formatted()
@@ -187,9 +195,14 @@ def _structured_to_bunch(arr, masked=True):
     a Bunch for each structure.  When a non-structure is
     encountered, process it with crunch().
     """
+
+    if isinstance(arr, str):
+        return arr
+
     # A single "void" object comes from a Matlab structure.
     # Each Matlab structure field corresponds to a field in
     # a numpy structured dtype.
+
     if arr.dtype.kind == 'V' and arr.shape == (1, 1):
         b = Bunch()
         x = arr[0, 0]
@@ -257,7 +270,7 @@ def loadbunch(fname, masked=True):
     out = Bunch()
     if fname.endswith('.mat'):
         with open(fname, 'rb') as fobj:
-            xx = loadmat(fobj)
+            xx = loadmat(fobj, chars_as_strings=True)
     elif fname.endswith('.npz'):
         xx = np.load(fname, encoding='latin1')
     else:
@@ -265,4 +278,34 @@ def loadbunch(fname, masked=True):
     keys = [k for k in xx.keys() if not k.startswith("__")]
     for k in keys:
         out[k] = _structured_to_bunch(xx[k], masked=masked)
+    return out
+
+
+def convert_unicode_arrays(b):
+    """
+    Given a dict-like, *b*, find ndarrays of dtype unicode and
+    convert them to object arrays of strings, or to a single
+    string if there is only one.  The strings have trailing
+    whitespace removed. A new Bunch is returned.
+    """
+    out = Bunch()
+    for key, val in b.items():
+        if isinstance(val, np.ndarray):
+            if val.dtype.kind == 'O':
+                newval = np.empty(shape=val.shape, dtype=val.dtype)
+                for k, x in enumerate(val):
+                    if (isinstance(x, np.ndarray) and x.dtype.kind == 'U'
+                            and x.size == 1):
+                        newval[k] = x.item()
+                    else:
+                        newval[k] = x
+            elif val.dtype.kind == 'U' and val.ndim == 1:
+                newval = np.array([s.rstrip() for s in val], dtype=object)
+            else:
+                newval = val
+        elif isinstance(val, dict):
+            newval = convert_unicode_arrays(val)
+        else:
+            newval = val
+        out[key] = newval
     return out
