@@ -2,10 +2,20 @@ language: python
 
 sudo: false
 
-env:
-    - CONDA="python=2.7"
-    - CONDA="python=3.4"
-    - CONDA="python=3.5"
+matrix:
+  fast_finish: true
+  include:
+  - python: 2.7
+    env: TEST_TARGET=default
+  - python: 3.4
+    env: TEST_TARGET=default
+  - python: 3.5
+    env: TEST_TARGET=default
+  - python: 3.5
+    env: TEST_TARGET=coding_standards
+  allow_failures:
+  - python: 3.5
+    env: TEST_TARGET=coding_standards
 
 
 before_install:
@@ -13,14 +23,19 @@ before_install:
     - bash miniconda.sh -b -p $HOME/miniconda
     - export PATH="$HOME/miniconda/bin:$PATH"
     - conda update --yes conda
-    - travis_retry conda create --yes -n TEST $CONDA --file requirements.txt
+    - conda config --add channels conda-forge --force
+    - conda create --yes -n TEST python=$TRAVIS_PYTHON_VERSION --file requirements.txt --file requirements-dev.txt
     - source activate TEST
-    - travis_retry pip install -r requirements-dev.txt
-    - travis_retry conda install --yes pytest
 
 install:
-    - export PYTHONWARNINGS=all
+    # Test source distribution.
+    - python setup.py sdist && version=$(python setup.py --version) && pushd dist  && pip install UTide-${version}.tar.gz && popd
 
 script:
-    - python setup.py test
-    - find . -type f -name "*.py" ! -name 'conf.py' | xargs flake8 --max-line-length=100
+    - if [[ $TEST_TARGET == 'default' ]]; then
+        py.test -vv  ;
+      fi
+
+    - if [[ $TEST_TARGET == 'coding_standards' ]]; then
+        find . -type f -name "*.py" ! -name 'conf.py' | xargs flake8 --max-line-length=100 ;
+      fi
