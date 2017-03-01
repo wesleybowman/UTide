@@ -77,6 +77,57 @@ def test_roundtrip():
     np.testing.assert_almost_equal(err, 0)
 
 
+def test_masked_input():
+    """Masked values in time and/or time series."""
+    ts = 735604
+    duration = 35
+
+    time = np.linspace(ts, ts+duration, 842)
+    tref = (time[-1] + time[0]) / 2
+
+    const = ut_constants.const
+
+    amp = 1.0
+    phase = 53
+    lat = 45.5
+
+    freq_cpd = 24 * const.freq
+
+    jj = 48-1  # Python index for M2
+
+    arg = 2 * np.pi * (time - tref) * freq_cpd[jj] - np.deg2rad(phase)
+    time_series = amp * np.cos(arg)
+
+    opts = dict(constit='auto',
+                phase='raw',
+                nodal=False,
+                trend=False,
+                method='ols',
+                conf_int='linear',
+                Rayleigh_min=0.95,
+                )
+
+    t = np.ma.array(time)
+    t[[10, 15, 20, 21]] = np.ma.masked
+
+    series = np.ma.array(time_series)
+    series[[11, 17, 22, 25]] = np.ma.masked
+
+    speed_coef = solve(t, series, series, lat=lat, **opts)
+    elev_coef = solve(t, series, lat=lat, **opts)
+
+    amp_err = amp - elev_coef['A'][0]
+    phase_err = phase - elev_coef['g'][0]
+    ts_recon = reconstruct(time, elev_coef).h
+
+    # pure smoke testing of reconstruct
+    vel = reconstruct(time, speed_coef)
+    elev = reconstruct(time, elev_coef)
+
+    np.testing.assert_almost_equal(amp_err, 0)
+    np.testing.assert_almost_equal(phase_err, 0)
+
+
 def test_robust():
     """
     Quick check that method='robust' works; no real checking

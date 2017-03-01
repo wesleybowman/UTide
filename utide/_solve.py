@@ -209,7 +209,6 @@ def _solv1(tin, uin, vin, lat, **opts):
     packed = _slvinit(tin, uin, vin, lat, **opts)
     tin, t, u, v, tref, lor, elor, opt = packed
     nt = len(t)
-
     if opt['RunTimeDisp']:
         print('solve: ', end='')
 
@@ -457,10 +456,10 @@ def _slvinit(tin, uin, vin, lat, **opts):
     if vin is not None:
         vin = np.ma.masked_invalid(vin)
     if np.ma.is_masked(tin):
-        mask = np.ma.getmaskarray(tin)
-        uin = uin.compress(mask)
+        goodmask = ~np.ma.getmaskarray(tin)
+        uin = uin.compress(goodmask)
         if vin is not None:
-            vin = vin.compress(mask)
+            vin = vin.compress(goodmask)
 
     tin = tin.compressed()  # No longer masked.
 
@@ -470,10 +469,11 @@ def _slvinit(tin, uin, vin, lat, **opts):
         mask = np.ma.getmaskarray(uin)
         if vin is not None:
             mask = np.ma.mask_or(np.ma.getmaskarray(vin), mask)
-        t = tin.compress(mask)
-        u = uin.compress(mask).filled()
+        goodmask = ~mask
+        t = tin.compress(goodmask)
+        u = uin.compress(goodmask).filled()
         if vin is not None:
-            v = vin.compress(mask).filled()
+            v = vin.compress(goodmask).filled()
     else:
         t = tin
         u = uin.filled()

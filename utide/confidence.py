@@ -14,6 +14,7 @@ import numpy as np
 
 from utide.periodogram import band_psd
 from utide.ellipse_params import ut_cs2cep
+from utide.utilities import complex_interp
 
 
 def band_averaged_psd_by_constit(tin, t, e, elor, coef, opt):
@@ -22,7 +23,7 @@ def band_averaged_psd_by_constit(tin, t, e, elor, coef, opt):
     if opt.equi:
         e_ = e
         if len(tin) > len(t):
-            e_ = np.interp(tin, t, e)
+            e_ = complex_interp(tin, t, e)
         ba = band_psd(tin, e_, constits, equi=True)
 
     else:
