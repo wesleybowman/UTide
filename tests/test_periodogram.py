@@ -11,7 +11,7 @@ import utide.periodogram as pgram
 def random_ts(ndays, dt_hours, complex=True):
     """Returns t (time in days) and x (random series)."""
     np.random.seed(1)
-    npts = ndays * 24 / dt_hours
+    npts = int(ndays * 24 / dt_hours)
     if npts % 2:
         npts -= 1
     t = np.arange(npts, dtype=float) * dt_hours / 24
