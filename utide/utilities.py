@@ -5,11 +5,19 @@ from __future__ import (absolute_import, division, print_function)
 import numpy as np
 from scipy.io import loadmat
 
-# This module is an excerpt from the one in python-gsw.
+# This module began as an excerpt from the one in python-gsw.
 
 # Based on Robert Kern's Bunch; taken from
 # http://currents.soest.hawaii.edu/hgstage/pycurrents/
 # pycurrents/system/utilities.py
+
+
+def complex_interp(x, xp, fp, **kw):
+    if fp.dtype.kind == 'c':
+        fr = np.interp(x, xp, fp.real, **kw)
+        fi = np.interp(x, xp, fp.imag, **kw)
+        return fr + 1j*fi
+    return np.interp(x, xp, fp, **kw)
 
 
 class Bunch(dict):
