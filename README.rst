@@ -28,41 +28,16 @@ not yet available.
 Installation
 ============
 
-Download the zip file and unzip it; or, much better,
-clone the git repository. In either case, change
-your directory to the newly-created ``utide`` distribution
-directory.
+.. code:: shell
+
+    pip install utide
+
+If you are using conda,
 
 .. code:: shell
 
-    python setup.py install
+    conda install utide -c conda-forge
 
-or
-
-.. code:: shell
-
-    python setup.py install --user
-
-if you don't want a system-wide installation.
-
-If you want to work on developing the package, then
-
-.. code:: shell
-
-    python setup.py develop
-
-will allow you to test without reinstalling after making
-a modification.
-
-Another option is to use
-
-.. code:: shell
-
-    pip install .
-
-If you are using conda and will not be developing the code,
-you can install from the IOOS channel. See
-https://github.com/ioos/conda-recipes/wiki.
 
 The public functions can be imported using
 
