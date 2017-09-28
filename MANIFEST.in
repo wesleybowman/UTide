@@ -4,3 +4,5 @@ include requirements.txt
 
 recursive-include utide *.py
 recursive-include utide *.npz
+include versioneer.py
+include utide/_version.py
