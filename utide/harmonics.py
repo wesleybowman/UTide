@@ -26,7 +26,7 @@ kshallow = np.nonzero(~not_shallow)[0]
 def linearized_freqs(tref):
     astro, ader = ut_astron(tref)
     freq = const.freq.copy()
-    selected = np.dot(const.doodson[not_shallow, ...], ader) / 24
+    selected = np.dot(const.doodson[not_shallow, :], ader) / 24
     freq[not_shallow] = selected.squeeze()
     for i0, nshal, k in zip(ishallow, nshallow, kshallow):
         ik = i0 + np.arange(nshal)
