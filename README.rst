@@ -1,8 +1,21 @@
 UTide
 =====
+|travis| |license| |conda| |downloads| |anaconda_cloud|
 
-.. image:: https://travis-ci.org/wesleybowman/UTide.svg?branch=master
+.. |travis| image:: https://travis-ci.org/wesleybowman/UTide.svg?branch=master
    :target: https://travis-ci.org/wesleybowman/UTide
+
+.. |license| image:: https://anaconda.org/conda-forge/utide/badges/license.svg
+   :target: https://choosealicense.com/licenses/mit/
+
+.. |conda| image:: https://anaconda.org/conda-forge/utide/badges/installer/conda.svg
+   :target: https://anaconda.org/conda-forge/utide
+
+.. |downloads| image:: https://anaconda.org/conda-forge/utide/badges/downloads.svg
+   :target: https://anaconda.org/conda-forge/utide
+
+.. |anaconda_cloud| image:: https://anaconda.org/conda-forge/utide/badges/version.svg
+   :target: https://anaconda.org/conda-forge/utide
 
 Python re-implementation of the Matlab package UTide.
 
