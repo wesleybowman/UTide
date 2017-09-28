@@ -3,30 +3,7 @@ import sys
 from setuptools import setup
 from setuptools.command.test import test as TestCommand
 
-
-class PyTest(TestCommand):
-    def finalize_options(self):
-        TestCommand.finalize_options(self)
-        self.verbose = True
-
-    def run_tests(self):
-        import pytest
-        errno = pytest.main(self.test_args)
-        sys.exit(errno)
-
-
-def extract_version(module='utide'):
-    version = None
-    fdir = os.path.dirname(__file__)
-    fnme = os.path.join(fdir, module, '__init__.py')
-    with open(fnme) as fd:
-        for line in fd:
-            if (line.startswith('__version__')):
-                _, version = line.split('=')
-                # Remove quotation characters.
-                version = version.strip()[1:-1]
-                break
-    return version
+import versioneer
 
 
 rootpath = os.path.abspath(os.path.dirname(__file__))
@@ -43,7 +20,7 @@ with open('requirements.txt') as f:
 install_requires = [r.strip() for r in require]
 
 setup(name='UTide',
-      version=extract_version(),
+      version=versioneer.get_version(),
       license='MIT',
       long_description=long_description,
       classifiers=['Development Status :: 5 - Production/Stable',
@@ -65,7 +42,7 @@ setup(name='UTide',
       packages=['utide'],
       package_data={'utide': ['data/*.npz']},
       tests_require=['pytest'],
-      cmdclass=dict(test=PyTest),
+      cmdclass=versioneer.get_cmdclass(),
       author=['Wesley Bowman'],
       author_email='wesley.bowman23@gmail.com',
       zip_safe=False)
