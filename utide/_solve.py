@@ -12,7 +12,7 @@ from .ellipse_params import ut_cs2cep
 from .constituent_selection import ut_cnstitsel
 from .confidence import _confidence
 from .utilities import Bunch
-from . import constit_index_dict
+from ._ut_constants import constit_index_dict
 from .robustfit import robustfit
 from ._time_conversion import _normalize_time
 
