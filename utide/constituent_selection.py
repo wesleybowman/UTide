@@ -5,8 +5,7 @@ from collections import OrderedDict
 import numpy as np
 
 from .astronomy import ut_astron
-from . import ut_constants
-from . import constit_index_dict
+from ._ut_constants import ut_constants, constit_index_dict
 from .utilities import Bunch
 
 

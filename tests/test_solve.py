@@ -11,9 +11,10 @@ from __future__ import (absolute_import, division, print_function)
 
 import numpy as np
 
-from utide import ut_constants
+from utide._ut_constants import ut_constants
 from utide import solve
 from utide import reconstruct
+from utide.utilities import Bunch
 
 
 def test_roundtrip():
@@ -63,7 +64,8 @@ def test_roundtrip():
     htmp = reconstruct(time, elev_coef, min_PE=10)
     vel = reconstruct(time, speed_coef, min_SNR=0)
     htmp = reconstruct(time, elev_coef, min_SNR=0)
-
+    assert isinstance(vel, Bunch)
+    assert isinstance(htmp, Bunch)
 
     # Now the round-trip check, just for the elevation.
     err = np.sqrt(np.mean((time_series-ts_recon)**2))
@@ -119,10 +121,14 @@ def test_masked_input():
     amp_err = amp - elev_coef['A'][0]
     phase_err = phase - elev_coef['g'][0]
     ts_recon = reconstruct(time, elev_coef).h
+    assert isinstance(ts_recon, np.ndarray)
 
     # pure smoke testing of reconstruct
     vel = reconstruct(time, speed_coef)
+    assert isinstance(vel, Bunch)
+
     elev = reconstruct(time, elev_coef)
+    assert isinstance(elev, Bunch)
 
     np.testing.assert_almost_equal(amp_err, 0)
     np.testing.assert_almost_equal(phase_err, 0)

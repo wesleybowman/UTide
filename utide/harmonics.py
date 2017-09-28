@@ -7,8 +7,8 @@ from __future__ import (absolute_import, division, print_function)
 
 import numpy as np
 
-from utide.astronomy import ut_astron
-from utide import ut_constants
+from .astronomy import ut_astron
+from ._ut_constants import ut_constants
 
 
 sat = ut_constants.sat

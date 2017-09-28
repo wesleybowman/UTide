@@ -14,7 +14,7 @@ from numpy.testing import assert_array_almost_equal
 
 from utide.harmonics import FUV
 from utide.utilities import loadbunch
-from utide import _base_dir
+from utide._ut_constants import _base_dir
 
 fname = os.path.join(_base_dir, 'FUV0.npz')
 
