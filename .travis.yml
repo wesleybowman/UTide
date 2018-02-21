@@ -13,8 +13,6 @@ matrix:
     env: TEST_TARGET=default
   - python: 3.6
     env: TEST_TARGET=default
-  - python: 3.5
-    env: TEST_TARGET=coding_standards
   allow_failures:
   - python: 3.6
     env: TEST_TARGET=coding_standards
@@ -24,9 +22,10 @@ before_install:
     - wget http://bit.ly/miniconda -O miniconda.sh
     - bash miniconda.sh -b -p $HOME/miniconda
     - export PATH="$HOME/miniconda/bin:$PATH"
-    - conda update --yes conda
+    - conda config --set always_yes yes --set changeps1 no --set show_channel_urls true
+    - conda update conda
     - conda config --add channels conda-forge --force
-    - conda create --yes -n TEST python=$TRAVIS_PYTHON_VERSION --file requirements.txt --file requirements-dev.txt
+    - conda create --name TEST python=$TRAVIS_PYTHON_VERSION --file requirements.txt --file requirements-dev.txt
     - source activate TEST
 
 install:
