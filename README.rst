@@ -58,17 +58,6 @@ The public functions can be imported using
 
     from utide import solve, reconstruct
 
-To test and make sure that the package has been installed
-and imported correctly, run:
-
-.. code:: python
-
-    from utide.tests.test_solve import test_roundtrip
-    test_roundtrip()
-
-If you have the pytest package installed, you can execute ``python setup.py test``
-from within the source directory to run all tests.
-
 A sample call would be
 
 .. code:: python
