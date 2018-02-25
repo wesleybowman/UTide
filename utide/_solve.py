@@ -116,22 +116,22 @@ def solve(t, u, v=None, lat=None, **opts):
         Sea-surface height, velocity component, etc.
     v : {None, array_like}, optional
         If `u` is a velocity component, `v` is the orthogonal component.
-    lat : float
-        Latitude in degrees; required.
+    lat : float, required
+        Latitude in degrees.
     epoch : {string, `datetime.date`, `datetime.datetime`}, optional
         Valid strings are 'python' (default); 'matlab' if `t` is
         an array of Matlab datenums; or an arbitrary date in the
         form 'YYYY-MM-DD'.  The default corresponds to the Python
         standard library `datetime` proleptic Gregorian calendar,
-        starting with 1 on January 1 of year 1.
+        starting with 1 at 00:00 on January 1 of year 1; this is
+        the 'datenum' used by Matplotlib.
     constit : {'auto', array_like}, optional
         List of strings with standard letter abbreviations of
         tidal constituents; or 'auto' to let the list be determined
         based on the time span.
     conf_int : {'linear', 'MC', 'none'}, optional
         If not 'none' (string), calculate linearized confidence
-        intervals, or use a Monte-Carlo simulation (not yet
-        implemented).
+        intervals, or use a Monte-Carlo simulation.
     method : {'ols', 'robust'}, optional
         Solve with ordinary least squares, or with a robust algorithm.
     trend : bool, optional
