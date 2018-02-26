@@ -48,13 +48,26 @@ def reconstruct(t, coef,
         Scalar time series is returned as `tide.h`; a vector
         series as `tide.u`, `tide.v`.  Each is an ndarray with
         ``np.nan`` as the missing value.
+        Most input kwargs are included: 'epoch', 'constit',
+        'min_SNR', and 'min_PE'.
+        The input time array is included as 't_in', and 't_mpl';
+        the former is the original input time argument, and the
+        latter is the time as a matplotlib datenum.  If 'epoch'
+        is 'python', these will be identical, and the names will
+        point to the same array.
 
     """
 
+    out = Bunch(t_in=t, epoch=epoch, constit=constit, min_SNR=min_SNR,
+                min_PE=min_PE)
     t = np.atleast_1d(t)
     if t.ndim != 1:
         raise ValueError("t must be a 1-D array")
     t = _normalize_time(t, epoch)
+    if epoch == 'python':
+        out.t_mpl = out.t_in
+    else:
+        out.t_mpl = t
     t = np.ma.masked_invalid(t)
     goodmask = ~np.ma.getmaskarray(t)
     t = t.compressed()
@@ -65,7 +78,6 @@ def reconstruct(t, coef,
                         min_SNR=min_SNR,
                         min_PE=min_PE)
 
-    out = Bunch()
     if v is not None:
         out.u, out.v = u, v
     else:
