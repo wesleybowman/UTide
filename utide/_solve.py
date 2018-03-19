@@ -286,7 +286,10 @@ def _solv1(tin, uin, vin, lat, **opts):
         xraw = u
 
     if opt.newopts.method == 'ols':
-        m = np.linalg.lstsq(B, xraw)[0]  # Model coefficients.
+        try:
+          m = np.linalg.lstsq(B, xraw, rcond=None)[0]  # Model coefficients.
+        except:
+          m = np.linalg.lstsq(B, xraw)[0]  # Model coefficients
         W = np.ones(nt)  # Uniform weighting; we could use a scalar 1, or None.
     else:
         rf = robustfit(B, xraw, **opt.newopts.robust_kw)
