@@ -36,5 +36,6 @@ script:
       fi
 
     - if [[ $TEST_TARGET == 'coding_standards' ]]; then
-        find . -type f -name "*.py" ! -name 'conf.py' | xargs flake8 --ignore=E741 --max-line-length=100 ;
+        pycodestyle --ignore=E741,E226 --max-line-length=100 tests ;
+        pycodestyle --ignore=E741,E226 --max-line-length=100 utide ;
       fi

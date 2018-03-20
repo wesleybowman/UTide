@@ -1,12 +1,13 @@
 import os
 
-import pytest
-
 import numpy as np
 from numpy.testing import assert_array_almost_equal, assert_array_equal
 
+import pytest
+
 import utide
-from utide.utilities import Bunch, loadbunch, convert_unicode_arrays
+from utide.utilities import Bunch, convert_unicode_arrays, loadbunch
+
 
 thisdir = os.path.dirname(__file__)
 datapath = os.path.join(thisdir, 'data')
@@ -16,8 +17,13 @@ t, h = np.loadtxt(HNL_path, unpack=True)
 
 epoch = '1700-01-01'
 
-solve_kw = dict(epoch=epoch, lat=21, constit='auto', method='ols',
-                conf_int='linear')
+solve_kw = {
+    'epoch': epoch,
+    'lat': 21,
+    'constit': 'auto',
+    'method': 'ols',
+    'conf_int': 'linear',
+}
 
 coef_all = utide.solve(t, h, **solve_kw)
 

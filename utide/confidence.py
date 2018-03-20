@@ -12,8 +12,8 @@ import warnings
 
 import numpy as np
 
-from utide.periodogram import band_psd
 from utide.ellipse_params import ut_cs2cep
+from utide.periodogram import band_psd
 from utide.utilities import complex_interp
 
 
@@ -346,7 +346,7 @@ def _confidence(coef, cnstit, opt, t, e, tin, elor, xraw, xmod, W, m, B,
                         coef.theta_ci[ind] = 1.96 * sig2.imag
                     ind += 1
         else:
-            raise NotImplementedError("Monte Carlo inference not implemented")
+            raise NotImplementedError('Monte Carlo inference not implemented')
 
     return coef
 

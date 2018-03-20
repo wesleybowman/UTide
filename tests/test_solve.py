@@ -11,9 +11,9 @@ from __future__ import (absolute_import, division, print_function)
 
 import numpy as np
 
-from utide._ut_constants import ut_constants
-from utide import solve
 from utide import reconstruct
+from utide import solve
+from utide._ut_constants import ut_constants
 from utide.utilities import Bunch
 
 
@@ -38,14 +38,15 @@ def test_roundtrip():
     arg = 2 * np.pi * (time - tref) * freq_cpd[jj] - np.deg2rad(phase)
     time_series = amp * np.cos(arg)
 
-    opts = dict(constit='auto',
-                phase='raw',
-                nodal=False,
-                trend=False,
-                method='ols',
-                conf_int='linear',
-                Rayleigh_min=0.95,
-                )
+    opts = {
+        'constit': 'auto',
+        'phase': 'raw',
+        'nodal': False,
+        'trend': False,
+        'method': 'ols',
+        'conf_int': 'linear',
+        'Rayleigh_min': 0.95,
+    }
 
     speed_coef = solve(time, time_series, time_series, lat=lat, **opts)
     elev_coef = solve(time, time_series, lat=lat, **opts)
@@ -100,14 +101,15 @@ def test_masked_input():
     arg = 2 * np.pi * (time - tref) * freq_cpd[jj] - np.deg2rad(phase)
     time_series = amp * np.cos(arg)
 
-    opts = dict(constit='auto',
-                phase='raw',
-                nodal=False,
-                trend=False,
-                method='ols',
-                conf_int='linear',
-                Rayleigh_min=0.95,
-                )
+    opts = {
+        'constit': 'auto',
+        'phase': 'raw',
+        'nodal': False,
+        'trend': False,
+        'method': 'ols',
+        'conf_int': 'linear',
+        'Rayleigh_min': 0.95,
+    }
 
     t = np.ma.array(time)
     t[[10, 15, 20, 21]] = np.ma.masked
@@ -170,14 +172,15 @@ def test_robust():
     time_series[:5] = 10
     time_series[-5:] = -10
 
-    opts = dict(constit='auto',
-                phase='raw',
-                nodal=False,
-                trend=False,
-                method='robust',
-                conf_int='linear',
-                Rayleigh_min=0.95,
-                )
+    opts = {
+        'constit': 'auto',
+        'phase': 'raw',
+        'nodal': False,
+        'trend': False,
+        'method': 'robust',
+        'conf_int': 'linear',
+        'Rayleigh_min': 0.95,
+    }
 
     speed_coef = solve(time, time_series, time_series, lat=lat, **opts)
     elev_coef = solve(time, time_series, lat=lat, **opts)
@@ -210,17 +213,18 @@ def test_MC():
     np.random.seed(1)
     time_series += 0.01 * np.random.randn(len(time_series))
 
-    opts = dict(constit='auto',
-                phase='raw',
-                nodal=False,
-                trend=False,
-                method='ols',
-                conf_int='MC',
-                white=False,
-                Rayleigh_min=0.95,
-                )
+    opts = {
+        'constit': 'auto',
+        'phase': 'raw',
+        'nodal': False,
+        'trend': False,
+        'method': 'ols',
+        'conf_int': 'MC',
+        'white': False,
+        'Rayleigh_min': 0.95,
+    }
 
-    speed_coef = solve(time, time_series,  time_series, lat=lat, **opts)
+    speed_coef = solve(time, time_series, time_series, lat=lat, **opts)
     elev_coef = solve(time, time_series, lat=lat, **opts)
 
     for name, AA, AA_ci, gg, gg_ci in zip(elev_coef.name,

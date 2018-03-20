@@ -12,9 +12,9 @@ import os
 
 from numpy.testing import assert_array_almost_equal
 
+from utide._ut_constants import _base_dir
 from utide.harmonics import FUV
 from utide.utilities import loadbunch
-from utide._ut_constants import _base_dir
 
 fname = os.path.join(_base_dir, 'FUV0.npz')
 
@@ -27,7 +27,7 @@ def test_FUV():
 
     for i, flag in enumerate(x.flags):
         F, U, V = FUV(x.t, x.t0, x.lind-1, x.lat, flag)
-        print('i:', i, "ngflgs:", flag)
+        print('i: {} ngflags: {}'.format(i, flag))
 
         # We use broadcasting instead of replication, so
         # we need to test only against the first row of
