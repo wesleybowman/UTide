@@ -1,5 +1,5 @@
-flake8
+matplotlib
+pandas
+pycodestyle
 pytest
 pytest-cov
-pandas
-matplotlib

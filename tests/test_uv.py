@@ -2,15 +2,16 @@
 Full example test.
 
 """
-import pytest
 
-import numpy as np
-from pandas import date_range
 from matplotlib.dates import date2num
 
-from utide import solve
-from utide import reconstruct
+import numpy as np
 
+from pandas import date_range
+
+import pytest
+
+from utide import reconstruct, solve
 from utide.utilities import Bunch
 
 

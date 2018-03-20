@@ -5,17 +5,18 @@ Tests for periodogram module.
 from __future__ import (absolute_import, division, print_function)
 
 import numpy as np
+
 import utide.periodogram as pgram
 
 
-def random_ts(ndays, dt_hours, complex=True):
+def random_ts(ndays, dt_hours, is_complex=True):
     """Returns t (time in days) and x (random series)."""
     np.random.seed(1)
     npts = int(ndays * 24 / dt_hours)
     if npts % 2:
         npts -= 1
     t = np.arange(npts, dtype=float) * dt_hours / 24
-    if complex:
+    if is_complex:
         x = np.random.randn(npts) + 1j * np.random.randn(npts)
     else:
         x = np.random.randn(npts)
@@ -39,7 +40,7 @@ def test_fft_ls_consistency():
 
 
 def test_uv_consistency():
-    t, x = random_ts(20, 0.5, complex=False)
+    t, x = random_ts(20, 0.5, is_complex=False)
     xx = x + 1j * x
     y_fft = pgram.band_psd(t, xx, [1/12.42], equi=True)
     y_ls = pgram.band_psd(t, xx, [1/12.42], equi=False)
