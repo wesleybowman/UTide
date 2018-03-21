@@ -302,7 +302,7 @@ def convert_unicode_arrays(b):
             if val.dtype.kind == 'O':
                 newval = np.empty(shape=val.shape, dtype=val.dtype)
                 for k, x in enumerate(val):
-                    if (isinstance(x, np.ndarray) and x.dtype.kind == 'U' and x.size == 1):  # noqa
+                    if isinstance(x, np.ndarray) and x.dtype.kind == 'U' and x.size == 1:
                         newval[k] = x.item()
                     else:
                         newval[k] = x
