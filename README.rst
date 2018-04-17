@@ -24,19 +24,18 @@ Still in heavy development--everything is subject to change!
 Note: the user interface differs from the Matlab version, so
 consult the Python function docstrings to see how to specify
 parameters. Some functionality from the Matlab version is
-not yet available.
+not yet available. For more information see:
 
 ::
 
-    % For more information see:
-    % Codiga, D.L., 2011. Unified Tidal Analysis and Prediction Using the
-    % UTide Matlab Functions. Technical Report 2011-01. Graduate School
-    % of Oceanography, University of Rhode Island, Narragansett, RI.
-    % 59pp. ftp://www.po.gso.uri.edu/pub/downloads/codiga/pubs/
-    % 2011Codiga-UTide-Report.pdf
-    %
-    % UTide v1p0 9/2011 d.codiga@gso.uri.edu
-    % http://www.po.gso.uri.edu/~codiga/utide/utide.htm
+    Codiga, D.L., 2011. Unified Tidal Analysis and Prediction Using the
+    UTide Matlab Functions. Technical Report 2011-01. Graduate School
+    of Oceanography, University of Rhode Island, Narragansett, RI.
+    59pp. ftp://www.po.gso.uri.edu/pub/downloads/codiga/pubs/
+    2011Codiga-UTide-Report.pdf
+    
+    UTide v1p0 9/2011 d.codiga@gso.uri.edu
+     http://www.po.gso.uri.edu/~codiga/utide/utide.htm
 
 Installation
 ============
