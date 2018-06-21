@@ -122,7 +122,9 @@ def FUV(t, tref, lind, lat, ngflgs):
 
         astro, ader = ut_astron(tt)
 
-        if abs(lat) < 5:
+        if lat == 0:
+            lat = 5
+        elif abs(lat) < 5:
             lat = np.sign(lat) * 5
 
         slat = np.sin(np.deg2rad(lat))
