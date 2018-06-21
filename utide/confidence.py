@@ -255,7 +255,7 @@ def _confidence(coef, cnstit, opt, t, e, tin, elor, xraw, xmod, W, m, B,
                 Duu = Puu[c] * Duu
                 trace = np.trace(Duu)
                 if trace != 0.:
-                    Duu = Duu / trace
+                    Duu /= trace
                 varcov_mCc[c, :2, :2] = Duu
 
             if not opt.twodim:
