@@ -332,7 +332,7 @@ def band_psd(t, e, cfrq, equi=True, frqosamp=1):
         t = t[:-1]
         nt -= 1
 
-    hn = signal.hanning(nt, sym=False)
+    hn = signal.windows.hann(nt, sym=False)
 
     # on real component
     if equi:  # If even sampling, FFT.

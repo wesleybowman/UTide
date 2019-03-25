@@ -15,8 +15,7 @@ from utide import reconstruct, solve
 from utide.utilities import Bunch
 
 
-@pytest.fixture
-def fake_tide(t, M2amp, M2phase):
+def _fake_tide(t, M2amp, M2phase):
     """
     Generate a minimally realistic-looking fake semidiurnal tide.
 
@@ -36,14 +35,14 @@ def make_data():
     np.random.seed(1234)
     t = date_range(start='2016-03-29', periods=N, freq='H')
     # Signal + some noise.
-    u = fake_tide(np.arange(N), M2amp=2, M2phase=0) + np.random.randn(N)
-    v = fake_tide(np.arange(N), M2amp=1, M2phase=np.pi) + np.random.randn(N)
+    u = _fake_tide(np.arange(N), M2amp=2, M2phase=0) + np.random.randn(N)
+    v = _fake_tide(np.arange(N), M2amp=1, M2phase=np.pi) + np.random.randn(N)
     time = date2num(t.to_pydatetime())
     return time, u, v
 
 
-def test_solve():
-    time, u, v = make_data()
+def test_solve(make_data):
+    time, u, v = make_data
     coef = solve(time, u, v,
                  lat=-42.5,
                  nodal=False,
