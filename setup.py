@@ -11,8 +11,6 @@ def read(*parts):
     return open(os.path.join(rootpath, *parts), 'r').read()
 
 
-long_description = '{}\n{}'.format(read('README.rst'), read('LICENSE.txt'))
-
 with open('requirements.txt') as f:
     require = f.readlines()
 install_requires = [r.strip() for r in require]
@@ -20,7 +18,7 @@ install_requires = [r.strip() for r in require]
 setup(name='UTide',
       version=versioneer.get_version(),
       license='MIT',
-      long_description=long_description,
+      long_description=read('README.rst'),
       classifiers=['Development Status :: 5 - Production/Stable',
                    'Environment :: Console',
                    'Intended Audience :: Science/Research',
