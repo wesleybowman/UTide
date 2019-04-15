@@ -5,9 +5,6 @@ environment:
     - PYTHON: "C:\\Miniconda36-x64"
       PY: 3.7
 
-init:
-  - "ECHO %PYTHON_VERSION% %MINICONDA%"
-
 install:
   # Install and configure miniconda.
   - "set PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
