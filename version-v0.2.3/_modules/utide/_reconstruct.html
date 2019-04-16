@@ -1,0 +1,233 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>utide._reconstruct &#8212; UTide 0.1 documentation</title>
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">UTide 0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for utide._reconstruct</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="p">(</span><span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">.harmonics</span> <span class="k">import</span> <span class="n">ut_E</span>
+<span class="kn">from</span> <span class="nn">.utilities</span> <span class="k">import</span> <span class="n">Bunch</span>
+<span class="kn">from</span> <span class="nn">._time_conversion</span> <span class="k">import</span> <span class="n">_normalize_time</span>
+
+
+<div class="viewcode-block" id="reconstruct"><a class="viewcode-back" href="../../usage.html#utide.reconstruct">[docs]</a><span class="k">def</span> <span class="nf">reconstruct</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">coef</span><span class="p">,</span>
+                <span class="n">epoch</span><span class="o">=</span><span class="s1">&#39;python&#39;</span><span class="p">,</span>
+                <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">constit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">min_SNR</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                <span class="n">min_PE</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Reconstruct a tidal signal.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    t : array_like</span>
+<span class="sd">        Time in days since ``epoch``.</span>
+<span class="sd">    coef : `Bunch`</span>
+<span class="sd">        Data structure returned by `utide.solve`.</span>
+<span class="sd">    epoch : {string, `datetime.date`, `datetime.datetime`}, optional</span>
+<span class="sd">        Valid strings are &#39;python&#39; (default); &#39;matlab&#39; if `t` is</span>
+<span class="sd">        an array of Matlab datenums; or an arbitrary date in the</span>
+<span class="sd">        form &#39;YYYY-MM-DD&#39;.  The default corresponds to the Python</span>
+<span class="sd">        standard library `datetime` proleptic Gregorian calendar,</span>
+<span class="sd">        starting with 1 on January 1 of year 1.</span>
+<span class="sd">    verbose : {True, False}, optional</span>
+<span class="sd">        True to enable output message (default). False turns off all</span>
+<span class="sd">        messages.</span>
+<span class="sd">    constit : {None, array_like}, optional</span>
+<span class="sd">        List of strings with standard letter abbreviations of</span>
+<span class="sd">        tidal constituents, to be used in reconstruction if present</span>
+<span class="sd">        in coef; alternative to the SNR and PE criteria.</span>
+<span class="sd">    min_SNR : float, optional, default 2</span>
+<span class="sd">        Include only the constituents with signal-to-noise SNR &gt;= min_SNR,</span>
+<span class="sd">        where SNR is based on the constituent confidence intervals in</span>
+<span class="sd">        ``coef``.</span>
+<span class="sd">    min_PE : float, optional, default 0</span>
+<span class="sd">        Include only the constituents with percent energy PE &gt;= min_PE,</span>
+<span class="sd">        where PE is based on the amplitudes in ``coef``.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    tide : `Bunch`</span>
+<span class="sd">        Scalar time series is returned as `tide.h`; a vector</span>
+<span class="sd">        series as `tide.u`, `tide.v`.  Each is an ndarray with</span>
+<span class="sd">        ``np.nan`` as the missing value.</span>
+<span class="sd">        Most input kwargs are included: &#39;epoch&#39;, &#39;constit&#39;,</span>
+<span class="sd">        &#39;min_SNR&#39;, and &#39;min_PE&#39;.</span>
+<span class="sd">        The input time array is included as &#39;t_in&#39;, and &#39;t_mpl&#39;;</span>
+<span class="sd">        the former is the original input time argument, and the</span>
+<span class="sd">        latter is the time as a matplotlib datenum.  If &#39;epoch&#39;</span>
+<span class="sd">        is &#39;python&#39;, these will be identical, and the names will</span>
+<span class="sd">        point to the same array.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">out</span> <span class="o">=</span> <span class="n">Bunch</span><span class="p">(</span><span class="n">t_in</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="n">epoch</span><span class="o">=</span><span class="n">epoch</span><span class="p">,</span> <span class="n">constit</span><span class="o">=</span><span class="n">constit</span><span class="p">,</span> <span class="n">min_SNR</span><span class="o">=</span><span class="n">min_SNR</span><span class="p">,</span>
+                <span class="n">min_PE</span><span class="o">=</span><span class="n">min_PE</span><span class="p">)</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;t must be a 1-D array&quot;</span><span class="p">)</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">_normalize_time</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">epoch</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">epoch</span> <span class="o">==</span> <span class="s1">&#39;python&#39;</span><span class="p">:</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">t_mpl</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">t_in</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">t_mpl</span> <span class="o">=</span> <span class="n">t</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">masked_invalid</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+    <span class="n">goodmask</span> <span class="o">=</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">getmaskarray</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">compressed</span><span class="p">()</span>
+
+    <span class="n">u</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">_reconstruct</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">goodmask</span><span class="p">,</span> <span class="n">coef</span><span class="p">,</span>
+                        <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+                        <span class="n">constit</span><span class="o">=</span><span class="n">constit</span><span class="p">,</span>
+                        <span class="n">min_SNR</span><span class="o">=</span><span class="n">min_SNR</span><span class="p">,</span>
+                        <span class="n">min_PE</span><span class="o">=</span><span class="n">min_PE</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">u</span><span class="p">,</span> <span class="n">out</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">h</span> <span class="o">=</span> <span class="n">u</span>
+    <span class="k">return</span> <span class="n">out</span></div>
+
+
+<span class="k">def</span> <span class="nf">_reconstruct</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">goodmask</span><span class="p">,</span> <span class="n">coef</span><span class="p">,</span> <span class="n">verbose</span><span class="p">,</span> <span class="n">constit</span><span class="p">,</span> <span class="n">min_SNR</span><span class="p">,</span> <span class="n">min_PE</span><span class="p">):</span>
+
+    <span class="n">twodim</span> <span class="o">=</span> <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;aux&#39;</span><span class="p">][</span><span class="s1">&#39;opt&#39;</span><span class="p">][</span><span class="s1">&#39;twodim&#39;</span><span class="p">]</span>
+
+    <span class="c1"># Determine constituents to include.</span>
+    <span class="k">if</span> <span class="n">constit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">ind</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">coef</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">constit</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">min_SNR</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">min_PE</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">ind</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">twodim</span><span class="p">:</span>
+            <span class="n">E</span> <span class="o">=</span> <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;Lsmaj&#39;</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;Lsmin&#39;</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span>
+            <span class="n">N</span> <span class="o">=</span> <span class="p">(</span><span class="n">coef</span><span class="p">[</span><span class="s1">&#39;Lsmaj_ci&#39;</span><span class="p">]</span><span class="o">/</span><span class="mf">1.96</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">coef</span><span class="p">[</span><span class="s1">&#39;Lsmin_ci&#39;</span><span class="p">]</span><span class="o">/</span><span class="mf">1.96</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">E</span> <span class="o">=</span> <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span>
+            <span class="n">N</span> <span class="o">=</span> <span class="p">(</span><span class="n">coef</span><span class="p">[</span><span class="s1">&#39;A_ci&#39;</span><span class="p">]</span><span class="o">/</span><span class="mf">1.96</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+        <span class="n">SNR</span> <span class="o">=</span> <span class="n">E</span> <span class="o">/</span> <span class="n">N</span>
+        <span class="n">PE</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">*</span> <span class="n">E</span> <span class="o">/</span> <span class="n">E</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="n">ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">SNR</span> <span class="o">&gt;=</span> <span class="n">min_SNR</span><span class="p">,</span> <span class="n">PE</span> <span class="o">&gt;=</span> <span class="n">min_PE</span><span class="p">)</span>
+
+    <span class="c1"># Complex coefficients.</span>
+    <span class="n">rpd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">180</span>
+    <span class="k">if</span> <span class="n">twodim</span><span class="p">:</span>
+        <span class="n">ap</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">((</span><span class="n">coef</span><span class="p">[</span><span class="s1">&#39;Lsmaj&#39;</span><span class="p">][</span><span class="n">ind</span><span class="p">]</span> <span class="o">+</span> <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;Lsmin&#39;</span><span class="p">][</span><span class="n">ind</span><span class="p">])</span> <span class="o">*</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="p">(</span><span class="n">coef</span><span class="p">[</span><span class="s1">&#39;theta&#39;</span><span class="p">][</span><span class="n">ind</span><span class="p">]</span> <span class="o">-</span> <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">][</span><span class="n">ind</span><span class="p">])</span> <span class="o">*</span> <span class="n">rpd</span><span class="p">))</span>
+        <span class="n">am</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">((</span><span class="n">coef</span><span class="p">[</span><span class="s1">&#39;Lsmaj&#39;</span><span class="p">][</span><span class="n">ind</span><span class="p">]</span> <span class="o">-</span> <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;Lsmin&#39;</span><span class="p">][</span><span class="n">ind</span><span class="p">])</span> <span class="o">*</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="p">(</span><span class="n">coef</span><span class="p">[</span><span class="s1">&#39;theta&#39;</span><span class="p">][</span><span class="n">ind</span><span class="p">]</span> <span class="o">+</span> <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">][</span><span class="n">ind</span><span class="p">])</span> <span class="o">*</span> <span class="n">rpd</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ap</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">][</span><span class="n">ind</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">coef</span><span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">][</span><span class="n">ind</span><span class="p">]</span> <span class="o">*</span> <span class="n">rpd</span><span class="p">)</span>
+        <span class="n">am</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">ap</span><span class="p">)</span>
+
+    <span class="n">ngflgs</span> <span class="o">=</span> <span class="p">[</span><span class="n">coef</span><span class="p">[</span><span class="s1">&#39;aux&#39;</span><span class="p">][</span><span class="s1">&#39;opt&#39;</span><span class="p">][</span><span class="s1">&#39;nodsatlint&#39;</span><span class="p">],</span>
+              <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;aux&#39;</span><span class="p">][</span><span class="s1">&#39;opt&#39;</span><span class="p">][</span><span class="s1">&#39;nodsatnone&#39;</span><span class="p">],</span>
+              <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;aux&#39;</span><span class="p">][</span><span class="s1">&#39;opt&#39;</span><span class="p">][</span><span class="s1">&#39;gwchlint&#39;</span><span class="p">],</span>
+              <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;aux&#39;</span><span class="p">][</span><span class="s1">&#39;opt&#39;</span><span class="p">][</span><span class="s1">&#39;gwchnone&#39;</span><span class="p">]]</span>
+
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;prep/calcs ... &#39;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+    <span class="n">E</span> <span class="o">=</span> <span class="n">ut_E</span><span class="p">(</span><span class="n">t</span><span class="p">,</span>
+             <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;aux&#39;</span><span class="p">][</span><span class="s1">&#39;reftime&#39;</span><span class="p">],</span> <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;aux&#39;</span><span class="p">][</span><span class="s1">&#39;frq&#39;</span><span class="p">][</span><span class="n">ind</span><span class="p">],</span>
+             <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;aux&#39;</span><span class="p">][</span><span class="s1">&#39;lind&#39;</span><span class="p">][</span><span class="n">ind</span><span class="p">],</span> <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;aux&#39;</span><span class="p">][</span><span class="s1">&#39;lat&#39;</span><span class="p">],</span> <span class="n">ngflgs</span><span class="p">,</span>
+             <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;aux&#39;</span><span class="p">][</span><span class="s1">&#39;opt&#39;</span><span class="p">][</span><span class="s1">&#39;prefilt&#39;</span><span class="p">])</span>
+
+    <span class="n">fit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">E</span><span class="p">,</span> <span class="n">ap</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">E</span><span class="p">),</span> <span class="n">am</span><span class="p">)</span>
+
+    <span class="c1"># Mean (&amp; trend).</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">goodmask</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">u</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+    <span class="n">trend</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;aux&#39;</span><span class="p">][</span><span class="s1">&#39;opt&#39;</span><span class="p">][</span><span class="s1">&#39;notrend&#39;</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">twodim</span><span class="p">:</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">u</span><span class="p">[</span><span class="n">goodmask</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span> <span class="o">+</span> <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;umean&#39;</span><span class="p">]</span>
+        <span class="n">v</span><span class="p">[</span><span class="n">goodmask</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span> <span class="o">+</span> <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;vmean&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">trend</span><span class="p">:</span>
+            <span class="n">u</span><span class="p">[</span><span class="n">goodmask</span><span class="p">]</span> <span class="o">+=</span> <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;uslope&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">t</span> <span class="o">-</span> <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;aux&#39;</span><span class="p">][</span><span class="s1">&#39;reftime&#39;</span><span class="p">])</span>
+            <span class="n">v</span><span class="p">[</span><span class="n">goodmask</span><span class="p">]</span> <span class="o">+=</span> <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;vslope&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">t</span> <span class="o">-</span> <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;aux&#39;</span><span class="p">][</span><span class="s1">&#39;reftime&#39;</span><span class="p">])</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">u</span><span class="p">[</span><span class="n">goodmask</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span> <span class="o">+</span> <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;mean&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">trend</span><span class="p">:</span>
+            <span class="n">u</span><span class="p">[</span><span class="n">goodmask</span><span class="p">]</span> <span class="o">+=</span> <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;slope&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">t</span> <span class="o">-</span> <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;aux&#39;</span><span class="p">][</span><span class="s1">&#39;reftime&#39;</span><span class="p">])</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;done.&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">UTide 0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2015, Dan Codiga, Wesley Bowman, and contributors.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.0.1.
+    </div>
+  </body>
+</html>
