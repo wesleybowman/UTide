@@ -103,7 +103,8 @@ def _reconstruct(t, goodmask, coef, verbose, constit, min_SNR, min_PE):
             N = (coef['A_ci']/1.96)**2
         SNR = E / N
         PE = 100 * E / E.sum()
-        ind = np.logical_and(SNR >= min_SNR, PE >= min_PE)
+        with np.errstate(invalid='ignore'):
+            ind = np.logical_and(SNR >= min_SNR, PE >= min_PE)
 
     # Complex coefficients.
     rpd = np.pi/180

@@ -238,7 +238,9 @@ def _confidence(coef, cnstit, opt, t, e, tin, elor, xraw, xmod, W, m, B,
                     varYv = Pvv[c] * varYv / den
                     varcov_mCc[c, :, :] = np.diag(np.array([varXu, varYu,
                                                             varXv, varYv]))
-                sig1, sig2 = ut_linci(Xu[c] + 1j * Xv[c], Yu[c] + 1j * Yv[c],
+                with np.errstate(invalid='ignore'):
+                    sig1, sig2 = ut_linci(Xu[c] + 1j * Xv[c],
+                                      Yu[c] + 1j * Yv[c],
                                       np.sqrt(varXu) + 1j * np.sqrt(varXv),
                                       np.sqrt(varYu) + 1j * np.sqrt(varYv))
                 coef['Lsmaj_ci'][c] = 1.96 * np.real(sig1)
