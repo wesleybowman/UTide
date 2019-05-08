@@ -280,7 +280,7 @@ def loadbunch(fname, masked=True):
         with open(fname, 'rb') as fobj:
             xx = loadmat(fobj, chars_as_strings=True)
     elif fname.endswith('.npz'):
-        xx = np.load(fname, encoding='latin1')
+        xx = np.load(fname, encoding='latin1', allow_pickle=True)
     else:
         raise ValueError('Unrecognized file {}'.format(fname))
     keys = [k for k in xx.keys() if not k.startswith("__")]
