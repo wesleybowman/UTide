@@ -9,10 +9,10 @@ env:
 matrix:
   fast_finish: true
   include:
-    - name: "python-3.7 numpy=1.11"
-      env: PY=3.7 NP=1.11
     - name: "python-3.7 numpy=1.16"
       env: PY=3.7 NP=1.16
+    - name: "python-3.7 numpy=1.11"
+      env: PY=3.7 NP=1.11
     - name: "python-3.6"
       env: PY=3.6
     - name: "python-2.7"
@@ -82,4 +82,4 @@ deploy:
     repo: wesleybowman/UTide
     tags: true
     all_branches: master
-    condition: '$TRAVIS_JOB_NAME == "python-3.7"'
+    condition: '$TRAVIS_JOB_NAME == "docs'
