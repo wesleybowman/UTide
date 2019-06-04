@@ -1,0 +1,454 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>utide.periodogram &#8212; UTide 0.2.4 documentation</title>
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">UTide 0.2.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for utide.periodogram</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Band-averaged spectral estimation for use in tidal error analysis.</span>
+
+<span class="sd">There is only one function in this module that is imported by</span>
+<span class="sd">other modules: `band_psd` (``ut_pdgm`` in the Matlab version), which</span>
+<span class="sd">uses the residuals from the tidal fit to calculate power spectral</span>
+<span class="sd">density averaged in bands near the constituent clusters.</span>
+
+<span class="sd">Because the functions here are intended for internal use only,</span>
+<span class="sd">they are stripped down to their essentials, with little or</span>
+<span class="sd">no argument checking.  Some argument flexibility is included</span>
+<span class="sd">to facilitate testing.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="p">(</span><span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="k">import</span> <span class="n">signal</span>
+
+<span class="kn">from</span> <span class="nn">utide.utilities</span> <span class="k">import</span> <span class="n">Bunch</span>
+
+
+<span class="c1"># __all__ = [&#39;freq_bands&#39;, &#39;band_psd&#39;]</span>
+
+<span class="c1"># Frequency bands in cycles per hour for</span>
+<span class="c1"># estimating background noise levels.</span>
+<span class="n">freq_bands</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">.</span><span class="mi">00010</span><span class="p">,</span> <span class="o">.</span><span class="mi">00417</span><span class="p">],</span>   <span class="c1"># fortnightly etc.</span>
+                       <span class="p">[</span><span class="o">.</span><span class="mi">03192</span><span class="p">,</span> <span class="o">.</span><span class="mi">04859</span><span class="p">],</span>   <span class="c1"># diurnal</span>
+                       <span class="p">[</span><span class="o">.</span><span class="mi">07218</span><span class="p">,</span> <span class="o">.</span><span class="mi">08884</span><span class="p">],</span>   <span class="c1"># semidiurnal</span>
+                       <span class="p">[</span><span class="o">.</span><span class="mi">11243</span><span class="p">,</span> <span class="o">.</span><span class="mi">12910</span><span class="p">],</span>   <span class="c1"># mk3, 2mk3</span>
+                       <span class="p">[</span><span class="o">.</span><span class="mi">15269</span><span class="p">,</span> <span class="o">.</span><span class="mi">16936</span><span class="p">],</span>   <span class="c1"># about 4 cpd</span>
+                       <span class="p">[</span><span class="o">.</span><span class="mi">19295</span><span class="p">,</span> <span class="o">.</span><span class="mi">20961</span><span class="p">],</span>
+                       <span class="p">[</span><span class="o">.</span><span class="mi">23320</span><span class="p">,</span> <span class="o">.</span><span class="mi">25100</span><span class="p">],</span>   <span class="c1"># s6</span>
+                       <span class="p">[</span><span class="o">.</span><span class="mi">26000</span><span class="p">,</span> <span class="o">.</span><span class="mi">29000</span><span class="p">],</span>
+                       <span class="p">[</span><span class="o">.</span><span class="mi">30000</span><span class="p">,</span> <span class="o">.</span><span class="mi">50000</span><span class="p">]])</span>  <span class="c1"># m8 is 0.322; highest is 0.487</span>
+
+
+<div class="viewcode-block" id="fbndavg"><a class="viewcode-back" href="../../internals/periodogram.html#utide.periodogram.fbndavg">[docs]</a><span class="k">def</span> <span class="nf">fbndavg</span><span class="p">(</span><span class="n">P</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="n">cfreq</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fbands</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Band-average periodogram, excluding constituent frequencies</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    P : ndarray (nfreq,)</span>
+<span class="sd">        periodogram in units^2 per CPH</span>
+<span class="sd">    freq: ndarray (nfreq,)</span>
+<span class="sd">        frequencies in CPH</span>
+<span class="sd">    cfreq: None or array_like</span>
+<span class="sd">        constituent frequencies (CPH) to be excluded</span>
+<span class="sd">    fbands: array_like (nbands, 2)</span>
+<span class="sd">        limits of frequency bands; defaults to 9 bands in `freq_bands`</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ndarray (nbands,)</span>
+<span class="sd">        mean of `P` within `fbands`</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    From ut_fbndavg, which was based on residual_spectrum.m of</span>
+<span class="sd">    t_tide, Pawlowicz et al. (2002).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">fbands</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">fbands</span> <span class="o">=</span> <span class="n">freq_bands</span>
+
+    <span class="n">nfreq</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">freq</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">cfreq</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Exclude periodogram values that are nearest neighbors of</span>
+        <span class="c1"># input constituent frequencies.</span>
+        <span class="n">P</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">P</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">nfreq</span><span class="p">)</span>
+        <span class="n">i_constit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">cfreq</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="n">indices</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+        <span class="n">i_constit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">i_constit</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">nfreq</span><span class="p">)</span>
+        <span class="n">P</span><span class="p">[</span><span class="n">i_constit</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">masked</span>
+
+    <span class="n">nbands</span> <span class="o">=</span> <span class="n">fbands</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">avP</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nbands</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">P</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="p">(</span><span class="n">f0</span><span class="p">,</span> <span class="n">f1</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">fbands</span><span class="p">):</span>
+        <span class="n">i0</span><span class="p">,</span> <span class="n">i1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">freq</span><span class="p">,</span> <span class="p">[</span><span class="n">f0</span><span class="p">,</span> <span class="n">f1</span><span class="p">])</span>
+        <span class="n">i1</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">nfreq</span><span class="p">,</span> <span class="n">i1</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">inband</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="n">i0</span><span class="p">,</span> <span class="n">i1</span><span class="p">)</span>
+        <span class="n">avP</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">P</span><span class="p">[</span><span class="n">inband</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
+    <span class="c1"># Better to leave it as a masked array?</span>
+    <span class="n">avP</span> <span class="o">=</span> <span class="n">avP</span><span class="o">.</span><span class="n">filled</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">avP</span></div>
+
+
+<div class="viewcode-block" id="_lomb_freqs"><a class="viewcode-back" href="../../internals/periodogram.html#utide.periodogram._lomb_freqs">[docs]</a><span class="k">def</span> <span class="nf">_lomb_freqs</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">fbands</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ofac</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_per_band</span><span class="o">=</span><span class="mi">500</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate uniformly spaced frequencies in each band, with</span>
+<span class="sd">    no more than `max_per_band` in any band.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">fbands</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">fbands</span> <span class="o">=</span> <span class="n">freq_bands</span>
+
+    <span class="c1"># Estimated record length as n delta-t, where delta-t</span>
+    <span class="c1"># is the *average* time per sample.</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+    <span class="n">delta_t</span> <span class="o">=</span> <span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">reclen</span> <span class="o">=</span> <span class="n">n</span> <span class="o">*</span> <span class="n">delta_t</span>
+
+    <span class="n">nf</span> <span class="o">=</span> <span class="n">n</span> <span class="o">*</span> <span class="n">ofac</span>  <span class="c1"># number of &quot;Fourier frequencies&quot; based on oversampling</span>
+    <span class="c1"># Simplify by ignoring the 0 and Nyquist frequencies.</span>
+    <span class="c1"># Divide by reclen to convert cycles/record to cycles/time unit.</span>
+    <span class="n">freq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">nf</span><span class="o">//</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="n">reclen</span>
+    <span class="n">nfreq</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">freq</span><span class="p">)</span>
+
+    <span class="n">freqs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="p">(</span><span class="n">f0</span><span class="p">,</span> <span class="n">f1</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">fbands</span><span class="p">):</span>
+        <span class="n">i0</span><span class="p">,</span> <span class="n">i1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">freq</span><span class="p">,</span> <span class="p">[</span><span class="n">f0</span><span class="p">,</span> <span class="n">f1</span><span class="p">])</span>
+        <span class="n">i1</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">nfreq</span><span class="p">,</span> <span class="n">i1</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">inband</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="n">i0</span><span class="p">,</span> <span class="n">i1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">i1</span> <span class="o">-</span> <span class="n">i0</span> <span class="o">&gt;</span> <span class="n">max_per_band</span><span class="p">:</span>
+            <span class="n">band</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">freq</span><span class="p">[</span><span class="n">i0</span><span class="p">],</span> <span class="n">freq</span><span class="p">[</span><span class="n">i1</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">max_per_band</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">band</span> <span class="o">=</span> <span class="n">freq</span><span class="p">[</span><span class="n">inband</span><span class="p">]</span>
+        <span class="n">freqs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">band</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span><span class="n">freqs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="_psd_lomb"><a class="viewcode-back" href="../../internals/periodogram.html#utide.periodogram._psd_lomb">[docs]</a><span class="k">def</span> <span class="nf">_psd_lomb</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ofac</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Periodogram estimate for irregular sampling, Lomb-Scargle method</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    t : ndarray, (n,)</span>
+<span class="sd">        time, monotonic but possibly irregularly spaced</span>
+<span class="sd">    x : ndarray, (n,)</span>
+<span class="sd">        signal, real or complex</span>
+<span class="sd">    window : None or ndarray, (n,)</span>
+<span class="sd">        if not None, a uniformly-sampled data window</span>
+<span class="sd">    freq : ndarray (nfreq,)</span>
+<span class="sd">        evaluation frequencies in cycles per unit time</span>
+<span class="sd">    ofac : integer</span>
+<span class="sd">        oversampling factor; defaults to 1</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    P : Bunch</span>
+
+<span class="sd">        - P.F: Frequencies (units: cycles per time unit) of the Pxx estimates.</span>
+<span class="sd">        - P.Pxx: One-sided auto-spectral density estimate for real(`x`).</span>
+
+<span class="sd">        if `x` is complex:</span>
+
+<span class="sd">        - P.Pyy: as above, for imag(`x`)</span>
+<span class="sd">        - P.Pxy: complex cross-spectrum between real(`x`) and imag(`x`)</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    If `freq` is None, `P.F` is calculated to coincide with the</span>
+<span class="sd">    Fourier frequencies for a series of n uniformly distributed</span>
+<span class="sd">    times from min(`t`) to max(`t`). The mean and Nyquist are omitted</span>
+<span class="sd">    because they are irrelevant in this context.</span>
+
+<span class="sd">    PSD units are [`x`-units^2 per cycle per unit time]</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">Bunch</span><span class="p">()</span>
+
+    <span class="c1"># copy inputs</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+    <span class="c1"># remove mean</span>
+    <span class="n">x</span> <span class="o">-=</span> <span class="n">x</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">window</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># interpolate window from uniform grid to nonuniform t</span>
+        <span class="n">t_uniform</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="n">n</span><span class="p">)</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">t_uniform</span><span class="p">,</span> <span class="n">window</span><span class="p">)</span>
+
+        <span class="n">x</span> <span class="o">*=</span> <span class="n">w</span>
+
+    <span class="c1"># Estimated record length as n delta-t, where delta-t</span>
+    <span class="c1"># is the *average* time per sample.</span>
+    <span class="n">delta_t</span> <span class="o">=</span> <span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">reclen</span> <span class="o">=</span> <span class="n">n</span> <span class="o">*</span> <span class="n">delta_t</span>
+
+    <span class="k">if</span> <span class="n">freq</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">ofac</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">ofac</span><span class="p">))</span>
+        <span class="n">nf</span> <span class="o">=</span> <span class="n">n</span> <span class="o">*</span> <span class="n">ofac</span>  <span class="c1"># number of &quot;Fourier frequencies&quot; based on oversampling</span>
+        <span class="c1"># Simplify by ignoring the 0 and Nyquist frequencies.</span>
+        <span class="c1"># Divide by reclen to convert cycles/record to cycles/time unit.</span>
+        <span class="n">freq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">nf</span><span class="o">//</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="n">reclen</span>
+
+    <span class="n">out</span><span class="o">.</span><span class="n">F</span> <span class="o">=</span> <span class="n">freq</span>
+
+    <span class="n">xr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+    <span class="c1"># signal.lombscargle returns &quot;(A**2) * N/4 for a harmonic signal</span>
+    <span class="c1"># with amplitude A for sufficiently large N.&quot;</span>
+    <span class="c1"># It takes *angular* frequencies as 3rd argument.</span>
+    <span class="n">freq_radian</span> <span class="o">=</span> <span class="n">freq</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+    <span class="n">psdnorm</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">delta_t</span> <span class="o">*</span> <span class="n">n</span> <span class="o">/</span> <span class="p">(</span><span class="n">w</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="n">out</span><span class="o">.</span><span class="n">Pxx</span> <span class="o">=</span> <span class="n">psdnorm</span> <span class="o">*</span> <span class="n">signal</span><span class="o">.</span><span class="n">lombscargle</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">xr</span><span class="p">,</span> <span class="n">freq_radian</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="s1">&#39;f&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">out</span>
+
+    <span class="n">out</span><span class="o">.</span><span class="n">Pyy</span> <span class="o">=</span> <span class="n">psdnorm</span> <span class="o">*</span> <span class="n">signal</span><span class="o">.</span><span class="n">lombscargle</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">imag</span><span class="p">,</span> <span class="n">freq_radian</span><span class="p">)</span>
+
+    <span class="c1"># If we need to limit memory usage and don&#39;t want to use</span>
+    <span class="c1"># Cython, we can segment the frequencies and loop over the</span>
+    <span class="c1"># segments.  The speed penalty will be minimal.</span>
+    <span class="n">out</span><span class="o">.</span><span class="n">Pxy</span> <span class="o">=</span> <span class="n">psdnorm</span> <span class="o">*</span> <span class="n">_ls_cross</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">freq_radian</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">out</span></div>
+
+
+<div class="viewcode-block" id="_ls_cross"><a class="viewcode-back" href="../../internals/periodogram.html#utide.periodogram._ls_cross">[docs]</a><span class="k">def</span> <span class="nf">_ls_cross</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">fr</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Cross spectral counterpart of signal.lombscargle.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># The python code can be replaced with cython later.</span>
+
+    <span class="c1"># Initial argument for phase shift calculation: double frequency</span>
+    <span class="n">arg</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">fr</span> <span class="o">*</span> <span class="n">t</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+
+    <span class="c1"># One phase shift per frequency:</span>
+    <span class="n">tau</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+
+    <span class="c1"># Phase-shifted argument of sine, cosine:</span>
+    <span class="n">arg</span> <span class="o">*=</span> <span class="mf">0.5</span>   <span class="c1"># from double frequency back to original frequency</span>
+    <span class="n">arg</span> <span class="o">-=</span> <span class="n">tau</span>
+
+    <span class="n">xr</span><span class="p">,</span> <span class="n">xi</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">real</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">imag</span>
+
+    <span class="c1"># Calculate unnormalized, 2-sided, mean-removed cross-periodogram</span>
+
+    <span class="n">tmpx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">fr</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+    <span class="n">tmpy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">fr</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+
+    <span class="n">c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">c</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+    <span class="n">tmpx</span><span class="o">.</span><span class="n">real</span> <span class="o">=</span> <span class="n">a</span> <span class="o">*</span> <span class="p">(</span><span class="n">xr</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span> <span class="o">*</span> <span class="n">c</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">tmpy</span><span class="o">.</span><span class="n">real</span> <span class="o">=</span> <span class="n">a</span> <span class="o">*</span> <span class="p">(</span><span class="n">xi</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span> <span class="o">*</span> <span class="n">c</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">del</span> <span class="n">c</span>
+
+    <span class="n">s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">s</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+    <span class="n">tmpx</span><span class="o">.</span><span class="n">imag</span> <span class="o">=</span> <span class="n">b</span> <span class="o">*</span> <span class="p">(</span><span class="n">xr</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span> <span class="o">*</span> <span class="n">s</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">tmpy</span><span class="o">.</span><span class="n">imag</span> <span class="o">=</span> <span class="o">-</span><span class="n">b</span> <span class="o">*</span> <span class="p">(</span><span class="n">xi</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span> <span class="o">*</span> <span class="n">s</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="n">f0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">tau</span><span class="p">)</span>
+    <span class="n">tmpx</span> <span class="o">*=</span> <span class="n">f0</span>
+    <span class="n">tmpy</span> <span class="o">*=</span> <span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">f0</span><span class="p">)</span>
+    <span class="n">pxy</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">tmpx</span> <span class="o">*</span> <span class="n">tmpy</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">pxy</span></div>
+
+
+<div class="viewcode-block" id="_psd"><a class="viewcode-back" href="../../internals/periodogram.html#utide.periodogram._psd">[docs]</a><span class="k">def</span> <span class="nf">_psd</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">fs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Autospectrum if `e` is real, or cross spectrum if complex.</span>
+
+<span class="sd">    `e` must be uniformly spaced, with sampling frequency `fs` in</span>
+<span class="sd">    cycles per time unit.  Number of points is assumed to be even.</span>
+
+<span class="sd">    `window` is a set of data windowing weights, the length of `e`</span>
+
+<span class="sd">    Returns PSD in cycles per time unit.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># iny = nt//2 +1</span>
+    <span class="c1"># Detrending: just remove the mean.</span>
+    <span class="n">e</span> <span class="o">=</span> <span class="n">e</span> <span class="o">-</span> <span class="n">e</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="n">e</span> <span class="o">*=</span> <span class="n">window</span>
+    <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="s1">&#39;c&#39;</span><span class="p">:</span>
+        <span class="n">cs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfft</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">real</span><span class="p">))</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfft</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">imag</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">cs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfft</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">real</span><span class="p">))</span><span class="o">**</span><span class="mi">2</span>
+
+    <span class="c1"># cs = cs[:iny]</span>
+    <span class="n">cs</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*=</span> <span class="mi">2</span>
+    <span class="n">psdnorm</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">fs</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="n">window</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>  <span class="c1"># dt / sum of win squared.</span>
+    <span class="k">return</span> <span class="n">cs</span> <span class="o">*</span> <span class="n">psdnorm</span></div>
+
+
+<div class="viewcode-block" id="band_psd"><a class="viewcode-back" href="../../internals/periodogram.html#utide.periodogram.band_psd">[docs]</a><span class="k">def</span> <span class="nf">band_psd</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">cfrq</span><span class="p">,</span> <span class="n">equi</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">frqosamp</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Band-averaged power spectral density in vicinity of tidal constituents</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    t : ndarray</span>
+<span class="sd">        time [days] relative to an arbitrary origin</span>
+<span class="sd">    e : ndarray</span>
+<span class="sd">        residual from tidal fit, complex/real</span>
+<span class="sd">    cfrq : ndarray</span>
+<span class="sd">        frequencies of NR &amp; R constituents [CPH]</span>
+<span class="sd">    equi : boolean</span>
+<span class="sd">        True (default) if sample times are uniformly spaced</span>
+<span class="sd">    frqosamp : integer</span>
+<span class="sd">        Lomb-Scargle frequency oversampling factor, if equi = False</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    P : Bunch</span>
+
+<span class="sd">        - P.fbnd : edges of freq bands [CPH]</span>
+<span class="sd">        - P.Puu : 1-sided auto-sp dens of u err (=real(e)) [units^2/CPH]</span>
+<span class="sd">        - P.Pvv : (complex case only)= as P.Puu but for v err (=imag(e))</span>
+<span class="sd">        - P.Puv (complex case only)= cross-sp dens between u and v</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    This is the only function in this module that is called from</span>
+<span class="sd">    other modules.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">P</span> <span class="o">=</span> <span class="n">Bunch</span><span class="p">(</span><span class="n">fbnd</span><span class="o">=</span><span class="n">freq_bands</span><span class="p">)</span>
+
+    <span class="n">nt</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">nt</span> <span class="o">%</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">e</span> <span class="o">=</span> <span class="n">e</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">t</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">nt</span> <span class="o">-=</span> <span class="mi">1</span>
+
+    <span class="n">hn</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">windows</span><span class="o">.</span><span class="n">hann</span><span class="p">(</span><span class="n">nt</span><span class="p">,</span> <span class="n">sym</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="c1"># on real component</span>
+    <span class="k">if</span> <span class="n">equi</span><span class="p">:</span>  <span class="c1"># If even sampling, FFT.</span>
+        <span class="c1"># sample interval in hours; t is in days</span>
+        <span class="n">dt</span> <span class="o">=</span> <span class="mi">24</span> <span class="o">*</span> <span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="n">fs</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="n">dt</span>  <span class="c1"># sampling frequency: cycles (samples) per hour</span>
+        <span class="n">Puu1s</span> <span class="o">=</span> <span class="n">_psd</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">e</span><span class="p">),</span> <span class="n">hn</span><span class="p">,</span> <span class="n">fs</span><span class="p">)</span>
+        <span class="n">allfrq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">nt</span><span class="o">//</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">nt</span> <span class="o">*</span> <span class="n">dt</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># If uneven, Lomb-scargle.</span>
+        <span class="c1"># time in hours, for output in CPH and x^2 per CPH</span>
+        <span class="n">lfreq</span> <span class="o">=</span> <span class="n">_lomb_freqs</span><span class="p">(</span><span class="n">t</span> <span class="o">*</span> <span class="mi">24</span><span class="p">,</span> <span class="n">fbands</span><span class="o">=</span><span class="n">freq_bands</span><span class="p">,</span> <span class="n">ofac</span><span class="o">=</span><span class="n">frqosamp</span><span class="p">)</span>
+        <span class="n">ls_spec</span> <span class="o">=</span> <span class="n">_psd_lomb</span><span class="p">(</span><span class="n">t</span> <span class="o">*</span> <span class="mi">24</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="n">hn</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="n">lfreq</span><span class="p">)</span>
+        <span class="n">Puu1s</span> <span class="o">=</span> <span class="n">ls_spec</span><span class="o">.</span><span class="n">Pxx</span>
+        <span class="n">allfrq</span> <span class="o">=</span> <span class="n">ls_spec</span><span class="o">.</span><span class="n">F</span>
+
+    <span class="n">P</span><span class="o">.</span><span class="n">Puu</span> <span class="o">=</span> <span class="n">fbndavg</span><span class="p">(</span><span class="n">Puu1s</span><span class="p">,</span> <span class="n">allfrq</span><span class="p">,</span> <span class="n">cfrq</span><span class="p">)</span>
+
+    <span class="c1"># If e is complex, handle imaginary part.</span>
+    <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="s1">&#39;c&#39;</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="n">equi</span><span class="p">:</span>  <span class="c1"># If even sampling, Welch.</span>
+            <span class="n">Pvv1s</span> <span class="o">=</span> <span class="n">_psd</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">imag</span><span class="p">,</span> <span class="n">hn</span><span class="p">,</span> <span class="n">fs</span><span class="p">)</span>
+            <span class="n">Puv1s</span> <span class="o">=</span> <span class="n">_psd</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">hn</span><span class="p">,</span> <span class="n">fs</span><span class="p">)</span>       <span class="c1"># complex cross-periodogram</span>
+
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># If uneven, lomscargle.</span>
+            <span class="n">Pvv1s</span> <span class="o">=</span> <span class="n">ls_spec</span><span class="o">.</span><span class="n">Pyy</span>
+            <span class="n">Puv1s</span> <span class="o">=</span> <span class="n">ls_spec</span><span class="o">.</span><span class="n">Pxy</span>
+
+        <span class="n">P</span><span class="o">.</span><span class="n">Pvv</span> <span class="o">=</span> <span class="n">fbndavg</span><span class="p">(</span><span class="n">Pvv1s</span><span class="p">,</span> <span class="n">allfrq</span><span class="p">,</span> <span class="n">cfrq</span><span class="p">)</span>
+
+        <span class="c1"># Take co-spectrum only; ignore the quadrature (imag) part.</span>
+        <span class="n">P</span><span class="o">.</span><span class="n">Puv</span> <span class="o">=</span> <span class="n">fbndavg</span><span class="p">(</span><span class="n">Puv1s</span><span class="p">,</span> <span class="n">allfrq</span><span class="p">,</span> <span class="n">cfrq</span><span class="p">)</span><span class="o">.</span><span class="n">real</span>
+
+        <span class="c1"># I don&#39;t think we want to throw away the sign of the</span>
+        <span class="c1"># co-spectrum, which determines the quadrant in which the</span>
+        <span class="c1"># semi-major variance ellipse lies.</span>
+        <span class="c1"># If it does matter, we need to check the sign convention.</span>
+        <span class="c1"># P.Puv = np.abs(P.Puv)</span>
+
+    <span class="k">return</span> <span class="n">P</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">UTide 0.2.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2015, Dan Codiga, Wesley Bowman, and contributors.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.0.
+    </div>
+  </body>
+</html>
