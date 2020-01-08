@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>periodogram &#8212; UTide 0.2.3+8.gd1795e1 documentation</title>
+    <title>periodogram &#8212; UTide 0.2.4+2.gc5ac303 documentation</title>
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
@@ -32,7 +32,7 @@
         <li class="right" >
           <a href="index.html" title="Internal details"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">UTide 0.2.3+8.gd1795e1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">UTide 0.2.4+2.gc5ac303 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Internal details</a> &#187;</li> 
       </ul>
     </div>  
@@ -87,7 +87,7 @@ cycles per time unit.  Number of points is assumed to be even.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>t</strong> (<em>ndarray</em><em>, </em><em>(</em><em>n</em><em>,</em><em>)</em>) – time, monotonic but possibly irregularly spaced</p></li>
 <li><p><strong>x</strong> (<em>ndarray</em><em>, </em><em>(</em><em>n</em><em>,</em><em>)</em>) – signal, real or complex</p></li>
-<li><p><strong>window</strong> (<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><em>None</em></a><em> or </em><em>ndarray</em><em>, </em><em>(</em><em>n</em><em>,</em><em>)</em>) – if not None, a uniformly-sampled data window</p></li>
+<li><p><strong>window</strong> (<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em> or </em><em>ndarray</em><em>, </em><em>(</em><em>n</em><em>,</em><em>)</em>) – if not None, a uniformly-sampled data window</p></li>
 <li><p><strong>freq</strong> (<em>ndarray</em><em> (</em><em>nfreq</em><em>,</em><em>)</em>) – evaluation frequencies in cycles per unit time</p></li>
 <li><p><strong>ofac</strong> (<em>integer</em>) – oversampling factor; defaults to 1</p></li>
 </ul>
@@ -161,8 +161,8 @@ other modules.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>P</strong> (<em>ndarray</em><em> (</em><em>nfreq</em><em>,</em><em>)</em>) – periodogram in units^2 per CPH</p></li>
 <li><p><strong>freq</strong> (<em>ndarray</em><em> (</em><em>nfreq</em><em>,</em><em>)</em>) – frequencies in CPH</p></li>
-<li><p><strong>cfreq</strong> (<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><em>None</em></a><em> or </em><em>array_like</em>) – constituent frequencies (CPH) to be excluded</p></li>
-<li><p><strong>fbands</strong> (<em>array_like</em><em> (</em><em>nbands</em><em>, </em><em>2</em><em>)</em>) – limits of frequency bands; defaults to 9 bands in <a class="reference internal" href="#utide.periodogram.freq_bands" title="utide.periodogram.freq_bands"><code class="xref py py-obj docutils literal notranslate"><span class="pre">freq_bands</span></code></a></p></li>
+<li><p><strong>cfreq</strong> (<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em> or </em><em>array_like</em>) – constituent frequencies (CPH) to be excluded</p></li>
+<li><p><strong>fbands</strong> (<em>array_like</em><em> (</em><em>nbands</em><em>, </em><em>2</em><em>)</em>) – limits of frequency bands; defaults to 9 bands in <code class="xref py py-obj docutils literal notranslate"><span class="pre">freq_bands</span></code></p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -176,11 +176,6 @@ other modules.</p>
 <p>From ut_fbndavg, which was based on residual_spectrum.m of
 t_tide, Pawlowicz et al. (2002).</p>
 </dd></dl>
-
-<dl class="data">
-<dt id="utide.periodogram.freq_bands">
-<code class="sig-prename descclassname">utide.periodogram.</code><code class="sig-name descname">freq_bands</code><em class="property"> = array([[1.0000e-04, 4.1700e-03],        [3.1920e-02, 4.8590e-02],        [7.2180e-02, 8.8840e-02],        [1.1243e-01, 1.2910e-01],        [1.5269e-01, 1.6936e-01],        [1.9295e-01, 2.0961e-01],        [2.3320e-01, 2.5100e-01],        [2.6000e-01, 2.9000e-01],        [3.0000e-01, 5.0000e-01]])</em><a class="headerlink" href="#utide.periodogram.freq_bands" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 
 </div>
 </div>
@@ -241,13 +236,13 @@ t_tide, Pawlowicz et al. (2002).</p>
         <li class="right" >
           <a href="index.html" title="Internal details"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">UTide 0.2.3+8.gd1795e1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">UTide 0.2.4+2.gc5ac303 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Internal details</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2015, Dan Codiga, Wesley Bowman, and contributors.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.0.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.3.1.
     </div>
   </body>
 </html>

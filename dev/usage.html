@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>Usage &#8212; UTide 0.2.3+8.gd1795e1 documentation</title>
+    <title>Usage &#8212; UTide 0.2.4+2.gc5ac303 documentation</title>
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -32,7 +32,7 @@
         <li class="right" >
           <a href="strategy.html" title="Strategy"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">UTide 0.2.3+8.gd1795e1 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">UTide 0.2.4+2.gc5ac303 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -57,11 +57,11 @@
 <li><p><strong>t</strong> (<em>array_like</em>) – Time in days since <code class="xref py py-obj docutils literal notranslate"><span class="pre">epoch</span></code>.</p></li>
 <li><p><strong>u</strong> (<em>array_like</em>) – Sea-surface height, velocity component, etc.</p></li>
 <li><p><strong>v</strong> (<em>{None</em><em>, </em><em>array_like}</em><em>, </em><em>optional</em>) – If <code class="xref py py-obj docutils literal notranslate"><span class="pre">u</span></code> is a velocity component, <code class="xref py py-obj docutils literal notranslate"><span class="pre">v</span></code> is the orthogonal component.</p></li>
-<li><p><strong>lat</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>required</em>) – Latitude in degrees.</p></li>
-<li><p><strong>epoch</strong> ({string, <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.date" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime.date</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime.datetime</span></code></a>}, optional) – Valid strings are ‘python’ (default); ‘matlab’ if <code class="xref py py-obj docutils literal notranslate"><span class="pre">t</span></code> is
+<li><p><strong>lat</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>required</em>) – Latitude in degrees.</p></li>
+<li><p><strong>epoch</strong> ({string, <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.date" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime.date</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime.datetime</span></code></a>}, optional) – Valid strings are ‘python’ (default); ‘matlab’ if <code class="xref py py-obj docutils literal notranslate"><span class="pre">t</span></code> is
 an array of Matlab datenums; or an arbitrary date in the
 form ‘YYYY-MM-DD’.  The default corresponds to the Python
-standard library <a class="reference external" href="https://docs.python.org/3/library/datetime.html#module-datetime" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime</span></code></a> proleptic Gregorian calendar,
+standard library <a class="reference external" href="https://docs.python.org/3/library/datetime.html#module-datetime" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime</span></code></a> proleptic Gregorian calendar,
 starting with 1 at 00:00 on January 1 of year 1; this is
 the ‘datenum’ used by Matplotlib.</p></li>
 <li><p><strong>constit</strong> (<em>{'auto'</em><em>, </em><em>array_like}</em><em>, </em><em>optional</em>) – List of strings with standard letter abbreviations of
@@ -70,7 +70,7 @@ based on the time span.</p></li>
 <li><p><strong>conf_int</strong> (<em>{'linear'</em><em>, </em><em>'MC'</em><em>, </em><em>'none'}</em><em>, </em><em>optional</em>) – If not ‘none’ (string), calculate linearized confidence
 intervals, or use a Monte-Carlo simulation.</p></li>
 <li><p><strong>method</strong> (<em>{'ols'</em><em>, </em><em>'robust'}</em><em>, </em><em>optional</em>) – Solve with ordinary least squares, or with a robust algorithm.</p></li>
-<li><p><strong>trend</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) – True (default) to include a linear trend in the model.</p></li>
+<li><p><strong>trend</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – True (default) to include a linear trend in the model.</p></li>
 <li><p><strong>phase</strong> (<em>{'Greenwich'</em><em>, </em><em>'linear_time'</em><em>, </em><em>'raw'}</em><em>, </em><em>optional</em>) – Give Greenwich-referenced phase lags, an approximation
 using linearized times, or raw lags.</p></li>
 <li><p><strong>nodal</strong> (<em>{True</em><em>, </em><em>False</em><em>, </em><em>'linear_time'}</em><em>, </em><em>optional</em>) – True (default) to include nodal/satellite corrections;
@@ -134,20 +134,20 @@ assume a white background spectrum.</p></li>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>t</strong> (<em>array_like</em>) – Time in days since <code class="docutils literal notranslate"><span class="pre">epoch</span></code>.</p></li>
 <li><p><strong>coef</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">Bunch</span></code>) – Data structure returned by <a class="reference internal" href="#utide.solve" title="utide.solve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">utide.solve</span></code></a>.</p></li>
-<li><p><strong>epoch</strong> ({string, <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.date" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime.date</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime.datetime</span></code></a>}, optional) – Valid strings are ‘python’ (default); ‘matlab’ if <code class="xref py py-obj docutils literal notranslate"><span class="pre">t</span></code> is
+<li><p><strong>epoch</strong> ({string, <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.date" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime.date</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime.datetime</span></code></a>}, optional) – Valid strings are ‘python’ (default); ‘matlab’ if <code class="xref py py-obj docutils literal notranslate"><span class="pre">t</span></code> is
 an array of Matlab datenums; or an arbitrary date in the
 form ‘YYYY-MM-DD’.  The default corresponds to the Python
-standard library <a class="reference external" href="https://docs.python.org/3/library/datetime.html#module-datetime" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime</span></code></a> proleptic Gregorian calendar,
+standard library <a class="reference external" href="https://docs.python.org/3/library/datetime.html#module-datetime" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime</span></code></a> proleptic Gregorian calendar,
 starting with 1 on January 1 of year 1.</p></li>
 <li><p><strong>verbose</strong> (<em>{True</em><em>, </em><em>False}</em><em>, </em><em>optional</em>) – True to enable output message (default). False turns off all
 messages.</p></li>
 <li><p><strong>constit</strong> (<em>{None</em><em>, </em><em>array_like}</em><em>, </em><em>optional</em>) – List of strings with standard letter abbreviations of
 tidal constituents, to be used in reconstruction if present
 in coef; alternative to the SNR and PE criteria.</p></li>
-<li><p><strong>min_SNR</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em><em>, </em><em>default 2</em>) – Include only the constituents with signal-to-noise SNR &gt;= min_SNR,
+<li><p><strong>min_SNR</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>optional</em><em>, </em><em>default 2</em>) – Include only the constituents with signal-to-noise SNR &gt;= min_SNR,
 where SNR is based on the constituent confidence intervals in
 <code class="docutils literal notranslate"><span class="pre">coef</span></code>.</p></li>
-<li><p><strong>min_PE</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em><em>, </em><em>default 0</em>) – Include only the constituents with percent energy PE &gt;= min_PE,
+<li><p><strong>min_PE</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>optional</em><em>, </em><em>default 0</em>) – Include only the constituents with percent energy PE &gt;= min_PE,
 where PE is based on the amplitudes in <code class="docutils literal notranslate"><span class="pre">coef</span></code>.</p></li>
 </ul>
 </dd>
@@ -258,12 +258,12 @@ formatted() method.</p>
         <li class="right" >
           <a href="strategy.html" title="Strategy"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">UTide 0.2.3+8.gd1795e1 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">UTide 0.2.4+2.gc5ac303 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2015, Dan Codiga, Wesley Bowman, and contributors.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.0.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.3.1.
     </div>
   </body>
 </html>
