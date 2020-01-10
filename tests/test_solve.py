@@ -9,15 +9,18 @@ Smoke testing--just see if the system runs.
 
 from __future__ import (absolute_import, division, print_function)
 
+import pytest
+
 import numpy as np
 
 from utide import reconstruct
 from utide import solve
 from utide._ut_constants import ut_constants
 from utide.utilities import Bunch
-
-
-def test_roundtrip():
+# We omit the 'MC' case for now because with this test data, it
+# fails with 'numpy.linalg.LinAlgError: SVD did not converge'.
+@pytest.mark.parametrize('conf_int',  ['linear', 'none'])
+def test_roundtrip(conf_int):
     """Minimal conversion from simple_utide_test."""
     ts = 735604
     duration = 35
@@ -44,7 +47,7 @@ def test_roundtrip():
         'nodal': False,
         'trend': False,
         'method': 'ols',
-        'conf_int': 'linear',
+        'conf_int': conf_int,
         'Rayleigh_min': 0.95,
     }
 

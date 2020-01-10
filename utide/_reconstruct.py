@@ -92,7 +92,7 @@ def _reconstruct(t, goodmask, coef, verbose, constit, min_SNR, min_PE):
     # Determine constituents to include.
     if constit is not None:
         ind = [i for i, c in enumerate(coef['name']) if c in constit]
-    elif min_SNR == 0 and min_PE == 0:
+    elif (min_SNR == 0 and min_PE == 0) or coef['aux']['opt']['nodiagn']:
         ind = slice(None)
     else:
         if twodim:
