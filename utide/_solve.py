@@ -57,6 +57,7 @@ def _translate_opts(opts):
         oldopts.linci = False
     elif opts.conf_int == 'none':
         oldopts.conf_int = False
+        oldopts.nodiagn = 1
     else:
         raise ValueError("'conf_int' must be 'linear', 'MC', or 'none'")
 
