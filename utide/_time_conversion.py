@@ -2,8 +2,6 @@
 Utility for allowing flexible time input.
 """
 
-from __future__ import (absolute_import, division, print_function)
-
 import warnings
 from datetime import date, datetime
 

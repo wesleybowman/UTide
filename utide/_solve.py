@@ -2,8 +2,6 @@
 Central module for calculating the tidal amplitudes, phases, etc.
 """
 
-from __future__ import (absolute_import, division, print_function)
-
 import numpy as np
 
 from .harmonics import ut_E

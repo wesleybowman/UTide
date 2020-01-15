@@ -5,8 +5,6 @@ This will probably end up being consolidated in another
 module.
 """
 
-from __future__ import (absolute_import, division, print_function)
-
 import numpy as np
 
 

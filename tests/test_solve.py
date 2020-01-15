@@ -7,8 +7,6 @@ Smoke testing--just see if the system runs.
 # TODO: extend the tests by cycling through various combinations
 #       of configuration and data input.
 
-from __future__ import (absolute_import, division, print_function)
-
 import pytest
 
 import numpy as np
