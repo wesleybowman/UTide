@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>robustfit &#8212; UTide 0.2.4 documentation</title>
+    <title>robustfit &#8212; UTide 0.2.5 documentation</title>
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
@@ -28,7 +28,7 @@
         <li class="right" >
           <a href="periodogram.html" title="periodogram"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">UTide 0.2.4 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">UTide 0.2.5 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Internal details</a> &#187;</li> 
       </ul>
     </div>  
@@ -101,11 +101,11 @@ model matrix, x.</p>
 <li><p><strong>X</strong> (<em>ndarray</em><em> (</em><em>n</em><em>, </em><em>p</em><em>)</em>) – MLR model with <code class="xref py py-obj docutils literal notranslate"><span class="pre">p</span></code> parameters (independent variables) at <code class="xref py py-obj docutils literal notranslate"><span class="pre">n</span></code> times</p></li>
 <li><p><strong>y</strong> (<em>ndarray</em><em> (</em><em>n</em><em>,</em><em>)</em>) – dependent variable</p></li>
 <li><p><strong>weight_function</strong> (<em>string</em><em>, </em><em>optional</em>) – name of weighting function</p></li>
-<li><p><strong>tune</strong> (<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><em>None</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – Tuning parameter for normalizing residuals in weight calculation;
-larger numbers <em>decrease</em> the sensitivity to outliers. If <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>,
+<li><p><strong>tune</strong> (<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>optional</em>) – Tuning parameter for normalizing residuals in weight calculation;
+larger numbers <em>decrease</em> the sensitivity to outliers. If <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>,
 a default will be provided based on the <code class="xref py py-obj docutils literal notranslate"><span class="pre">weight_function</span></code>.</p></li>
-<li><p><strong>rcond</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – minimum condition number parameter for <code class="xref py py-obj docutils literal notranslate"><span class="pre">np.linalg.lstsq</span></code></p></li>
-<li><p><strong>tol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) – When the fractional reduction in mean squared weighted residuals
+<li><p><strong>rcond</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>optional</em>) – minimum condition number parameter for <code class="xref py py-obj docutils literal notranslate"><span class="pre">np.linalg.lstsq</span></code></p></li>
+<li><p><strong>tol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>optional</em>) – When the fractional reduction in mean squared weighted residuals
 is less than <code class="xref py py-obj docutils literal notranslate"><span class="pre">tol</span></code>, the iteration stops.</p></li>
 <li><p><strong>maxit</strong> (<em>integer</em><em>, </em><em>optional</em>) – Maximum number of iterations.</p></li>
 </ul>
@@ -141,19 +141,9 @@ is less than <code class="xref py py-obj docutils literal notranslate"><span cla
 <code class="sig-prename descclassname">utide.robustfit.</code><code class="sig-name descname">talwar</code><span class="sig-paren">(</span><em class="sig-param">r</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utide/robustfit.html#talwar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#utide.robustfit.talwar" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="data">
-<dt id="utide.robustfit.tune_defaults">
-<code class="sig-prename descclassname">utide.robustfit.</code><code class="sig-name descname">tune_defaults</code><em class="property"> = {'andrews': 1.339, 'bisquare': 4.685, 'cauchy': 2.385, 'fair': 1.4, 'huber': 1.345, 'logistic': 1.205, 'ols': 1, 'talwar': 2.795, 'welsch': 2.985}</em><a class="headerlink" href="#utide.robustfit.tune_defaults" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 <dl class="function">
 <dt id="utide.robustfit.welsch">
 <code class="sig-prename descclassname">utide.robustfit.</code><code class="sig-name descname">welsch</code><span class="sig-paren">(</span><em class="sig-param">r</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utide/robustfit.html#welsch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#utide.robustfit.welsch" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="data">
-<dt id="utide.robustfit.wfuncdict">
-<code class="sig-prename descclassname">utide.robustfit.</code><code class="sig-name descname">wfuncdict</code><em class="property"> = {'andrews': &lt;function andrews&gt;, 'bisquare': &lt;function bisquare&gt;, 'cauchy': &lt;function cauchy&gt;, 'fair': &lt;function fair&gt;, 'huber': &lt;function huber&gt;, 'logistic': &lt;function logistic&gt;, 'ols': &lt;function ols&gt;, 'talwar': &lt;function talwar&gt;, 'welsch': &lt;function welsch&gt;}</em><a class="headerlink" href="#utide.robustfit.wfuncdict" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
@@ -209,13 +199,13 @@ is less than <code class="xref py py-obj docutils literal notranslate"><span cla
         <li class="right" >
           <a href="periodogram.html" title="periodogram"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">UTide 0.2.4 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">UTide 0.2.5 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Internal details</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2015, Dan Codiga, Wesley Bowman, and contributors.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.0.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.3.1.
     </div>
   </body>
 </html>
