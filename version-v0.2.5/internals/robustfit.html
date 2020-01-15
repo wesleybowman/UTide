@@ -1,0 +1,211 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>robustfit &#8212; UTide 0.2.5 documentation</title>
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="periodogram" href="periodogram.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="periodogram.html" title="periodogram"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">UTide 0.2.5 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Internal details</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="robustfit">
+<h1>robustfit<a class="headerlink" href="#robustfit" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-utide.robustfit">
+<span id="utide-robustfit"></span><h2><a class="reference internal" href="#module-utide.robustfit" title="utide.robustfit"><code class="xref py py-mod docutils literal notranslate"><span class="pre">utide.robustfit</span></code></a><a class="headerlink" href="#module-utide.robustfit" title="Permalink to this headline">¶</a></h2>
+<p>Robust MLR via iteratively reweighted least squares.</p>
+<dl class="function">
+<dt id="utide.robustfit.andrews">
+<code class="sig-prename descclassname">utide.robustfit.</code><code class="sig-name descname">andrews</code><span class="sig-paren">(</span><em class="sig-param">r</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utide/robustfit.html#andrews"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#utide.robustfit.andrews" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="utide.robustfit.bisquare">
+<code class="sig-prename descclassname">utide.robustfit.</code><code class="sig-name descname">bisquare</code><span class="sig-paren">(</span><em class="sig-param">r</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utide/robustfit.html#bisquare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#utide.robustfit.bisquare" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="utide.robustfit.cauchy">
+<code class="sig-prename descclassname">utide.robustfit.</code><code class="sig-name descname">cauchy</code><span class="sig-paren">(</span><em class="sig-param">r</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utide/robustfit.html#cauchy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#utide.robustfit.cauchy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="utide.robustfit.fair">
+<code class="sig-prename descclassname">utide.robustfit.</code><code class="sig-name descname">fair</code><span class="sig-paren">(</span><em class="sig-param">r</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utide/robustfit.html#fair"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#utide.robustfit.fair" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="utide.robustfit.huber">
+<code class="sig-prename descclassname">utide.robustfit.</code><code class="sig-name descname">huber</code><span class="sig-paren">(</span><em class="sig-param">r</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utide/robustfit.html#huber"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#utide.robustfit.huber" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="utide.robustfit.leverage">
+<code class="sig-prename descclassname">utide.robustfit.</code><code class="sig-name descname">leverage</code><span class="sig-paren">(</span><em class="sig-param">x</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utide/robustfit.html#leverage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#utide.robustfit.leverage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate leverage as the diagonal of the “Hat” matrix of the
+model matrix, x.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="utide.robustfit.logistic">
+<code class="sig-prename descclassname">utide.robustfit.</code><code class="sig-name descname">logistic</code><span class="sig-paren">(</span><em class="sig-param">r</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utide/robustfit.html#logistic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#utide.robustfit.logistic" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="utide.robustfit.ols">
+<code class="sig-prename descclassname">utide.robustfit.</code><code class="sig-name descname">ols</code><span class="sig-paren">(</span><em class="sig-param">r</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utide/robustfit.html#ols"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#utide.robustfit.ols" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="utide.robustfit.r_normed">
+<code class="sig-prename descclassname">utide.robustfit.</code><code class="sig-name descname">r_normed</code><span class="sig-paren">(</span><em class="sig-param">R</em>, <em class="sig-param">rfac</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utide/robustfit.html#r_normed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#utide.robustfit.r_normed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Normalized residuals from raw residuals and a multiplicative factor.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="utide.robustfit.robustfit">
+<code class="sig-prename descclassname">utide.robustfit.</code><code class="sig-name descname">robustfit</code><span class="sig-paren">(</span><em class="sig-param">X</em>, <em class="sig-param">y</em>, <em class="sig-param">weight_function='bisquare'</em>, <em class="sig-param">tune=None</em>, <em class="sig-param">rcond=1</em>, <em class="sig-param">tol=0.001</em>, <em class="sig-param">maxit=50</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utide/robustfit.html#robustfit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#utide.robustfit.robustfit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Multiple linear regression via iteratively reweighted least squares.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>ndarray</em><em> (</em><em>n</em><em>, </em><em>p</em><em>)</em>) – MLR model with <code class="xref py py-obj docutils literal notranslate"><span class="pre">p</span></code> parameters (independent variables) at <code class="xref py py-obj docutils literal notranslate"><span class="pre">n</span></code> times</p></li>
+<li><p><strong>y</strong> (<em>ndarray</em><em> (</em><em>n</em><em>,</em><em>)</em>) – dependent variable</p></li>
+<li><p><strong>weight_function</strong> (<em>string</em><em>, </em><em>optional</em>) – name of weighting function</p></li>
+<li><p><strong>tune</strong> (<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>optional</em>) – Tuning parameter for normalizing residuals in weight calculation;
+larger numbers <em>decrease</em> the sensitivity to outliers. If <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>,
+a default will be provided based on the <code class="xref py py-obj docutils literal notranslate"><span class="pre">weight_function</span></code>.</p></li>
+<li><p><strong>rcond</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>optional</em>) – minimum condition number parameter for <code class="xref py py-obj docutils literal notranslate"><span class="pre">np.linalg.lstsq</span></code></p></li>
+<li><p><strong>tol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>optional</em>) – When the fractional reduction in mean squared weighted residuals
+is less than <code class="xref py py-obj docutils literal notranslate"><span class="pre">tol</span></code>, the iteration stops.</p></li>
+<li><p><strong>maxit</strong> (<em>integer</em><em>, </em><em>optional</em>) – Maximum number of iterations.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p><strong>rf</strong> –</p>
+<ul class="simple">
+<li><p>rf.b: model coefficients of the solution</p></li>
+<li><p>rf.w: weights used for the solution</p></li>
+<li><p>rf.s: singular values for each model component</p></li>
+<li><p>rf.rms_resid: rms residuals (unweighted) from the fit</p></li>
+<li><p>rf.leverage: sensitivity of the OLS estimate to each point in <code class="xref py py-obj docutils literal notranslate"><span class="pre">y</span></code></p></li>
+<li><p>rf.ols_b: OLS model coefficients</p></li>
+<li><p>rf.ols_rms_resid: rms residuals from the OLS fit</p></li>
+<li><p>rf.iterations: number of iterations completed</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="../usage.html#utide.utilities.Bunch" title="utide.utilities.Bunch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">utide.utilities.Bunch</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="utide.robustfit.sigma_hat">
+<code class="sig-prename descclassname">utide.robustfit.</code><code class="sig-name descname">sigma_hat</code><span class="sig-paren">(</span><em class="sig-param">x</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utide/robustfit.html#sigma_hat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#utide.robustfit.sigma_hat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Robust estimate of standard deviation based on medians.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="utide.robustfit.talwar">
+<code class="sig-prename descclassname">utide.robustfit.</code><code class="sig-name descname">talwar</code><span class="sig-paren">(</span><em class="sig-param">r</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utide/robustfit.html#talwar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#utide.robustfit.talwar" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="utide.robustfit.welsch">
+<code class="sig-prename descclassname">utide.robustfit.</code><code class="sig-name descname">welsch</code><span class="sig-paren">(</span><em class="sig-param">r</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utide/robustfit.html#welsch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#utide.robustfit.welsch" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">robustfit</a><ul>
+<li><a class="reference internal" href="#module-utide.robustfit"><code class="xref py py-mod docutils literal notranslate"><span class="pre">utide.robustfit</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="periodogram.html"
+                        title="previous chapter">periodogram</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/internals/robustfit.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="periodogram.html" title="periodogram"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">UTide 0.2.5 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Internal details</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2015, Dan Codiga, Wesley Bowman, and contributors.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.3.1.
+    </div>
+  </body>
+</html>
