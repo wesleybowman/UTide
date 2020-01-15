@@ -15,8 +15,6 @@ matrix:
       env: PY=3.8 NP=1.11
     - name: "python-3.7"
       env: PY=3.7
-    - name: "python-2.7"
-      env: PY=2.7
     - name: "coding_standards"
       env: PY=3.8
     - name: "docs"
