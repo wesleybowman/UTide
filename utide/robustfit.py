@@ -3,8 +3,6 @@ Robust MLR via iteratively reweighted least squares.
 
 """
 
-from __future__ import (absolute_import, division, print_function)
-
 import numpy as np
 
 from utide.utilities import Bunch

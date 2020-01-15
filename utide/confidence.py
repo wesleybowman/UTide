@@ -6,8 +6,6 @@ a more general ut_linci() function for linearized estimates
 of ellipse parameter uncertainties.
 """
 
-from __future__ import (absolute_import, division, print_function)
-
 import warnings
 
 import numpy as np

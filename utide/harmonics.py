@@ -3,8 +3,6 @@ Function ut_E() returns complex exponential basis functions
 for a given set of frequencies.
 """
 
-from __future__ import (absolute_import, division, print_function)
-
 import numpy as np
 
 from .astronomy import ut_astron

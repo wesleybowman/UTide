@@ -6,8 +6,6 @@ modification of ut_FUV extracted from ut_solv.m.  The
 data-generating script is make_FUV_data.py.
 """
 
-from __future__ import (absolute_import, division, print_function)
-
 import os
 
 from numpy.testing import assert_array_almost_equal
