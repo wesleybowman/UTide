@@ -1,4 +1,4 @@
-language: python
+language: minimal
 
 sudo: false
 
@@ -9,21 +9,21 @@ env:
 matrix:
   fast_finish: true
   include:
-    - name: "python-3.7 numpy=1.16"
-      env: PY=3.7 NP=1.16
-    - name: "python-3.7 numpy=1.11"
-      env: PY=3.7 NP=1.11
-    - name: "python-3.6"
-      env: PY=3.6
+    - name: "python-3.8 numpy=1.16"
+      env: PY=3.8 NP=1.16
+    - name: "python-3.8 numpy=1.11"
+      env: PY=3.8 NP=1.11
+    - name: "python-3.7"
+      env: PY=3.7
     - name: "python-2.7"
       env: PY=2.7
     - name: "coding_standards"
-      env: PY=3.7
+      env: PY=3.8
     - name: "docs"
-      env: PY=3.7
+      env: PY=3.8
   allow_failures:
     - name: "coding_standards"
-      env: PY=3.7
+      env: PY=3.8
 
 before_install:
   # Install miniconda and create TEST env.
