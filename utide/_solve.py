@@ -131,7 +131,7 @@ def solve(t, u, v=None, lat=None, **opts):
     conf_int : {'linear', 'MC', 'none'}, optional
         If not 'none' (string), calculate linearized confidence
         intervals, or use a Monte-Carlo simulation.
-    method : {'ols', 'robust'}, optional
+    method : {'ols', 'robust', 'lmsr'}, optional
         Solve with ordinary least squares, or with a robust algorithm.
     trend : bool, optional
         True (default) to include a linear trend in the model.
@@ -290,6 +290,10 @@ def _solv1(tin, uin, vin, lat, **opts):
             m = np.linalg.lstsq(B, xraw, rcond=None)[0]
         except TypeError:
             m = np.linalg.lstsq(B, xraw)[0]
+        W = np.ones(nt)  # Uniform weighting; we could use a scalar 1, or None.
+    elif: opt.newopts.method == 'lsmr':
+        from scipy.sparse.linalg import lsmr
+        m = lsmr(B, xraw)[0]
         W = np.ones(nt)  # Uniform weighting; we could use a scalar 1, or None.
     else:
         rf = robustfit(B, xraw, **opt.newopts.robust_kw)
