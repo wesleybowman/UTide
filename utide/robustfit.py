@@ -18,13 +18,13 @@ def andrews(r):
 
 def bisquare(r):
     r = np.abs(r)
-    w = (r < 1) * (1 - r**2)**2
+    w = (r < 1) * (1 - r ** 2) ** 2
     return w
 
 
 def cauchy(r):
     r = np.abs(r)
-    w = 1 / (1 + r**2)
+    w = 1 / (1 + r ** 2)
     return w
 
 
@@ -57,29 +57,33 @@ def talwar(r):
 
 def welsch(r):
     r = np.abs(r)
-    w = np.exp(-(r**2))
+    w = np.exp(-(r ** 2))
     return w
 
 
-wfuncdict = dict(andrews=andrews,
-                 bisquare=bisquare,
-                 cauchy=cauchy,
-                 fair=fair,
-                 huber=huber,
-                 logistic=logistic,
-                 ols=ols,
-                 talwar=talwar,
-                 welsch=welsch)
+wfuncdict = dict(
+    andrews=andrews,
+    bisquare=bisquare,
+    cauchy=cauchy,
+    fair=fair,
+    huber=huber,
+    logistic=logistic,
+    ols=ols,
+    talwar=talwar,
+    welsch=welsch,
+)
 
-tune_defaults = {'andrews': 1.339,
-                 'bisquare': 4.685,
-                 'cauchy': 2.385,
-                 'fair': 1.400,
-                 'huber': 1.345,
-                 'logistic': 1.205,
-                 'ols': 1,
-                 'talwar': 2.795,
-                 'welsch': 2.985}
+tune_defaults = {
+    "andrews": 1.339,
+    "bisquare": 4.685,
+    "cauchy": 2.385,
+    "fair": 1.400,
+    "huber": 1.345,
+    "logistic": 1.205,
+    "ols": 1,
+    "talwar": 2.795,
+    "welsch": 2.985,
+}
 
 
 def sigma_hat(x):
@@ -102,7 +106,7 @@ def leverage(x):
     # and column j of pinv; hence the 'j' in the output means
     # *don't* sum over j.
 
-    hdiag = np.einsum('ij, ij -> j', x.T, np.linalg.pinv(x))
+    hdiag = np.einsum("ij, ij -> j", x.T, np.linalg.pinv(x))
     # This should be real and positive, but with floating point
     # arithmetic the imaginary part is not exactly zero.
     return np.abs(hdiag)
@@ -115,8 +119,9 @@ def r_normed(R, rfac):
     return rfac * R / sigma_hat(R)
 
 
-def robustfit(X, y, weight_function='bisquare', tune=None,
-              rcond=1, tol=0.001, maxit=50):
+def robustfit(
+    X, y, weight_function="bisquare", tune=None, rcond=1, tol=0.001, maxit=50
+):
     """
     Multiple linear regression via iteratively reweighted least squares.
 
@@ -166,12 +171,14 @@ def robustfit(X, y, weight_function='bisquare', tune=None,
 
     lev = leverage(X)
 
-    out = Bunch(weight_function=weight_function,
-                tune=tune,
-                rcond=rcond,
-                tol=tol,
-                maxit=maxit,
-                leverage=lev)
+    out = Bunch(
+        weight_function=weight_function,
+        tune=tune,
+        rcond=rcond,
+        tol=tol,
+        maxit=maxit,
+        leverage=lev,
+    )
 
     # LJ2009 has an incorrect expression for leverage in the
     # appendix, and an incorrect version of the following
@@ -195,8 +202,7 @@ def robustfit(X, y, weight_function='bisquare', tune=None,
         rsumsq = rsumsq[0]
         if i == 0:
             rms_resid = np.sqrt(rsumsq / n)
-            out.update(dict(ols_b=b,
-                            ols_rms_resid=rms_resid))
+            out.update(dict(ols_b=b, ols_rms_resid=rms_resid))
 
         # Weighted mean of squared weighted residuals:
         rmeansq = rsumsq / w.sum()
@@ -232,31 +238,30 @@ def robustfit(X, y, weight_function='bisquare', tune=None,
     if iterations == 0:
         iterations = maxit  # Did not converge.
 
-    rms_resid = np.sqrt(np.mean(np.abs(resid)**2))
+    rms_resid = np.sqrt(np.mean(np.abs(resid) ** 2))
 
-    out.update(dict(iterations=iterations,
-                    b=b,
-                    s=sing,
-                    w=w,
-                    rank=rank,
-                    rms_resid=rms_resid,
-                    ))
+    out.update(
+        dict(iterations=iterations, b=b, s=sing, w=w, rank=rank, rms_resid=rms_resid,)
+    )
 
     return out
 
 
 # Some simple test cases; this probably will be removed.
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     np.random.seed(1)
     n = 10000
     x = np.arange(n)
     x0 = np.ones_like(x)
-    x1 = np.exp(1j * x/9)
-    x2 = np.exp(1j * x/7)
-    y = (1 + 1j) * x1 + (2 - 1j) * x2 + (0.1 * np.random.randn(n) +
-                                         0.1 * 1j * np.random.randn(n))
+    x1 = np.exp(1j * x / 9)
+    x2 = np.exp(1j * x / 7)
+    y = (
+        (1 + 1j) * x1
+        + (2 - 1j) * x2
+        + (0.1 * np.random.randn(n) + 0.1 * 1j * np.random.randn(n))
+    )
     y[::10] = (np.random.randn(n) + 1j * np.random.randn(n))[::10]
 
     y[10] = 3
@@ -265,12 +270,12 @@ if __name__ == '__main__':
 
     A = np.vstack((x0, x1, x2)).T
     c = np.linalg.lstsq(A, y)
-    print('OLS:', c[0])
+    print("OLS:", c[0])
 
     rf1 = robustfit(A, y)
 
-    print('robust:', rf1.b)
-    print('another test: a very short real series')
+    print("robust:", rf1.b)
+    print("another test: a very short real series")
 
     x = np.arange(1, 21, dtype=float)
     x0 = np.ones_like(x)

@@ -1,13 +1,14 @@
 import pkg_resources
 
-from ._solve import solve
 from ._reconstruct import reconstruct
+from ._solve import solve
 from ._ut_constants import (
-    ut_constants,
     constit_index_dict,
-    hours_per_cycle,
     cycles_per_hour,
+    hours_per_cycle,
+    ut_constants,
 )
+
 
 try:
     __version__ = pkg_resources.get_distribution("utide").version

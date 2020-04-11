@@ -2,8 +2,8 @@ from collections import OrderedDict
 
 import numpy as np
 
+from ._ut_constants import constit_index_dict, ut_constants
 from .astronomy import ut_astron
-from ._ut_constants import ut_constants, constit_index_dict
 from .utilities import Bunch
 
 
@@ -45,14 +45,13 @@ def ut_cnstitsel(tref, minres, incnstit, infer):
     for k in ii.nonzero()[0]:
         ik = const.ishallow[k] + np.arange(const.nshallow[k])
         ik = ik.astype(int) - 1
-        const.freq[k] = np.sum(const.freq[shallow.iname[ik] - 1] *
-                               shallow.coef[ik])
+        const.freq[k] = np.sum(const.freq[shallow.iname[ik] - 1] * shallow.coef[ik])
 
     # cnstit.NR
-    cnstit['NR'] = Bunch()
+    cnstit["NR"] = Bunch()
 
     # if incnstit.lower() == 'auto':
-    if incnstit == 'auto':
+    if incnstit == "auto":
         cnstit.NR.lind = np.where(const.df >= minres)[0]
     else:
         cnstit.NR.lind = [constit_index_dict[n] for n in incnstit]
@@ -61,8 +60,7 @@ def ut_cnstitsel(tref, minres, incnstit, infer):
     if infer is not None:
         RIset = set(infer.inferred_names) | set(infer.reference_names)
         RI_index_set = {constit_index_dict[n] for n in RIset}
-        cnstit.NR.lind = [ind for ind in cnstit.NR.lind
-                          if ind not in RI_index_set]
+        cnstit.NR.lind = [ind for ind in cnstit.NR.lind if ind not in RI_index_set]
 
     cnstit.NR.frq = const.freq[cnstit.NR.lind]
     cnstit.NR.name = const.name[cnstit.NR.lind]
@@ -77,25 +75,25 @@ def ut_cnstitsel(tref, minres, incnstit, infer):
         nI = len(infer.inferred_names)
         # Find unique reference names
         _r = infer.reference_names
-        allrefs = list(OrderedDict(zip(_r, [1]*len(_r))).keys())
+        allrefs = list(OrderedDict(zip(_r, [1] * len(_r))).keys())
         nR = len(allrefs)
         for k, name in enumerate(allrefs):
             refstruct = Bunch(name=name)
             refstruct.lind = constit_index_dict[name]
             refstruct.frq = const.freq[refstruct.lind]
-            ind = [i for i, rname in enumerate(infer.reference_names)
-                   if name == rname]
+            ind = [i for i, rname in enumerate(infer.reference_names) if name == rname]
             refstruct.nI = len(ind)
-            refstruct.I = Bunch(Rp=[], Rm=[], name=[], lind=[], frq=[])
+            refstruct.I = Bunch(Rp=[], Rm=[], name=[], lind=[], frq=[])  # noqa
             for lk, ilk in enumerate(ind):
-                refstruct.I.Rp.append(infer.amp_ratios[ilk] *
-                                      np.exp(1j * infer.phase_offsets[ilk] *
-                                      np.pi/180))
+                refstruct.I.Rp.append(
+                    infer.amp_ratios[ilk]
+                    * np.exp(1j * infer.phase_offsets[ilk] * np.pi / 180)
+                )
                 if len(infer.amp_ratios) > nI:
-                    refstruct.I.Rm.append(infer.amp_ratios[ilk + nI] *
-                                          np.exp(-1j *
-                                          infer.phase_offsets[ilk + nI] *
-                                          np.pi / 180))
+                    refstruct.I.Rm.append(
+                        infer.amp_ratios[ilk + nI]
+                        * np.exp(-1j * infer.phase_offsets[ilk + nI] * np.pi / 180)
+                    )
                 else:
                     refstruct.I.Rm.append(np.conj(refstruct.I.Rp[lk]))
 
@@ -110,9 +108,9 @@ def ut_cnstitsel(tref, minres, incnstit, infer):
             cnstit.R.append(refstruct)
 
     coef.name = list(cnstit.NR.name[:])
-    coef.aux = Bunch(frq=list(cnstit.NR.frq[:]),
-                     lind=list(cnstit.NR.lind[:]),
-                     reftime=tref)
+    coef.aux = Bunch(
+        frq=list(cnstit.NR.frq[:]), lind=list(cnstit.NR.lind[:]), reftime=tref
+    )
 
     if infer is not None:
         # Append reference values, and then inferred values, to the lists.

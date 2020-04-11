@@ -1,5 +1,6 @@
 import numpy as np
 
+
 # (comments based on t_tide)
 # Coefficients of the formulas in the Explan. Suppl.
 _sc = np.array([270.434164, 13.1763965268, -0.0000850, 0.000000039])
@@ -64,7 +65,7 @@ def ut_astron(jd):
     d = jd - daten
     D = d / 10000
 
-    args = np.vstack((np.ones(jd.shape), d, D*D, D**3))
+    args = np.vstack((np.ones(jd.shape), d, D * D, D ** 3))
 
     astro = np.fmod((np.dot(_coefs, args) / 360), 1)
 
@@ -75,10 +76,11 @@ def ut_astron(jd):
     astro = np.vstack((tau, astro))
 
     # derivatives (polynomial)
-    dargs = np.vstack((np.zeros(jd.shape), np.ones(jd.shape),
-                      2.0e-4*D, 3.0e-4*D*D))
+    dargs = np.vstack(
+        (np.zeros(jd.shape), np.ones(jd.shape), 2.0e-4 * D, 3.0e-4 * D * D)
+    )
 
-    ader = np.dot(_coefs, dargs)/360.0
+    ader = np.dot(_coefs, dargs) / 360.0
     dtau = 1.0 + ader[1, :] - ader[0, :]
     ader = np.vstack((dtau, ader))
 

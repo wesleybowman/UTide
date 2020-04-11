@@ -7,23 +7,23 @@ Smoke testing--just see if the system runs.
 # TODO: extend the tests by cycling through various combinations
 #       of configuration and data input.
 
+import numpy as np
 import pytest
 
-import numpy as np
-
-from utide import reconstruct
-from utide import solve
+from utide import reconstruct, solve
 from utide._ut_constants import ut_constants
 from utide.utilities import Bunch
+
+
 # We omit the 'MC' case for now because with this test data, it
 # fails with 'numpy.linalg.LinAlgError: SVD did not converge'.
-@pytest.mark.parametrize('conf_int',  ['linear', 'none'])
+@pytest.mark.parametrize("conf_int", ["linear", "none"])
 def test_roundtrip(conf_int):
     """Minimal conversion from simple_utide_test."""
     ts = 735604
     duration = 35
 
-    time = np.linspace(ts, ts+duration, 842)
+    time = np.linspace(ts, ts + duration, 842)
     tref = (time[-1] + time[0]) / 2
 
     const = ut_constants.const
@@ -34,32 +34,32 @@ def test_roundtrip(conf_int):
 
     freq_cpd = 24 * const.freq
 
-    jj = 48-1  # Python index for M2
+    jj = 48 - 1  # Python index for M2
 
     arg = 2 * np.pi * (time - tref) * freq_cpd[jj] - np.deg2rad(phase)
     time_series = amp * np.cos(arg)
 
     opts = {
-        'constit': 'auto',
-        'phase': 'raw',
-        'nodal': False,
-        'trend': False,
-        'method': 'ols',
-        'conf_int': conf_int,
-        'Rayleigh_min': 0.95,
+        "constit": "auto",
+        "phase": "raw",
+        "nodal": False,
+        "trend": False,
+        "method": "ols",
+        "conf_int": conf_int,
+        "Rayleigh_min": 0.95,
     }
 
     speed_coef = solve(time, time_series, time_series, lat=lat, **opts)
     elev_coef = solve(time, time_series, lat=lat, **opts)
 
-    amp_err = amp - elev_coef['A'][0]
-    phase_err = phase - elev_coef['g'][0]
+    amp_err = amp - elev_coef["A"][0]
+    phase_err = phase - elev_coef["g"][0]
     ts_recon = reconstruct(time, elev_coef).h
 
     # pure smoke testing of reconstruct
     vel = reconstruct(time, speed_coef)
-    vel = reconstruct(time, speed_coef, constit=('M2', 'S2'))
-    htmp = reconstruct(time, elev_coef, constit=('M2', 'S2'))
+    vel = reconstruct(time, speed_coef, constit=("M2", "S2"))
+    htmp = reconstruct(time, elev_coef, constit=("M2", "S2"))
     vel = reconstruct(time, speed_coef, min_SNR=3)
     htmp = reconstruct(time, elev_coef, min_SNR=3)
     vel = reconstruct(time, speed_coef, min_PE=10)
@@ -70,11 +70,11 @@ def test_roundtrip(conf_int):
     assert isinstance(htmp, Bunch)
 
     # Now the round-trip check, just for the elevation.
-    err = np.sqrt(np.mean((time_series-ts_recon)**2))
+    err = np.sqrt(np.mean((time_series - ts_recon) ** 2))
 
     print(amp_err, phase_err, err)
-    print(elev_coef['aux']['reftime'], tref)
-    print(elev_coef['aux']['opt'])
+    print(elev_coef["aux"]["reftime"], tref)
+    print(elev_coef["aux"]["opt"])
 
     np.testing.assert_almost_equal(amp_err, 0)
     np.testing.assert_almost_equal(phase_err, 0)
@@ -86,7 +86,7 @@ def test_masked_input():
     ts = 735604
     duration = 35
 
-    time = np.linspace(ts, ts+duration, 842)
+    time = np.linspace(ts, ts + duration, 842)
     tref = (time[-1] + time[0]) / 2
 
     const = ut_constants.const
@@ -97,19 +97,19 @@ def test_masked_input():
 
     freq_cpd = 24 * const.freq
 
-    jj = 48-1  # Python index for M2
+    jj = 48 - 1  # Python index for M2
 
     arg = 2 * np.pi * (time - tref) * freq_cpd[jj] - np.deg2rad(phase)
     time_series = amp * np.cos(arg)
 
     opts = {
-        'constit': 'auto',
-        'phase': 'raw',
-        'nodal': False,
-        'trend': False,
-        'method': 'ols',
-        'conf_int': 'linear',
-        'Rayleigh_min': 0.95,
+        "constit": "auto",
+        "phase": "raw",
+        "nodal": False,
+        "trend": False,
+        "method": "ols",
+        "conf_int": "linear",
+        "Rayleigh_min": 0.95,
     }
 
     t = np.ma.array(time)
@@ -121,8 +121,8 @@ def test_masked_input():
     speed_coef = solve(t, series, series, lat=lat, **opts)
     elev_coef = solve(t, series, lat=lat, **opts)
 
-    amp_err = amp - elev_coef['A'][0]
-    phase_err = phase - elev_coef['g'][0]
+    amp_err = amp - elev_coef["A"][0]
+    phase_err = phase - elev_coef["g"][0]
     ts_recon = reconstruct(time, elev_coef).h
     assert isinstance(ts_recon, np.ndarray)
 
@@ -149,7 +149,7 @@ def test_robust():
     ts = 735604
     duration = 35
 
-    time = np.linspace(ts, ts+duration, 842)
+    time = np.linspace(ts, ts + duration, 842)
     tref = (time[-1] + time[0]) / 2
 
     const = ut_constants.const
@@ -160,7 +160,7 @@ def test_robust():
 
     freq_cpd = 24 * const.freq
 
-    jj = 48-1  # Python index for M2
+    jj = 48 - 1  # Python index for M2
 
     arg = 2 * np.pi * (time - tref) * freq_cpd[jj] - np.deg2rad(phase)
     time_series = amp * np.cos(arg)
@@ -174,13 +174,13 @@ def test_robust():
     time_series[-5:] = -10
 
     opts = {
-        'constit': 'auto',
-        'phase': 'raw',
-        'nodal': False,
-        'trend': False,
-        'method': 'robust',
-        'conf_int': 'linear',
-        'Rayleigh_min': 0.95,
+        "constit": "auto",
+        "phase": "raw",
+        "nodal": False,
+        "trend": False,
+        "method": "robust",
+        "conf_int": "linear",
+        "Rayleigh_min": 0.95,
     }
 
     speed_coef = solve(time, time_series, time_series, lat=lat, **opts)
@@ -194,7 +194,7 @@ def test_MC():
     ts = 735604
     duration = 35
 
-    time = np.linspace(ts, ts+duration, 842)
+    time = np.linspace(ts, ts + duration, 842)
     tref = (time[-1] + time[0]) / 2
 
     const = ut_constants.const
@@ -205,7 +205,7 @@ def test_MC():
 
     freq_cpd = 24 * const.freq
 
-    jj = 48-1  # Python index for M2
+    jj = 48 - 1  # Python index for M2
 
     arg = 2 * np.pi * (time - tref) * freq_cpd[jj] - np.deg2rad(phase)
     time_series = amp * np.cos(arg)
@@ -215,36 +215,36 @@ def test_MC():
     time_series += 0.01 * np.random.randn(len(time_series))
 
     opts = {
-        'constit': 'auto',
-        'phase': 'raw',
-        'nodal': False,
-        'trend': False,
-        'method': 'ols',
-        'conf_int': 'MC',
-        'white': False,
-        'Rayleigh_min': 0.95,
+        "constit": "auto",
+        "phase": "raw",
+        "nodal": False,
+        "trend": False,
+        "method": "ols",
+        "conf_int": "MC",
+        "white": False,
+        "Rayleigh_min": 0.95,
     }
 
     speed_coef = solve(time, time_series, time_series, lat=lat, **opts)
     elev_coef = solve(time, time_series, lat=lat, **opts)
 
-    for name, AA, AA_ci, gg, gg_ci in zip(elev_coef.name,
-                                          elev_coef.A,
-                                          elev_coef.A_ci,
-                                          elev_coef.g,
-                                          elev_coef.g_ci):
-        print('%5s %10.4g %10.4g  %10.4g %10.4g' %
-              (name, AA, AA_ci, gg, gg_ci))
+    for name, AA, AA_ci, gg, gg_ci in zip(
+        elev_coef.name, elev_coef.A, elev_coef.A_ci, elev_coef.g, elev_coef.g_ci
+    ):
+        print("%5s %10.4g %10.4g  %10.4g %10.4g" % (name, AA, AA_ci, gg, gg_ci))
 
-    for (name, Lsmaj, Lsmaj_ci, Lsmin, Lsmin_ci,
-         theta, theta_ci, gg, gg_ci) in zip(speed_coef.name,
-                                            speed_coef.Lsmaj,
-                                            speed_coef.Lsmaj_ci,
-                                            speed_coef.Lsmin,
-                                            speed_coef.Lsmin_ci,
-                                            speed_coef.theta,
-                                            speed_coef.theta_ci,
-                                            speed_coef.g,
-                                            speed_coef.g_ci):
-        print('%5s %10.4g %10.4g  %10.4g %10.4g  %10.4g %10.4g  %10.4g %10.4g' %
-              (name, Lsmaj, Lsmaj_ci, Lsmin, Lsmin_ci, theta, theta_ci, gg, gg_ci))
+    for (name, Lsmaj, Lsmaj_ci, Lsmin, Lsmin_ci, theta, theta_ci, gg, gg_ci) in zip(
+        speed_coef.name,
+        speed_coef.Lsmaj,
+        speed_coef.Lsmaj_ci,
+        speed_coef.Lsmin,
+        speed_coef.Lsmin_ci,
+        speed_coef.theta,
+        speed_coef.theta_ci,
+        speed_coef.g,
+        speed_coef.g_ci,
+    ):
+        print(
+            "%5s %10.4g %10.4g  %10.4g %10.4g  %10.4g %10.4g  %10.4g %10.4g"
+            % (name, Lsmaj, Lsmaj_ci, Lsmin, Lsmin_ci, theta, theta_ci, gg, gg_ci)
+        )

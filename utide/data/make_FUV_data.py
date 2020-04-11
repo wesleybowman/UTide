@@ -8,16 +8,18 @@ intermediate points where it is already being loaded.
 """
 
 import numpy as np
+
+from oct2py import Oct2PyError, octave
 from scipy.io.matlab import savemat
 
-from oct2py import octave, Oct2PyError
+
 octave.convert_to_float = False
 
 
-t0 = octave.datenum(1950., 1., 2.)    # floats are required
-print('t0 = ', t0)
+t0 = octave.datenum(1950.0, 1.0, 2.0)  # floats are required
+print("t0 = ", t0)
 
-t = np.linspace(t0, t0+300, 5)[:, None]
+t = np.linspace(t0, t0 + 300, 5)[:, None]
 # Probably an octave oddity: the following *must* be a float
 lat = 30.0
 # Otherwise, in the expression "pi * lat / 180" or any variation
@@ -27,10 +29,11 @@ lat = 30.0
 # the problem persists.
 
 
-linds = [1 + np.arange(146, dtype=int)[:, None],
-         [7, 8],
-         [12, 13, 14],
-         ]
+linds = [
+    1 + np.arange(146, dtype=int)[:, None],
+    [7, 8],
+    [12, 13, 14],
+]
 
 for ilind, lind in enumerate(linds):
     shape = (7, len(t), len(lind))
@@ -38,13 +41,15 @@ for ilind, lind in enumerate(linds):
     Uo = Fo.copy()
     Vo = Fo.copy()
 
-    flags = [[0, 0, 0, 0],
-             [0, 1, 0, 0],
-             [0, 0, 0, 1],
-             [0, 1, 0, 1],
-             [1, 0, 0, 0],
-             [0, 0, 1, 0],
-             [1, 0, 1, 0]]
+    flags = [
+        [0, 0, 0, 0],
+        [0, 1, 0, 0],
+        [0, 0, 0, 1],
+        [0, 1, 0, 1],
+        [1, 0, 0, 0],
+        [0, 0, 1, 0],
+        [1, 0, 1, 0],
+    ]
 
     for i, flag in enumerate(flags):
         print(flag)
@@ -54,11 +59,10 @@ for ilind, lind in enumerate(linds):
             Uo[i] = U
             Vo[i] = V
         except Oct2PyError:
-            print('failed')
+            print("failed")
 
-    save_args = dict(t=t, t0=t0, lat=lat, lind=lind, flags=flags,
-                     Fo=Fo, Uo=Uo, Vo=Vo)
+    save_args = dict(t=t, t0=t0, lat=lat, lind=lind, flags=flags, Fo=Fo, Uo=Uo, Vo=Vo)
 
-    np.savez('FUV%d.npz' % ilind, **save_args)
+    np.savez("FUV%d.npz" % ilind, **save_args)
 
-    savemat('FUV%d.mat' % ilind, save_args)
+    savemat("FUV%d.mat" % ilind, save_args)
