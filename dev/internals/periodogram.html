@@ -1,17 +1,17 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
-    <title>periodogram &#8212; UTide 0.2.5+8.g8ebc704 documentation</title>
+    <title>periodogram &#8212; UTide 0.2.6.dev10+g93cdb9e documentation</title>
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="robustfit" href="robustfit.html" />
@@ -32,7 +32,7 @@
         <li class="right" >
           <a href="index.html" title="Internal details"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">UTide 0.2.5+8.g8ebc704 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">UTide 0.2.6.dev10+g93cdb9e documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Internal details</a> &#187;</li> 
       </ul>
     </div>  
@@ -55,22 +55,22 @@ density averaged in bands near the constituent clusters.</p>
 they are stripped down to their essentials, with little or
 no argument checking.  Some argument flexibility is included
 to facilitate testing.</p>
-<dl class="function">
+<dl class="py function">
 <dt id="utide.periodogram._lomb_freqs">
-<code class="sig-prename descclassname">utide.periodogram.</code><code class="sig-name descname">_lomb_freqs</code><span class="sig-paren">(</span><em class="sig-param">t</em>, <em class="sig-param">fbands=None</em>, <em class="sig-param">ofac=1</em>, <em class="sig-param">max_per_band=500</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utide/periodogram.html#_lomb_freqs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#utide.periodogram._lomb_freqs" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">utide.periodogram.</code><code class="sig-name descname">_lomb_freqs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">t</span></em>, <em class="sig-param"><span class="n">fbands</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ofac</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">max_per_band</span><span class="o">=</span><span class="default_value">500</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utide/periodogram.html#_lomb_freqs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#utide.periodogram._lomb_freqs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate uniformly spaced frequencies in each band, with
 no more than <code class="xref py py-obj docutils literal notranslate"><span class="pre">max_per_band</span></code> in any band.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="utide.periodogram._ls_cross">
-<code class="sig-prename descclassname">utide.periodogram.</code><code class="sig-name descname">_ls_cross</code><span class="sig-paren">(</span><em class="sig-param">t</em>, <em class="sig-param">x</em>, <em class="sig-param">fr</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utide/periodogram.html#_ls_cross"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#utide.periodogram._ls_cross" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">utide.periodogram.</code><code class="sig-name descname">_ls_cross</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">t</span></em>, <em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">fr</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utide/periodogram.html#_ls_cross"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#utide.periodogram._ls_cross" title="Permalink to this definition">¶</a></dt>
 <dd><p>Cross spectral counterpart of signal.lombscargle.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="utide.periodogram._psd">
-<code class="sig-prename descclassname">utide.periodogram.</code><code class="sig-name descname">_psd</code><span class="sig-paren">(</span><em class="sig-param">e</em>, <em class="sig-param">window</em>, <em class="sig-param">fs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utide/periodogram.html#_psd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#utide.periodogram._psd" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">utide.periodogram.</code><code class="sig-name descname">_psd</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">e</span></em>, <em class="sig-param"><span class="n">window</span></em>, <em class="sig-param"><span class="n">fs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utide/periodogram.html#_psd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#utide.periodogram._psd" title="Permalink to this definition">¶</a></dt>
 <dd><p>Autospectrum if <code class="xref py py-obj docutils literal notranslate"><span class="pre">e</span></code> is real, or cross spectrum if complex.</p>
 <p><code class="xref py py-obj docutils literal notranslate"><span class="pre">e</span></code> must be uniformly spaced, with sampling frequency <code class="xref py py-obj docutils literal notranslate"><span class="pre">fs</span></code> in
 cycles per time unit.  Number of points is assumed to be even.</p>
@@ -78,9 +78,9 @@ cycles per time unit.  Number of points is assumed to be even.</p>
 <p>Returns PSD in cycles per time unit.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="utide.periodogram._psd_lomb">
-<code class="sig-prename descclassname">utide.periodogram.</code><code class="sig-name descname">_psd_lomb</code><span class="sig-paren">(</span><em class="sig-param">t</em>, <em class="sig-param">x</em>, <em class="sig-param">window=None</em>, <em class="sig-param">freq=None</em>, <em class="sig-param">ofac=1</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utide/periodogram.html#_psd_lomb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#utide.periodogram._psd_lomb" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">utide.periodogram.</code><code class="sig-name descname">_psd_lomb</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">t</span></em>, <em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">window</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">freq</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ofac</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utide/periodogram.html#_psd_lomb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#utide.periodogram._psd_lomb" title="Permalink to this definition">¶</a></dt>
 <dd><p>Periodogram estimate for irregular sampling, Lomb-Scargle method</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -117,9 +117,9 @@ because they are irrelevant in this context.</p>
 <p>PSD units are [<code class="xref py py-obj docutils literal notranslate"><span class="pre">x</span></code>-units^2 per cycle per unit time]</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="utide.periodogram.band_psd">
-<code class="sig-prename descclassname">utide.periodogram.</code><code class="sig-name descname">band_psd</code><span class="sig-paren">(</span><em class="sig-param">t</em>, <em class="sig-param">e</em>, <em class="sig-param">cfrq</em>, <em class="sig-param">equi=True</em>, <em class="sig-param">frqosamp=1</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utide/periodogram.html#band_psd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#utide.periodogram.band_psd" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">utide.periodogram.</code><code class="sig-name descname">band_psd</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">t</span></em>, <em class="sig-param"><span class="n">e</span></em>, <em class="sig-param"><span class="n">cfrq</span></em>, <em class="sig-param"><span class="n">equi</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">frqosamp</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utide/periodogram.html#band_psd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#utide.periodogram.band_psd" title="Permalink to this definition">¶</a></dt>
 <dd><p>Band-averaged power spectral density in vicinity of tidal constituents</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -152,9 +152,9 @@ other modules.</p>
 </div>
 </dd></dl>
 
-<dl class="function">
+<dl class="py function">
 <dt id="utide.periodogram.fbndavg">
-<code class="sig-prename descclassname">utide.periodogram.</code><code class="sig-name descname">fbndavg</code><span class="sig-paren">(</span><em class="sig-param">P</em>, <em class="sig-param">freq</em>, <em class="sig-param">cfreq=None</em>, <em class="sig-param">fbands=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utide/periodogram.html#fbndavg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#utide.periodogram.fbndavg" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">utide.periodogram.</code><code class="sig-name descname">fbndavg</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">P</span></em>, <em class="sig-param"><span class="n">freq</span></em>, <em class="sig-param"><span class="n">cfreq</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">fbands</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/utide/periodogram.html#fbndavg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#utide.periodogram.fbndavg" title="Permalink to this definition">¶</a></dt>
 <dd><p>Band-average periodogram, excluding constituent frequencies</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -216,7 +216,7 @@ t_tide, Pawlowicz et al. (2002).</p>
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -236,13 +236,13 @@ t_tide, Pawlowicz et al. (2002).</p>
         <li class="right" >
           <a href="index.html" title="Internal details"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">UTide 0.2.5+8.g8ebc704 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">UTide 0.2.6.dev10+g93cdb9e documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Internal details</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2015, Dan Codiga, Wesley Bowman, and contributors.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.3.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.0.1.
     </div>
   </body>
 </html>

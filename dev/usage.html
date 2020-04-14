@@ -1,17 +1,17 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
-    <title>Usage &#8212; UTide 0.2.5+8.g8ebc704 documentation</title>
+    <title>Usage &#8212; UTide 0.2.6.dev10+g93cdb9e documentation</title>
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="_static/language_data.js"></script>
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Internal details" href="internals/index.html" />
@@ -32,7 +32,7 @@
         <li class="right" >
           <a href="strategy.html" title="Strategy"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">UTide 0.2.5+8.g8ebc704 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">UTide 0.2.6.dev10+g93cdb9e documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -47,9 +47,9 @@
 </div>
 <div class="section" id="solve">
 <h2>solve<a class="headerlink" href="#solve" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
+<dl class="py function">
 <dt id="utide.solve">
-<code class="sig-prename descclassname">utide.</code><code class="sig-name descname">solve</code><span class="sig-paren">(</span><em class="sig-param">t</em>, <em class="sig-param">u</em>, <em class="sig-param">v=None</em>, <em class="sig-param">lat=None</em>, <em class="sig-param">**opts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utide/_solve.html#solve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#utide.solve" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">utide.</code><code class="sig-name descname">solve</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">t</span></em>, <em class="sig-param"><span class="n">u</span></em>, <em class="sig-param"><span class="n">v</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">lat</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">opts</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utide/_solve.html#solve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#utide.solve" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate amplitude, phase, confidence intervals of tidal constituents.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
@@ -125,9 +125,9 @@ assume a white background spectrum.</p></li>
 </div>
 <div class="section" id="reconstruct">
 <h2>reconstruct<a class="headerlink" href="#reconstruct" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
+<dl class="py function">
 <dt id="utide.reconstruct">
-<code class="sig-prename descclassname">utide.</code><code class="sig-name descname">reconstruct</code><span class="sig-paren">(</span><em class="sig-param">t</em>, <em class="sig-param">coef</em>, <em class="sig-param">epoch='python'</em>, <em class="sig-param">verbose=True</em>, <em class="sig-param">constit=None</em>, <em class="sig-param">min_SNR=2</em>, <em class="sig-param">min_PE=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utide/_reconstruct.html#reconstruct"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#utide.reconstruct" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">utide.</code><code class="sig-name descname">reconstruct</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">t</span></em>, <em class="sig-param"><span class="n">coef</span></em>, <em class="sig-param"><span class="n">epoch</span><span class="o">=</span><span class="default_value">'python'</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">constit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">min_SNR</span><span class="o">=</span><span class="default_value">2</span></em>, <em class="sig-param"><span class="n">min_PE</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utide/_reconstruct.html#reconstruct"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#utide.reconstruct" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reconstruct a tidal signal.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -176,9 +176,9 @@ point to the same array.</p>
 <code class="xref py py-obj docutils literal notranslate"><span class="pre">solve</span></code> is a hybrid; it is a dictionary subclass that provides
 attribute access to its data.  For example, <code class="docutils literal notranslate"><span class="pre">coef['aux']</span></code> and
 <code class="docutils literal notranslate"><span class="pre">coef.aux</span></code> can be used interchangeably.</p>
-<dl class="function">
+<dl class="py function">
 <dt id="utide.utilities.Bunch">
-<code class="sig-prename descclassname">utide.utilities.</code><code class="sig-name descname">Bunch</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utide/utilities.html#Bunch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#utide.utilities.Bunch" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">utide.utilities.</code><code class="sig-name descname">Bunch</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utide/utilities.html#Bunch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#utide.utilities.Bunch" title="Permalink to this definition">¶</a></dt>
 <dd><p>A dictionary that also provides access via attributes.</p>
 <p>Additional methods update_values and update_None provide
 control over whether new keys are added to the dictionary
@@ -238,7 +238,7 @@ formatted() method.</p>
     </form>
     </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -258,12 +258,12 @@ formatted() method.</p>
         <li class="right" >
           <a href="strategy.html" title="Strategy"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">UTide 0.2.5+8.g8ebc704 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">UTide 0.2.6.dev10+g93cdb9e documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2015, Dan Codiga, Wesley Bowman, and contributors.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.3.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.0.1.
     </div>
   </body>
 </html>
