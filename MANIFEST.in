@@ -1,8 +1,16 @@
+include *.txt
 include README.rst
-include LICENSE.txt
-include requirements.txt
+include pyproject.toml
 
-recursive-include utide *.py
-recursive-include utide *.npz
-include versioneer.py
-include utide/_version.py
+graft utide
+
+prune docs
+prune tests
+prune notebooks
+prune *.egg-info
+
+global-exclude *.mat
+
+exclude *.yml
+exclude *.enc
+exclude .gitignore
