@@ -37,7 +37,8 @@ def test_roundtrip(conf_int):
     jj = 48 - 1  # Python index for M2
 
     arg = 2 * np.pi * (time - tref) * freq_cpd[jj] - np.deg2rad(phase)
-    time_series = amp * np.cos(arg)
+    np.random.seed(int(np.pi * 9))
+    time_series = amp * np.cos(arg) + 1e-10 * np.random.randn(len(time))
 
     opts = {
         "constit": "auto",

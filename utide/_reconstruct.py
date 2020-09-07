@@ -87,6 +87,7 @@ def reconstruct(
 def _reconstruct(t, goodmask, coef, verbose, constit, min_SNR, min_PE):
 
     twodim = coef["aux"]["opt"]["twodim"]
+    print(f"constit is {constit}")
 
     # Determine constituents to include.
     if constit is not None:
@@ -102,8 +103,10 @@ def _reconstruct(t, goodmask, coef, verbose, constit, min_SNR, min_PE):
             N = (coef["A_ci"] / 1.96) ** 2
         SNR = E / N
         PE = 100 * E / E.sum()
+        print(f"SNR: {SNR}, PE: {PE}")
         with np.errstate(invalid="ignore"):
             ind = np.logical_and(SNR >= min_SNR, PE >= min_PE)
+    print(f"ind: {ind}")
 
     # Complex coefficients.
     rpd = np.pi / 180
