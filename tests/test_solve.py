@@ -54,7 +54,7 @@ def test_roundtrip(conf_int):
 
     amp_err = amp - elev_coef["A"][0]
     phase_err = phase - elev_coef["g"][0]
-    ts_recon = reconstruct(time, elev_coef).h
+    ts_recon = reconstruct(time, elev_coef).h.copy()  # clobbered?
 
     # pure smoke testing of reconstruct
     vel = reconstruct(time, speed_coef)
