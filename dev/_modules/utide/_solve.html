@@ -4,7 +4,8 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>utide._solve &#8212; UTide 0.2.6.dev10+g93cdb9e documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>utide._solve &#8212; UTide 0.2.6.dev13+g1dbd098 documentation</title>
     <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
@@ -24,8 +25,9 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">UTide 0.2.6.dev10+g93cdb9e documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">UTide 0.2.6.dev13+g1dbd098 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">utide._solve</a></li> 
       </ul>
     </div>  
 
@@ -41,30 +43,32 @@
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">.harmonics</span> <span class="kn">import</span> <span class="n">ut_E</span>
+<span class="kn">from</span> <span class="nn">._time_conversion</span> <span class="kn">import</span> <span class="n">_normalize_time</span>
+<span class="kn">from</span> <span class="nn">._ut_constants</span> <span class="kn">import</span> <span class="n">constit_index_dict</span>
+<span class="kn">from</span> <span class="nn">.confidence</span> <span class="kn">import</span> <span class="n">_confidence</span>
+<span class="kn">from</span> <span class="nn">.constituent_selection</span> <span class="kn">import</span> <span class="n">ut_cnstitsel</span>
 <span class="kn">from</span> <span class="nn">.diagnostics</span> <span class="kn">import</span> <span class="n">ut_diagn</span>
 <span class="kn">from</span> <span class="nn">.ellipse_params</span> <span class="kn">import</span> <span class="n">ut_cs2cep</span>
-<span class="kn">from</span> <span class="nn">.constituent_selection</span> <span class="kn">import</span> <span class="n">ut_cnstitsel</span>
-<span class="kn">from</span> <span class="nn">.confidence</span> <span class="kn">import</span> <span class="n">_confidence</span>
-<span class="kn">from</span> <span class="nn">.utilities</span> <span class="kn">import</span> <span class="n">Bunch</span>
-<span class="kn">from</span> <span class="nn">._ut_constants</span> <span class="kn">import</span> <span class="n">constit_index_dict</span>
+<span class="kn">from</span> <span class="nn">.harmonics</span> <span class="kn">import</span> <span class="n">ut_E</span>
 <span class="kn">from</span> <span class="nn">.robustfit</span> <span class="kn">import</span> <span class="n">robustfit</span>
-<span class="kn">from</span> <span class="nn">._time_conversion</span> <span class="kn">import</span> <span class="n">_normalize_time</span>
+<span class="kn">from</span> <span class="nn">.utilities</span> <span class="kn">import</span> <span class="n">Bunch</span>
 
-<span class="n">default_opts</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">constit</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">,</span>
-                    <span class="n">conf_int</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span>
-                    <span class="n">method</span><span class="o">=</span><span class="s1">&#39;ols&#39;</span><span class="p">,</span>
-                    <span class="n">trend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                    <span class="n">phase</span><span class="o">=</span><span class="s1">&#39;Greenwich&#39;</span><span class="p">,</span>
-                    <span class="n">nodal</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                    <span class="n">infer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                    <span class="n">MC_n</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
-                    <span class="n">Rayleigh_min</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-                    <span class="n">robust_kw</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">weight_function</span><span class="o">=</span><span class="s1">&#39;cauchy&#39;</span><span class="p">),</span>
-                    <span class="n">white</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                    <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                    <span class="n">epoch</span><span class="o">=</span><span class="s1">&#39;python&#39;</span><span class="p">,</span>
-                    <span class="p">)</span>
+
+<span class="n">default_opts</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;constit&quot;</span><span class="p">:</span> <span class="s2">&quot;auto&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;conf_int&quot;</span><span class="p">:</span> <span class="s2">&quot;linear&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;ols&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;trend&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="s2">&quot;phase&quot;</span><span class="p">:</span> <span class="s2">&quot;Greenwich&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;nodal&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="s2">&quot;infer&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="s2">&quot;MC_n&quot;</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span>
+    <span class="s2">&quot;Rayleigh_min&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s2">&quot;robust_kw&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;weight_function&quot;</span><span class="p">:</span> <span class="s2">&quot;cauchy&quot;</span><span class="p">},</span>
+    <span class="s2">&quot;white&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="s2">&quot;verbose&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="s2">&quot;epoch&quot;</span><span class="p">:</span> <span class="s2">&quot;python&quot;</span><span class="p">,</span>
+<span class="p">}</span>
 
 
 <span class="k">def</span> <span class="nf">_process_opts</span><span class="p">(</span><span class="n">opts</span><span class="p">,</span> <span class="n">is_2D</span><span class="p">):</span>
@@ -83,59 +87,55 @@
     <span class="c1"># Here or elsewhere, proper validation remains to be added.</span>
     <span class="n">oldopts</span> <span class="o">=</span> <span class="n">Bunch</span><span class="p">()</span>
     <span class="n">oldopts</span><span class="o">.</span><span class="n">cnstit</span> <span class="o">=</span> <span class="n">opts</span><span class="o">.</span><span class="n">constit</span>
-    <span class="n">oldopts</span><span class="o">.</span><span class="n">infer</span> <span class="o">=</span> <span class="n">opts</span><span class="o">.</span><span class="n">infer</span>     <span class="c1"># we will not use the matlab names, though</span>
+    <span class="n">oldopts</span><span class="o">.</span><span class="n">infer</span> <span class="o">=</span> <span class="n">opts</span><span class="o">.</span><span class="n">infer</span>  <span class="c1"># we will not use the matlab names, though</span>
 
     <span class="n">oldopts</span><span class="o">.</span><span class="n">conf_int</span> <span class="o">=</span> <span class="kc">True</span>
-    <span class="k">if</span> <span class="n">opts</span><span class="o">.</span><span class="n">conf_int</span> <span class="o">==</span> <span class="s1">&#39;linear&#39;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">opts</span><span class="o">.</span><span class="n">conf_int</span> <span class="o">==</span> <span class="s2">&quot;linear&quot;</span><span class="p">:</span>
         <span class="n">oldopts</span><span class="o">.</span><span class="n">linci</span> <span class="o">=</span> <span class="kc">True</span>
-    <span class="k">elif</span> <span class="n">opts</span><span class="o">.</span><span class="n">conf_int</span> <span class="o">==</span> <span class="s1">&#39;MC&#39;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">opts</span><span class="o">.</span><span class="n">conf_int</span> <span class="o">==</span> <span class="s2">&quot;MC&quot;</span><span class="p">:</span>
         <span class="n">oldopts</span><span class="o">.</span><span class="n">linci</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="k">elif</span> <span class="n">opts</span><span class="o">.</span><span class="n">conf_int</span> <span class="o">==</span> <span class="s1">&#39;none&#39;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">opts</span><span class="o">.</span><span class="n">conf_int</span> <span class="o">==</span> <span class="s2">&quot;none&quot;</span><span class="p">:</span>
         <span class="n">oldopts</span><span class="o">.</span><span class="n">conf_int</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="n">oldopts</span><span class="o">.</span><span class="n">nodiagn</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;conf_int&#39; must be &#39;linear&#39;, &#39;MC&#39;, or &#39;none&#39;&quot;</span><span class="p">)</span>
 
     <span class="n">oldopts</span><span class="o">.</span><span class="n">notrend</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">opts</span><span class="o">.</span><span class="n">trend</span>
-    <span class="n">oldopts</span><span class="p">[</span><span class="s1">&#39;nodesatlint&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="n">oldopts</span><span class="p">[</span><span class="s1">&#39;nodesatnone&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="n">oldopts</span><span class="p">[</span><span class="s1">&#39;gwchlint&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="n">oldopts</span><span class="p">[</span><span class="s1">&#39;gwchnone&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="k">if</span> <span class="n">opts</span><span class="o">.</span><span class="n">nodal</span> <span class="o">==</span> <span class="s1">&#39;linear_time&#39;</span><span class="p">:</span>
-        <span class="n">oldopts</span><span class="p">[</span><span class="s1">&#39;nodsatlint&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">oldopts</span><span class="p">[</span><span class="s2">&quot;nodesatlint&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">oldopts</span><span class="p">[</span><span class="s2">&quot;nodesatnone&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">oldopts</span><span class="p">[</span><span class="s2">&quot;gwchlint&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">oldopts</span><span class="p">[</span><span class="s2">&quot;gwchnone&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="n">opts</span><span class="o">.</span><span class="n">nodal</span> <span class="o">==</span> <span class="s2">&quot;linear_time&quot;</span><span class="p">:</span>
+        <span class="n">oldopts</span><span class="p">[</span><span class="s2">&quot;nodsatlint&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="k">elif</span> <span class="ow">not</span> <span class="n">opts</span><span class="o">.</span><span class="n">nodal</span><span class="p">:</span>
-        <span class="n">oldopts</span><span class="p">[</span><span class="s1">&#39;nodsatnone&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-    <span class="k">if</span> <span class="n">opts</span><span class="o">.</span><span class="n">phase</span> <span class="o">==</span> <span class="s1">&#39;linear_time&#39;</span><span class="p">:</span>
-        <span class="n">oldopts</span><span class="p">[</span><span class="s1">&#39;gwchlint&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-    <span class="k">elif</span> <span class="n">opts</span><span class="o">.</span><span class="n">phase</span> <span class="o">==</span> <span class="s1">&#39;raw&#39;</span><span class="p">:</span>
-        <span class="n">oldopts</span><span class="p">[</span><span class="s1">&#39;gwchnone&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">oldopts</span><span class="p">[</span><span class="s2">&quot;nodsatnone&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">if</span> <span class="n">opts</span><span class="o">.</span><span class="n">phase</span> <span class="o">==</span> <span class="s2">&quot;linear_time&quot;</span><span class="p">:</span>
+        <span class="n">oldopts</span><span class="p">[</span><span class="s2">&quot;gwchlint&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">elif</span> <span class="n">opts</span><span class="o">.</span><span class="n">phase</span> <span class="o">==</span> <span class="s2">&quot;raw&quot;</span><span class="p">:</span>
+        <span class="n">oldopts</span><span class="p">[</span><span class="s2">&quot;gwchnone&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="c1"># Otherwise it should be default, &#39;Greenwich.&#39;</span>
     <span class="n">oldopts</span><span class="o">.</span><span class="n">rmin</span> <span class="o">=</span> <span class="n">opts</span><span class="o">.</span><span class="n">Rayleigh_min</span>
     <span class="n">oldopts</span><span class="o">.</span><span class="n">white</span> <span class="o">=</span> <span class="n">opts</span><span class="o">.</span><span class="n">white</span>
     <span class="n">oldopts</span><span class="o">.</span><span class="n">newopts</span> <span class="o">=</span> <span class="n">opts</span>  <span class="c1"># So we can access new opts via the single &quot;opt.&quot;</span>
-    <span class="n">oldopts</span><span class="p">[</span><span class="s1">&#39;RunTimeDisp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">opts</span><span class="o">.</span><span class="n">verbose</span>
+    <span class="n">oldopts</span><span class="p">[</span><span class="s2">&quot;RunTimeDisp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">opts</span><span class="o">.</span><span class="n">verbose</span>
     <span class="n">oldopts</span><span class="o">.</span><span class="n">epoch</span> <span class="o">=</span> <span class="n">opts</span><span class="o">.</span><span class="n">epoch</span>
     <span class="k">return</span> <span class="n">oldopts</span>
 
 
 <span class="k">def</span> <span class="nf">validate_infer</span><span class="p">(</span><span class="n">infer</span><span class="p">,</span> <span class="n">is_2D</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">infer</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">infer</span> <span class="o">==</span> <span class="s1">&#39;none&#39;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">infer</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">infer</span> <span class="o">==</span> <span class="s2">&quot;none&quot;</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span>
-    <span class="n">required_keys</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;inferred_names&#39;</span><span class="p">,</span> <span class="s1">&#39;reference_names&#39;</span><span class="p">,</span> <span class="s1">&#39;amp_ratios&#39;</span><span class="p">,</span>
-                     <span class="s1">&#39;phase_offsets&#39;</span><span class="p">}</span>
+    <span class="n">required_keys</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;inferred_names&quot;</span><span class="p">,</span> <span class="s2">&quot;reference_names&quot;</span><span class="p">,</span> <span class="s2">&quot;amp_ratios&quot;</span><span class="p">,</span> <span class="s2">&quot;phase_offsets&quot;</span><span class="p">}</span>
     <span class="n">keys</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">infer</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
     <span class="k">if</span> <span class="n">keys</span> <span class="o">&lt;</span> <span class="n">required_keys</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;infer option must include </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">required_keys</span><span class="p">)</span>
     <span class="n">nI</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">infer</span><span class="o">.</span><span class="n">inferred_names</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">infer</span><span class="o">.</span><span class="n">reference_names</span><span class="p">)</span> <span class="o">!=</span> <span class="n">nI</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;inferred_names must be same&quot;</span>
-                         <span class="s2">&quot;  length as reference_names&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;inferred_names must be same&quot;</span> <span class="s2">&quot;  length as reference_names&quot;</span><span class="p">)</span>
     <span class="n">nratios</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">nI</span> <span class="k">if</span> <span class="n">is_2D</span> <span class="k">else</span> <span class="n">nI</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">infer</span><span class="o">.</span><span class="n">amp_ratios</span><span class="p">)</span> <span class="o">!=</span> <span class="n">nratios</span> <span class="ow">or</span>
-            <span class="nb">len</span><span class="p">(</span><span class="n">infer</span><span class="o">.</span><span class="n">phase_offsets</span><span class="p">)</span> <span class="o">!=</span> <span class="n">nratios</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;ratios and offsets need to have length </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span>
-                         <span class="n">nratios</span><span class="p">)</span>
-    <span class="k">if</span> <span class="s1">&#39;approximate&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">infer</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">infer</span><span class="o">.</span><span class="n">amp_ratios</span><span class="p">)</span> <span class="o">!=</span> <span class="n">nratios</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">infer</span><span class="o">.</span><span class="n">phase_offsets</span><span class="p">)</span> <span class="o">!=</span> <span class="n">nratios</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;ratios and offsets need to have length </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">nratios</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s2">&quot;approximate&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">infer</span><span class="p">:</span>
         <span class="n">infer</span><span class="o">.</span><span class="n">approximate</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="k">return</span> <span class="n">infer</span>
 
@@ -245,12 +245,13 @@
     <span class="n">packed</span> <span class="o">=</span> <span class="n">_slvinit</span><span class="p">(</span><span class="n">tin</span><span class="p">,</span> <span class="n">uin</span><span class="p">,</span> <span class="n">vin</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="o">**</span><span class="n">opts</span><span class="p">)</span>
     <span class="n">tin</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">tref</span><span class="p">,</span> <span class="n">lor</span><span class="p">,</span> <span class="n">elor</span><span class="p">,</span> <span class="n">opt</span> <span class="o">=</span> <span class="n">packed</span>
     <span class="n">nt</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;RunTimeDisp&#39;</span><span class="p">]:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;solve: &#39;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;RunTimeDisp&quot;</span><span class="p">]:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;solve: &quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
 
     <span class="c1"># opt[&#39;cnstit&#39;] = cnstit</span>
-    <span class="n">cnstit</span><span class="p">,</span> <span class="n">coef</span> <span class="o">=</span> <span class="n">ut_cnstitsel</span><span class="p">(</span><span class="n">tref</span><span class="p">,</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;rmin&#39;</span><span class="p">]</span><span class="o">/</span><span class="p">(</span><span class="mi">24</span><span class="o">*</span><span class="n">lor</span><span class="p">),</span>
-                                <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;cnstit&#39;</span><span class="p">],</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;infer&#39;</span><span class="p">])</span>
+    <span class="n">cnstit</span><span class="p">,</span> <span class="n">coef</span> <span class="o">=</span> <span class="n">ut_cnstitsel</span><span class="p">(</span>
+        <span class="n">tref</span><span class="p">,</span> <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;rmin&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="mi">24</span> <span class="o">*</span> <span class="n">lor</span><span class="p">),</span> <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;cnstit&quot;</span><span class="p">],</span> <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;infer&quot;</span><span class="p">]</span>
+    <span class="p">)</span>
 
     <span class="c1"># a function we don&#39;t need</span>
     <span class="c1"># coef.aux.rundescr = ut_rundescr(opt,nNR,nR,nI,t,tgd,uvgd,lat)</span>
@@ -258,11 +259,10 @@
     <span class="n">coef</span><span class="o">.</span><span class="n">aux</span><span class="o">.</span><span class="n">opt</span> <span class="o">=</span> <span class="n">opt</span>
     <span class="n">coef</span><span class="o">.</span><span class="n">aux</span><span class="o">.</span><span class="n">lat</span> <span class="o">=</span> <span class="n">lat</span>
 
-    <span class="k">if</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;RunTimeDisp&#39;</span><span class="p">]:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;matrix prep ... &#39;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;RunTimeDisp&quot;</span><span class="p">]:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;matrix prep ... &quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
 
-    <span class="n">ngflgs</span> <span class="o">=</span> <span class="p">[</span><span class="n">opt</span><span class="p">[</span><span class="s1">&#39;nodsatlint&#39;</span><span class="p">],</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;nodsatnone&#39;</span><span class="p">],</span>
-              <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;gwchlint&#39;</span><span class="p">],</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;gwchnone&#39;</span><span class="p">]]</span>
+    <span class="n">ngflgs</span> <span class="o">=</span> <span class="p">[</span><span class="n">opt</span><span class="p">[</span><span class="s2">&quot;nodsatlint&quot;</span><span class="p">],</span> <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;nodsatnone&quot;</span><span class="p">],</span> <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;gwchlint&quot;</span><span class="p">],</span> <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;gwchnone&quot;</span><span class="p">]]</span>
 
     <span class="n">E_args</span> <span class="o">=</span> <span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">ngflgs</span><span class="p">,</span> <span class="n">opt</span><span class="o">.</span><span class="n">prefilt</span><span class="p">)</span>
 
@@ -299,8 +299,8 @@
                 <span class="n">Etilm</span><span class="p">[:,</span> <span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">E</span>
                 <span class="n">num</span> <span class="o">=</span> <span class="n">ut_E</span><span class="p">(</span><span class="n">tref</span><span class="p">,</span> <span class="n">tref</span><span class="p">,</span> <span class="n">ref</span><span class="o">.</span><span class="n">I</span><span class="o">.</span><span class="n">frq</span><span class="p">,</span> <span class="n">ref</span><span class="o">.</span><span class="n">I</span><span class="o">.</span><span class="n">lind</span><span class="p">,</span> <span class="o">*</span><span class="n">E_args</span><span class="p">)</span><span class="o">.</span><span class="n">real</span>
                 <span class="n">den</span> <span class="o">=</span> <span class="n">ut_E</span><span class="p">(</span><span class="n">tref</span><span class="p">,</span> <span class="n">tref</span><span class="p">,</span> <span class="n">ref</span><span class="o">.</span><span class="n">frq</span><span class="p">,</span> <span class="n">ref</span><span class="o">.</span><span class="n">lind</span><span class="p">,</span> <span class="o">*</span><span class="n">E_args</span><span class="p">)</span><span class="o">.</span><span class="n">real</span>
-                <span class="n">Q</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">((</span><span class="n">num</span><span class="o">/</span><span class="n">den</span><span class="p">))[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
-                <span class="n">arg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">lor</span><span class="o">*</span><span class="mi">24</span><span class="o">*</span><span class="p">(</span><span class="n">ref</span><span class="o">.</span><span class="n">I</span><span class="o">.</span><span class="n">frq</span> <span class="o">-</span> <span class="n">ref</span><span class="o">.</span><span class="n">frq</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">nt</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">nt</span>
+                <span class="n">Q</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">((</span><span class="n">num</span> <span class="o">/</span> <span class="n">den</span><span class="p">))[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+                <span class="n">arg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">lor</span> <span class="o">*</span> <span class="mi">24</span> <span class="o">*</span> <span class="p">(</span><span class="n">ref</span><span class="o">.</span><span class="n">I</span><span class="o">.</span><span class="n">frq</span> <span class="o">-</span> <span class="n">ref</span><span class="o">.</span><span class="n">frq</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">nt</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">nt</span>
                 <span class="n">beta</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="o">/</span> <span class="n">arg</span>
 
         <span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">B</span><span class="p">,</span> <span class="n">Etilp</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">Etilm</span><span class="p">)))</span>
@@ -308,20 +308,20 @@
     <span class="c1"># add the mean</span>
     <span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">B</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">nt</span><span class="p">,</span> <span class="mi">1</span><span class="p">))))</span>
 
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;notrend&#39;</span><span class="p">]:</span>
-        <span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">B</span><span class="p">,</span> <span class="p">((</span><span class="n">t</span><span class="o">-</span><span class="n">tref</span><span class="p">)</span><span class="o">/</span><span class="n">lor</span><span class="p">)[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]))</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;notrend&quot;</span><span class="p">]:</span>
+        <span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">B</span><span class="p">,</span> <span class="p">((</span><span class="n">t</span> <span class="o">-</span> <span class="n">tref</span><span class="p">)</span> <span class="o">/</span> <span class="n">lor</span><span class="p">)[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]))</span>
 
     <span class="c1"># nm = B.shape[1]  # 2*(nNR + nR) + 1, plus 1 if trend is included.</span>
 
-    <span class="k">if</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;RunTimeDisp&#39;</span><span class="p">]:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;solution ... &#39;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;RunTimeDisp&quot;</span><span class="p">]:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;solution ... &quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;twodim&#39;</span><span class="p">]:</span>
-        <span class="n">xraw</span> <span class="o">=</span> <span class="n">u</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">v</span>
+    <span class="k">if</span> <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;twodim&quot;</span><span class="p">]:</span>
+        <span class="n">xraw</span> <span class="o">=</span> <span class="n">u</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">v</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">xraw</span> <span class="o">=</span> <span class="n">u</span>
 
-    <span class="k">if</span> <span class="n">opt</span><span class="o">.</span><span class="n">newopts</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;ols&#39;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">opt</span><span class="o">.</span><span class="n">newopts</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;ols&quot;</span><span class="p">:</span>
         <span class="c1"># Model coefficients.</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">m</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">lstsq</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">xraw</span><span class="p">,</span> <span class="n">rcond</span><span class="o">=</span><span class="kc">None</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
@@ -337,47 +337,47 @@
 
     <span class="n">xmod</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>  <span class="c1"># Model fit.</span>
 
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;twodim&#39;</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;twodim&quot;</span><span class="p">]:</span>
         <span class="n">xmod</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">xmod</span><span class="p">)</span>
 
-    <span class="n">e</span> <span class="o">=</span> <span class="n">W</span><span class="o">*</span><span class="p">(</span><span class="n">xraw</span><span class="o">-</span><span class="n">xmod</span><span class="p">)</span>  <span class="c1"># Weighted residuals.</span>
+    <span class="n">e</span> <span class="o">=</span> <span class="n">W</span> <span class="o">*</span> <span class="p">(</span><span class="n">xraw</span> <span class="o">-</span> <span class="n">xmod</span><span class="p">)</span>  <span class="c1"># Weighted residuals.</span>
 
     <span class="n">nI</span><span class="p">,</span> <span class="n">nR</span><span class="p">,</span> <span class="n">nNR</span> <span class="o">=</span> <span class="n">coef</span><span class="o">.</span><span class="n">nI</span><span class="p">,</span> <span class="n">coef</span><span class="o">.</span><span class="n">nR</span><span class="p">,</span> <span class="n">coef</span><span class="o">.</span><span class="n">nNR</span>
 
-    <span class="n">ap</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">m</span><span class="p">[:</span><span class="n">nNR</span><span class="p">],</span> <span class="n">m</span><span class="p">[</span><span class="mi">2</span><span class="o">*</span><span class="n">nNR</span><span class="p">:</span><span class="mi">2</span><span class="o">*</span><span class="n">nNR</span><span class="o">+</span><span class="n">nR</span><span class="p">]))</span>
-    <span class="n">i0</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">nNR</span> <span class="o">+</span> <span class="n">nR</span>
-    <span class="n">am</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">m</span><span class="p">[</span><span class="n">nNR</span><span class="p">:</span><span class="mi">2</span><span class="o">*</span><span class="n">nNR</span><span class="p">],</span> <span class="n">m</span><span class="p">[</span><span class="n">i0</span><span class="p">:</span><span class="n">i0</span><span class="o">+</span><span class="n">nR</span><span class="p">]))</span>
+    <span class="n">ap</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">m</span><span class="p">[:</span><span class="n">nNR</span><span class="p">],</span> <span class="n">m</span><span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="n">nNR</span> <span class="p">:</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">nNR</span> <span class="o">+</span> <span class="n">nR</span><span class="p">]))</span>
+    <span class="n">i0</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">nNR</span> <span class="o">+</span> <span class="n">nR</span>
+    <span class="n">am</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">m</span><span class="p">[</span><span class="n">nNR</span> <span class="p">:</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">nNR</span><span class="p">],</span> <span class="n">m</span><span class="p">[</span><span class="n">i0</span> <span class="p">:</span> <span class="n">i0</span> <span class="o">+</span> <span class="n">nR</span><span class="p">]))</span>
 
     <span class="n">Xu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">ap</span> <span class="o">+</span> <span class="n">am</span><span class="p">)</span>
     <span class="n">Yu</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">ap</span> <span class="o">-</span> <span class="n">am</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;twodim&#39;</span><span class="p">]:</span>
-        <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">],</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ut_cs2cep</span><span class="p">(</span><span class="n">Xu</span><span class="p">,</span> <span class="n">Yu</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;twodim&quot;</span><span class="p">]:</span>
+        <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">],</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;g&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ut_cs2cep</span><span class="p">(</span><span class="n">Xu</span><span class="p">,</span> <span class="n">Yu</span><span class="p">)</span>
         <span class="n">Xv</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">Yv</span> <span class="o">=</span> <span class="p">[]</span>
 
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">Xv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">ap</span><span class="o">+</span><span class="n">am</span><span class="p">)</span>
-        <span class="n">Yv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">ap</span><span class="o">-</span><span class="n">am</span><span class="p">)</span>
+        <span class="n">Xv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">ap</span> <span class="o">+</span> <span class="n">am</span><span class="p">)</span>
+        <span class="n">Yv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">ap</span> <span class="o">-</span> <span class="n">am</span><span class="p">)</span>
         <span class="n">packed</span> <span class="o">=</span> <span class="n">ut_cs2cep</span><span class="p">(</span><span class="n">Xu</span><span class="p">,</span> <span class="n">Yu</span><span class="p">,</span> <span class="n">Xv</span><span class="p">,</span> <span class="n">Yv</span><span class="p">)</span>
-        <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;Lsmaj&#39;</span><span class="p">],</span> <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;Lsmin&#39;</span><span class="p">],</span> <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;theta&#39;</span><span class="p">],</span> <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">packed</span>
+        <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;Lsmaj&quot;</span><span class="p">],</span> <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;Lsmin&quot;</span><span class="p">],</span> <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;theta&quot;</span><span class="p">],</span> <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;g&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">packed</span>
 
     <span class="c1"># Mean and trend.</span>
-    <span class="k">if</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;twodim&#39;</span><span class="p">]:</span>
-        <span class="k">if</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;notrend&#39;</span><span class="p">]:</span>
-            <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;umean&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-            <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;vmean&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;twodim&quot;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;notrend&quot;</span><span class="p">]:</span>
+            <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;umean&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;vmean&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;umean&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span>
-            <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;vmean&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span>
-            <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;uslope&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">/</span><span class="n">lor</span>
-            <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;vslope&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">/</span><span class="n">lor</span>
+            <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;umean&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span>
+            <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;vmean&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span>
+            <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;uslope&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="n">lor</span>
+            <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;vslope&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="n">lor</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;notrend&#39;</span><span class="p">]:</span>
-            <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;mean&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;notrend&quot;</span><span class="p">]:</span>
+            <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;mean&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;mean&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span>
-            <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;slope&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">/</span><span class="n">lor</span>
+            <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;mean&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span>
+            <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;slope&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="n">lor</span>
 
     <span class="k">if</span> <span class="n">opt</span><span class="o">.</span><span class="n">infer</span><span class="p">:</span>
         <span class="c1"># complex coefficients</span>
@@ -386,8 +386,8 @@
         <span class="n">ind</span> <span class="o">=</span> <span class="mi">0</span>
 
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">ref</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">cnstit</span><span class="o">.</span><span class="n">R</span><span class="p">):</span>
-            <span class="n">apI</span><span class="p">[</span><span class="n">ind</span><span class="p">:</span><span class="n">ind</span> <span class="o">+</span> <span class="n">ref</span><span class="o">.</span><span class="n">nI</span><span class="p">]</span> <span class="o">=</span> <span class="n">ref</span><span class="o">.</span><span class="n">I</span><span class="o">.</span><span class="n">Rp</span> <span class="o">*</span> <span class="n">ap</span><span class="p">[</span><span class="n">nNR</span> <span class="o">+</span> <span class="n">k</span><span class="p">]</span>
-            <span class="n">amI</span><span class="p">[</span><span class="n">ind</span><span class="p">:</span><span class="n">ind</span> <span class="o">+</span> <span class="n">ref</span><span class="o">.</span><span class="n">nI</span><span class="p">]</span> <span class="o">=</span> <span class="n">ref</span><span class="o">.</span><span class="n">I</span><span class="o">.</span><span class="n">Rm</span> <span class="o">*</span> <span class="n">am</span><span class="p">[</span><span class="n">nNR</span> <span class="o">+</span> <span class="n">k</span><span class="p">]</span>
+            <span class="n">apI</span><span class="p">[</span><span class="n">ind</span> <span class="p">:</span> <span class="n">ind</span> <span class="o">+</span> <span class="n">ref</span><span class="o">.</span><span class="n">nI</span><span class="p">]</span> <span class="o">=</span> <span class="n">ref</span><span class="o">.</span><span class="n">I</span><span class="o">.</span><span class="n">Rp</span> <span class="o">*</span> <span class="n">ap</span><span class="p">[</span><span class="n">nNR</span> <span class="o">+</span> <span class="n">k</span><span class="p">]</span>
+            <span class="n">amI</span><span class="p">[</span><span class="n">ind</span> <span class="p">:</span> <span class="n">ind</span> <span class="o">+</span> <span class="n">ref</span><span class="o">.</span><span class="n">nI</span><span class="p">]</span> <span class="o">=</span> <span class="n">ref</span><span class="o">.</span><span class="n">I</span><span class="o">.</span><span class="n">Rm</span> <span class="o">*</span> <span class="n">am</span><span class="p">[</span><span class="n">nNR</span> <span class="o">+</span> <span class="n">k</span><span class="p">]</span>
             <span class="n">ind</span> <span class="o">+=</span> <span class="n">ref</span><span class="o">.</span><span class="n">nI</span>
 
         <span class="n">XuI</span> <span class="o">=</span> <span class="p">(</span><span class="n">apI</span> <span class="o">+</span> <span class="n">amI</span><span class="p">)</span><span class="o">.</span><span class="n">real</span>
@@ -406,67 +406,68 @@
             <span class="n">coef</span><span class="o">.</span><span class="n">theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">coef</span><span class="o">.</span><span class="n">theta</span><span class="p">,</span> <span class="n">theta</span><span class="p">))</span>
             <span class="n">coef</span><span class="o">.</span><span class="n">g</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">coef</span><span class="o">.</span><span class="n">g</span><span class="p">,</span> <span class="n">g</span><span class="p">))</span>
 
-    <span class="k">if</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;conf_int&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-        <span class="n">coef</span> <span class="o">=</span> <span class="n">_confidence</span><span class="p">(</span><span class="n">coef</span><span class="p">,</span> <span class="n">cnstit</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">tin</span><span class="p">,</span> <span class="n">elor</span><span class="p">,</span> <span class="n">xraw</span><span class="p">,</span> <span class="n">xmod</span><span class="p">,</span>
-                           <span class="n">W</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">Xu</span><span class="p">,</span> <span class="n">Yu</span><span class="p">,</span> <span class="n">Xv</span><span class="p">,</span> <span class="n">Yv</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;conf_int&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">coef</span> <span class="o">=</span> <span class="n">_confidence</span><span class="p">(</span>
+            <span class="n">coef</span><span class="p">,</span> <span class="n">cnstit</span><span class="p">,</span> <span class="n">opt</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">tin</span><span class="p">,</span> <span class="n">elor</span><span class="p">,</span> <span class="n">xraw</span><span class="p">,</span> <span class="n">xmod</span><span class="p">,</span> <span class="n">W</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">Xu</span><span class="p">,</span> <span class="n">Yu</span><span class="p">,</span> <span class="n">Xv</span><span class="p">,</span> <span class="n">Yv</span>
+        <span class="p">)</span>
 
     <span class="c1"># Diagnostics.</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;nodiagn&#39;</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;nodiagn&quot;</span><span class="p">]:</span>
         <span class="n">coef</span><span class="p">,</span> <span class="n">indPE</span> <span class="o">=</span> <span class="n">ut_diagn</span><span class="p">(</span><span class="n">coef</span><span class="p">,</span> <span class="n">opt</span><span class="p">)</span>
 
     <span class="c1"># Re-order constituents.</span>
-    <span class="k">if</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;ordercnstit&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;ordercnstit&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
 
-        <span class="k">if</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;ordercnstit&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;frq&#39;</span><span class="p">:</span>
-            <span class="n">ind</span> <span class="o">=</span> <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;aux&#39;</span><span class="p">][</span><span class="s1">&#39;frq&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">argsort</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;ordercnstit&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;frq&quot;</span><span class="p">:</span>
+            <span class="n">ind</span> <span class="o">=</span> <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;aux&quot;</span><span class="p">][</span><span class="s2">&quot;frq&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">argsort</span><span class="p">()</span>
 
-        <span class="k">elif</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;ordercnstit&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;snr&#39;</span><span class="p">:</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;nodiagn&#39;</span><span class="p">]:</span>
-                <span class="n">ind</span> <span class="o">=</span> <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;diagn&#39;</span><span class="p">][</span><span class="s1">&#39;SNR&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">argsort</span><span class="p">()[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;ordercnstit&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;snr&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;nodiagn&quot;</span><span class="p">]:</span>
+                <span class="n">ind</span> <span class="o">=</span> <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;diagn&quot;</span><span class="p">][</span><span class="s2">&quot;SNR&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">argsort</span><span class="p">()[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;twodim&#39;</span><span class="p">]:</span>
-                    <span class="n">SNR</span> <span class="o">=</span> <span class="p">(</span><span class="n">coef</span><span class="p">[</span><span class="s1">&#39;Lsmaj&#39;</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;Lsmin&#39;</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span>
-                        <span class="p">(</span><span class="n">coef</span><span class="p">[</span><span class="s1">&#39;Lsmaj_ci&#39;</span><span class="p">]</span><span class="o">/</span><span class="mf">1.96</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span>
-                        <span class="p">(</span><span class="n">coef</span><span class="p">[</span><span class="s1">&#39;Lsmin_ci&#39;</span><span class="p">]</span><span class="o">/</span><span class="mf">1.96</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;twodim&quot;</span><span class="p">]:</span>
+                    <span class="n">SNR</span> <span class="o">=</span> <span class="p">(</span><span class="n">coef</span><span class="p">[</span><span class="s2">&quot;Lsmaj&quot;</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;Lsmin&quot;</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span>
+                        <span class="p">(</span><span class="n">coef</span><span class="p">[</span><span class="s2">&quot;Lsmaj_ci&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="mf">1.96</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">coef</span><span class="p">[</span><span class="s2">&quot;Lsmin_ci&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="mf">1.96</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
+                    <span class="p">)</span>
 
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">SNR</span> <span class="o">=</span> <span class="p">(</span><span class="n">coef</span><span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">coef</span><span class="p">[</span><span class="s1">&#39;A_ci&#39;</span><span class="p">]</span><span class="o">/</span><span class="mf">1.96</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+                    <span class="n">SNR</span> <span class="o">=</span> <span class="p">(</span><span class="n">coef</span><span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">coef</span><span class="p">[</span><span class="s2">&quot;A_ci&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="mf">1.96</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
 
                 <span class="n">ind</span> <span class="o">=</span> <span class="n">SNR</span><span class="o">.</span><span class="n">argsort</span><span class="p">()[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">ilist</span> <span class="o">=</span> <span class="p">[</span><span class="n">constit_index_dict</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;ordercnstit&#39;</span><span class="p">]]</span>
+            <span class="n">ilist</span> <span class="o">=</span> <span class="p">[</span><span class="n">constit_index_dict</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;ordercnstit&quot;</span><span class="p">]]</span>
             <span class="n">ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ilist</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
 
     <span class="k">else</span><span class="p">:</span>  <span class="c1"># Default: order by decreasing energy.</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;nodiagn&#39;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;nodiagn&quot;</span><span class="p">]:</span>
             <span class="n">ind</span> <span class="o">=</span> <span class="n">indPE</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;twodim&#39;</span><span class="p">]:</span>
-                <span class="n">PE</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">coef</span><span class="p">[</span><span class="s1">&#39;Lsmaj&#39;</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;Lsmin&#39;</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
-                <span class="n">PE</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">*</span> <span class="p">(</span><span class="n">coef</span><span class="p">[</span><span class="s1">&#39;Lsmaj&#39;</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;Lsmin&#39;</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="n">PE</span>
+            <span class="k">if</span> <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;twodim&quot;</span><span class="p">]:</span>
+                <span class="n">PE</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">coef</span><span class="p">[</span><span class="s2">&quot;Lsmaj&quot;</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;Lsmin&quot;</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+                <span class="n">PE</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">*</span> <span class="p">(</span><span class="n">coef</span><span class="p">[</span><span class="s2">&quot;Lsmaj&quot;</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;Lsmin&quot;</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="n">PE</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">PE</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">*</span> <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">coef</span><span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+                <span class="n">PE</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">*</span> <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">coef</span><span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
 
             <span class="n">ind</span> <span class="o">=</span> <span class="n">PE</span><span class="o">.</span><span class="n">argsort</span><span class="p">()[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
-    <span class="n">reorderlist</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">]</span>
+    <span class="n">reorderlist</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;g&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">opt</span><span class="o">.</span><span class="n">twodim</span><span class="p">:</span>
-        <span class="n">reorderlist</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;Lsmaj&#39;</span><span class="p">,</span> <span class="s1">&#39;Lsmin&#39;</span><span class="p">,</span> <span class="s1">&#39;theta&#39;</span><span class="p">])</span>
+        <span class="n">reorderlist</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s2">&quot;Lsmaj&quot;</span><span class="p">,</span> <span class="s2">&quot;Lsmin&quot;</span><span class="p">,</span> <span class="s2">&quot;theta&quot;</span><span class="p">])</span>
         <span class="k">if</span> <span class="n">opt</span><span class="o">.</span><span class="n">conf_int</span><span class="p">:</span>
-            <span class="n">reorderlist</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;Lsmaj_ci&#39;</span><span class="p">,</span> <span class="s1">&#39;Lsmin_ci&#39;</span><span class="p">,</span> <span class="s1">&#39;theta_ci&#39;</span><span class="p">,</span> <span class="s1">&#39;g_ci&#39;</span><span class="p">])</span>
+            <span class="n">reorderlist</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s2">&quot;Lsmaj_ci&quot;</span><span class="p">,</span> <span class="s2">&quot;Lsmin_ci&quot;</span><span class="p">,</span> <span class="s2">&quot;theta_ci&quot;</span><span class="p">,</span> <span class="s2">&quot;g_ci&quot;</span><span class="p">])</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">reorderlist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">)</span>
+        <span class="n">reorderlist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">opt</span><span class="o">.</span><span class="n">conf_int</span><span class="p">:</span>
-            <span class="n">reorderlist</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;A_ci&#39;</span><span class="p">,</span> <span class="s1">&#39;g_ci&#39;</span><span class="p">])</span>
+            <span class="n">reorderlist</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s2">&quot;A_ci&quot;</span><span class="p">,</span> <span class="s2">&quot;g_ci&quot;</span><span class="p">])</span>
 
     <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">reorderlist</span><span class="p">:</span>
         <span class="n">coef</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">coef</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">ind</span><span class="p">]</span>
 
-    <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;aux&#39;</span><span class="p">][</span><span class="s1">&#39;frq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;aux&#39;</span><span class="p">][</span><span class="s1">&#39;frq&#39;</span><span class="p">][</span><span class="n">ind</span><span class="p">]</span>
-    <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;aux&#39;</span><span class="p">][</span><span class="s1">&#39;lind&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;aux&#39;</span><span class="p">][</span><span class="s1">&#39;lind&#39;</span><span class="p">][</span><span class="n">ind</span><span class="p">]</span>
+    <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;aux&quot;</span><span class="p">][</span><span class="s2">&quot;frq&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;aux&quot;</span><span class="p">][</span><span class="s2">&quot;frq&quot;</span><span class="p">][</span><span class="n">ind</span><span class="p">]</span>
+    <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;aux&quot;</span><span class="p">][</span><span class="s2">&quot;lind&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;aux&quot;</span><span class="p">][</span><span class="s2">&quot;lind&quot;</span><span class="p">][</span><span class="n">ind</span><span class="p">]</span>
 
-    <span class="k">if</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;RunTimeDisp&#39;</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;RunTimeDisp&quot;</span><span class="p">]:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;done.&quot;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">coef</span>
@@ -488,7 +489,7 @@
     <span class="n">opt</span> <span class="o">=</span> <span class="n">Bunch</span><span class="p">(</span><span class="n">twodim</span><span class="o">=</span><span class="p">(</span><span class="n">vin</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">))</span>
 
     <span class="c1"># Step 0: apply epoch to time.</span>
-    <span class="n">tin</span> <span class="o">=</span> <span class="n">_normalize_time</span><span class="p">(</span><span class="n">tin</span><span class="p">,</span> <span class="n">opts</span><span class="p">[</span><span class="s1">&#39;epoch&#39;</span><span class="p">])</span>
+    <span class="n">tin</span> <span class="o">=</span> <span class="n">_normalize_time</span><span class="p">(</span><span class="n">tin</span><span class="p">,</span> <span class="n">opts</span><span class="p">[</span><span class="s2">&quot;epoch&quot;</span><span class="p">])</span>
 
     <span class="c1"># Step 1: remove invalid times from tin, uin, vin</span>
     <span class="n">tin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">masked_invalid</span><span class="p">(</span><span class="n">tin</span><span class="p">)</span>
@@ -526,41 +527,41 @@
     <span class="c1"># Are the times equally spaced?</span>
     <span class="n">eps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">tin</span><span class="p">)))</span> <span class="o">&lt;</span> <span class="n">eps</span><span class="p">:</span>
-        <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;equi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># based on times; u/v can still have nans (&quot;gappy&quot;)</span>
+        <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;equi&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># based on times; u/v can still have nans (&quot;gappy&quot;)</span>
         <span class="n">lor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ptp</span><span class="p">(</span><span class="n">tin</span><span class="p">)</span>
         <span class="n">ntgood</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">tin</span><span class="p">)</span>
-        <span class="n">elor</span> <span class="o">=</span> <span class="n">lor</span><span class="o">*</span><span class="n">ntgood</span> <span class="o">/</span> <span class="p">(</span><span class="n">ntgood</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">tref</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">tin</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">tin</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">elor</span> <span class="o">=</span> <span class="n">lor</span> <span class="o">*</span> <span class="n">ntgood</span> <span class="o">/</span> <span class="p">(</span><span class="n">ntgood</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">tref</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">tin</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">tin</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;equi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;equi&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="n">lor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ptp</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
         <span class="n">nt</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
-        <span class="n">elor</span> <span class="o">=</span> <span class="n">lor</span><span class="o">*</span><span class="n">nt</span> <span class="o">/</span> <span class="p">(</span><span class="n">nt</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">tref</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="n">t</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">elor</span> <span class="o">=</span> <span class="n">lor</span> <span class="o">*</span> <span class="n">nt</span> <span class="o">/</span> <span class="p">(</span><span class="n">nt</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">tref</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">t</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
 
     <span class="c1"># Options.</span>
-    <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;conf_int&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-    <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;cnstit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;auto&#39;</span>
-    <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;notrend&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;prefilt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;nodsatlint&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;nodsatnone&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;gwchlint&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;gwchnone&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;infer&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;inferaprx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;rmin&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-    <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;method&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;ols&#39;</span>
-    <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;tunrdn&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-    <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;linci&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;white&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;nrlzn&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">200</span>
-    <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;lsfrqosmp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-    <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;nodiagn&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;diagnplots&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;diagnminsnr&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
-    <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;ordercnstit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;runtimedisp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;yyy&#39;</span>
+    <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;conf_int&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;cnstit&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;auto&quot;</span>
+    <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;notrend&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;prefilt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;nodsatlint&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;nodsatnone&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;gwchlint&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;gwchnone&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;infer&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;inferaprx&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;rmin&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;method&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;ols&quot;</span>
+    <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;tunrdn&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;linci&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;white&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;nrlzn&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">200</span>
+    <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;lsfrqosmp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;nodiagn&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;diagnplots&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;diagnminsnr&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;ordercnstit&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;runtimedisp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;yyy&quot;</span>
 
     <span class="c1"># Update the default opt dictionary with the kwargs,</span>
     <span class="c1"># ensuring that every kwarg key matches a key in opt.</span>
@@ -568,11 +569,12 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="n">opt</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">item</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;solve: unrecognized input: </span><span class="si">{0}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;solve: unrecognized input: </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
 
     <span class="k">return</span> <span class="n">tin</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">tref</span><span class="p">,</span> <span class="n">lor</span><span class="p">,</span> <span class="n">elor</span><span class="p">,</span> <span class="n">opt</span>
 </pre></div>
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -601,13 +603,14 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">UTide 0.2.6.dev10+g93cdb9e documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">UTide 0.2.6.dev13+g1dbd098 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">utide._solve</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2015, Dan Codiga, Wesley Bowman, and contributors.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.0.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
     </div>
   </body>
 </html>

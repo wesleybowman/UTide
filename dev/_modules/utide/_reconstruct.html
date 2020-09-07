@@ -4,7 +4,8 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>utide._reconstruct &#8212; UTide 0.2.6.dev10+g93cdb9e documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>utide._reconstruct &#8212; UTide 0.2.6.dev13+g1dbd098 documentation</title>
     <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
@@ -24,8 +25,9 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">UTide 0.2.6.dev10+g93cdb9e documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">UTide 0.2.6.dev13+g1dbd098 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">utide._reconstruct</a></li> 
       </ul>
     </div>  
 
@@ -36,17 +38,15 @@
             
   <h1>Source code for utide._reconstruct</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">._time_conversion</span> <span class="kn">import</span> <span class="n">_normalize_time</span>
 <span class="kn">from</span> <span class="nn">.harmonics</span> <span class="kn">import</span> <span class="n">ut_E</span>
 <span class="kn">from</span> <span class="nn">.utilities</span> <span class="kn">import</span> <span class="n">Bunch</span>
-<span class="kn">from</span> <span class="nn">._time_conversion</span> <span class="kn">import</span> <span class="n">_normalize_time</span>
 
 
-<div class="viewcode-block" id="reconstruct"><a class="viewcode-back" href="../../usage.html#utide.reconstruct">[docs]</a><span class="k">def</span> <span class="nf">reconstruct</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">coef</span><span class="p">,</span>
-                <span class="n">epoch</span><span class="o">=</span><span class="s1">&#39;python&#39;</span><span class="p">,</span>
-                <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                <span class="n">constit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                <span class="n">min_SNR</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-                <span class="n">min_PE</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<div class="viewcode-block" id="reconstruct"><a class="viewcode-back" href="../../usage.html#utide.reconstruct">[docs]</a><span class="k">def</span> <span class="nf">reconstruct</span><span class="p">(</span>
+    <span class="n">t</span><span class="p">,</span> <span class="n">coef</span><span class="p">,</span> <span class="n">epoch</span><span class="o">=</span><span class="s2">&quot;python&quot;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">constit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">min_SNR</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">min_PE</span><span class="o">=</span><span class="mi">0</span>
+<span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Reconstruct a tidal signal.</span>
 
@@ -93,13 +93,12 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">out</span> <span class="o">=</span> <span class="n">Bunch</span><span class="p">(</span><span class="n">t_in</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="n">epoch</span><span class="o">=</span><span class="n">epoch</span><span class="p">,</span> <span class="n">constit</span><span class="o">=</span><span class="n">constit</span><span class="p">,</span> <span class="n">min_SNR</span><span class="o">=</span><span class="n">min_SNR</span><span class="p">,</span>
-                <span class="n">min_PE</span><span class="o">=</span><span class="n">min_PE</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">Bunch</span><span class="p">(</span><span class="n">t_in</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="n">epoch</span><span class="o">=</span><span class="n">epoch</span><span class="p">,</span> <span class="n">constit</span><span class="o">=</span><span class="n">constit</span><span class="p">,</span> <span class="n">min_SNR</span><span class="o">=</span><span class="n">min_SNR</span><span class="p">,</span> <span class="n">min_PE</span><span class="o">=</span><span class="n">min_PE</span><span class="p">)</span>
     <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;t must be a 1-D array&quot;</span><span class="p">)</span>
     <span class="n">t</span> <span class="o">=</span> <span class="n">_normalize_time</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">epoch</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">epoch</span> <span class="o">==</span> <span class="s1">&#39;python&#39;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">epoch</span> <span class="o">==</span> <span class="s2">&quot;python&quot;</span><span class="p">:</span>
         <span class="n">out</span><span class="o">.</span><span class="n">t_mpl</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">t_in</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">out</span><span class="o">.</span><span class="n">t_mpl</span> <span class="o">=</span> <span class="n">t</span>
@@ -107,11 +106,15 @@
     <span class="n">goodmask</span> <span class="o">=</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">getmaskarray</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
     <span class="n">t</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">compressed</span><span class="p">()</span>
 
-    <span class="n">u</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">_reconstruct</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">goodmask</span><span class="p">,</span> <span class="n">coef</span><span class="p">,</span>
-                        <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
-                        <span class="n">constit</span><span class="o">=</span><span class="n">constit</span><span class="p">,</span>
-                        <span class="n">min_SNR</span><span class="o">=</span><span class="n">min_SNR</span><span class="p">,</span>
-                        <span class="n">min_PE</span><span class="o">=</span><span class="n">min_PE</span><span class="p">)</span>
+    <span class="n">u</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">_reconstruct</span><span class="p">(</span>
+        <span class="n">t</span><span class="p">,</span>
+        <span class="n">goodmask</span><span class="p">,</span>
+        <span class="n">coef</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+        <span class="n">constit</span><span class="o">=</span><span class="n">constit</span><span class="p">,</span>
+        <span class="n">min_SNR</span><span class="o">=</span><span class="n">min_SNR</span><span class="p">,</span>
+        <span class="n">min_PE</span><span class="o">=</span><span class="n">min_PE</span><span class="p">,</span>
+    <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">out</span><span class="o">.</span><span class="n">u</span><span class="p">,</span> <span class="n">out</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span>
@@ -122,76 +125,88 @@
 
 <span class="k">def</span> <span class="nf">_reconstruct</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">goodmask</span><span class="p">,</span> <span class="n">coef</span><span class="p">,</span> <span class="n">verbose</span><span class="p">,</span> <span class="n">constit</span><span class="p">,</span> <span class="n">min_SNR</span><span class="p">,</span> <span class="n">min_PE</span><span class="p">):</span>
 
-    <span class="n">twodim</span> <span class="o">=</span> <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;aux&#39;</span><span class="p">][</span><span class="s1">&#39;opt&#39;</span><span class="p">][</span><span class="s1">&#39;twodim&#39;</span><span class="p">]</span>
+    <span class="n">twodim</span> <span class="o">=</span> <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;aux&quot;</span><span class="p">][</span><span class="s2">&quot;opt&quot;</span><span class="p">][</span><span class="s2">&quot;twodim&quot;</span><span class="p">]</span>
 
     <span class="c1"># Determine constituents to include.</span>
     <span class="k">if</span> <span class="n">constit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">ind</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">coef</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">constit</span><span class="p">]</span>
-    <span class="k">elif</span> <span class="p">(</span><span class="n">min_SNR</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">min_PE</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;aux&#39;</span><span class="p">][</span><span class="s1">&#39;opt&#39;</span><span class="p">][</span><span class="s1">&#39;nodiagn&#39;</span><span class="p">]:</span>
+        <span class="n">ind</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">coef</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">constit</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="p">(</span><span class="n">min_SNR</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">min_PE</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;aux&quot;</span><span class="p">][</span><span class="s2">&quot;opt&quot;</span><span class="p">][</span><span class="s2">&quot;nodiagn&quot;</span><span class="p">]:</span>
         <span class="n">ind</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">twodim</span><span class="p">:</span>
-            <span class="n">E</span> <span class="o">=</span> <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;Lsmaj&#39;</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;Lsmin&#39;</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span>
-            <span class="n">N</span> <span class="o">=</span> <span class="p">(</span><span class="n">coef</span><span class="p">[</span><span class="s1">&#39;Lsmaj_ci&#39;</span><span class="p">]</span><span class="o">/</span><span class="mf">1.96</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">coef</span><span class="p">[</span><span class="s1">&#39;Lsmin_ci&#39;</span><span class="p">]</span><span class="o">/</span><span class="mf">1.96</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+            <span class="n">E</span> <span class="o">=</span> <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;Lsmaj&quot;</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;Lsmin&quot;</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span>
+            <span class="n">N</span> <span class="o">=</span> <span class="p">(</span><span class="n">coef</span><span class="p">[</span><span class="s2">&quot;Lsmaj_ci&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="mf">1.96</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">coef</span><span class="p">[</span><span class="s2">&quot;Lsmin_ci&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="mf">1.96</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">E</span> <span class="o">=</span> <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span>
-            <span class="n">N</span> <span class="o">=</span> <span class="p">(</span><span class="n">coef</span><span class="p">[</span><span class="s1">&#39;A_ci&#39;</span><span class="p">]</span><span class="o">/</span><span class="mf">1.96</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+            <span class="n">E</span> <span class="o">=</span> <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span>
+            <span class="n">N</span> <span class="o">=</span> <span class="p">(</span><span class="n">coef</span><span class="p">[</span><span class="s2">&quot;A_ci&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="mf">1.96</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
         <span class="n">SNR</span> <span class="o">=</span> <span class="n">E</span> <span class="o">/</span> <span class="n">N</span>
         <span class="n">PE</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">*</span> <span class="n">E</span> <span class="o">/</span> <span class="n">E</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
-        <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">invalid</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">):</span>
+        <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">invalid</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">):</span>
             <span class="n">ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">SNR</span> <span class="o">&gt;=</span> <span class="n">min_SNR</span><span class="p">,</span> <span class="n">PE</span> <span class="o">&gt;=</span> <span class="n">min_PE</span><span class="p">)</span>
 
     <span class="c1"># Complex coefficients.</span>
-    <span class="n">rpd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">180</span>
+    <span class="n">rpd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span>
     <span class="k">if</span> <span class="n">twodim</span><span class="p">:</span>
-        <span class="n">ap</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">((</span><span class="n">coef</span><span class="p">[</span><span class="s1">&#39;Lsmaj&#39;</span><span class="p">][</span><span class="n">ind</span><span class="p">]</span> <span class="o">+</span> <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;Lsmin&#39;</span><span class="p">][</span><span class="n">ind</span><span class="p">])</span> <span class="o">*</span>
-                    <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="p">(</span><span class="n">coef</span><span class="p">[</span><span class="s1">&#39;theta&#39;</span><span class="p">][</span><span class="n">ind</span><span class="p">]</span> <span class="o">-</span> <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">][</span><span class="n">ind</span><span class="p">])</span> <span class="o">*</span> <span class="n">rpd</span><span class="p">))</span>
-        <span class="n">am</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">((</span><span class="n">coef</span><span class="p">[</span><span class="s1">&#39;Lsmaj&#39;</span><span class="p">][</span><span class="n">ind</span><span class="p">]</span> <span class="o">-</span> <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;Lsmin&#39;</span><span class="p">][</span><span class="n">ind</span><span class="p">])</span> <span class="o">*</span>
-                    <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="p">(</span><span class="n">coef</span><span class="p">[</span><span class="s1">&#39;theta&#39;</span><span class="p">][</span><span class="n">ind</span><span class="p">]</span> <span class="o">+</span> <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">][</span><span class="n">ind</span><span class="p">])</span> <span class="o">*</span> <span class="n">rpd</span><span class="p">))</span>
+        <span class="n">ap</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span>
+            <span class="p">(</span><span class="n">coef</span><span class="p">[</span><span class="s2">&quot;Lsmaj&quot;</span><span class="p">][</span><span class="n">ind</span><span class="p">]</span> <span class="o">+</span> <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;Lsmin&quot;</span><span class="p">][</span><span class="n">ind</span><span class="p">])</span>
+            <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="p">(</span><span class="n">coef</span><span class="p">[</span><span class="s2">&quot;theta&quot;</span><span class="p">][</span><span class="n">ind</span><span class="p">]</span> <span class="o">-</span> <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;g&quot;</span><span class="p">][</span><span class="n">ind</span><span class="p">])</span> <span class="o">*</span> <span class="n">rpd</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">am</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span>
+            <span class="p">(</span><span class="n">coef</span><span class="p">[</span><span class="s2">&quot;Lsmaj&quot;</span><span class="p">][</span><span class="n">ind</span><span class="p">]</span> <span class="o">-</span> <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;Lsmin&quot;</span><span class="p">][</span><span class="n">ind</span><span class="p">])</span>
+            <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="p">(</span><span class="n">coef</span><span class="p">[</span><span class="s2">&quot;theta&quot;</span><span class="p">][</span><span class="n">ind</span><span class="p">]</span> <span class="o">+</span> <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;g&quot;</span><span class="p">][</span><span class="n">ind</span><span class="p">])</span> <span class="o">*</span> <span class="n">rpd</span><span class="p">)</span>
+        <span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">ap</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">][</span><span class="n">ind</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">coef</span><span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">][</span><span class="n">ind</span><span class="p">]</span> <span class="o">*</span> <span class="n">rpd</span><span class="p">)</span>
+        <span class="n">ap</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">][</span><span class="n">ind</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;g&quot;</span><span class="p">][</span><span class="n">ind</span><span class="p">]</span> <span class="o">*</span> <span class="n">rpd</span><span class="p">)</span>
         <span class="n">am</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">ap</span><span class="p">)</span>
 
-    <span class="n">ngflgs</span> <span class="o">=</span> <span class="p">[</span><span class="n">coef</span><span class="p">[</span><span class="s1">&#39;aux&#39;</span><span class="p">][</span><span class="s1">&#39;opt&#39;</span><span class="p">][</span><span class="s1">&#39;nodsatlint&#39;</span><span class="p">],</span>
-              <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;aux&#39;</span><span class="p">][</span><span class="s1">&#39;opt&#39;</span><span class="p">][</span><span class="s1">&#39;nodsatnone&#39;</span><span class="p">],</span>
-              <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;aux&#39;</span><span class="p">][</span><span class="s1">&#39;opt&#39;</span><span class="p">][</span><span class="s1">&#39;gwchlint&#39;</span><span class="p">],</span>
-              <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;aux&#39;</span><span class="p">][</span><span class="s1">&#39;opt&#39;</span><span class="p">][</span><span class="s1">&#39;gwchnone&#39;</span><span class="p">]]</span>
+    <span class="n">ngflgs</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;aux&quot;</span><span class="p">][</span><span class="s2">&quot;opt&quot;</span><span class="p">][</span><span class="s2">&quot;nodsatlint&quot;</span><span class="p">],</span>
+        <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;aux&quot;</span><span class="p">][</span><span class="s2">&quot;opt&quot;</span><span class="p">][</span><span class="s2">&quot;nodsatnone&quot;</span><span class="p">],</span>
+        <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;aux&quot;</span><span class="p">][</span><span class="s2">&quot;opt&quot;</span><span class="p">][</span><span class="s2">&quot;gwchlint&quot;</span><span class="p">],</span>
+        <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;aux&quot;</span><span class="p">][</span><span class="s2">&quot;opt&quot;</span><span class="p">][</span><span class="s2">&quot;gwchnone&quot;</span><span class="p">],</span>
+    <span class="p">]</span>
 
     <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;prep/calcs ... &#39;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;prep/calcs ... &quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
 
-    <span class="n">E</span> <span class="o">=</span> <span class="n">ut_E</span><span class="p">(</span><span class="n">t</span><span class="p">,</span>
-             <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;aux&#39;</span><span class="p">][</span><span class="s1">&#39;reftime&#39;</span><span class="p">],</span> <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;aux&#39;</span><span class="p">][</span><span class="s1">&#39;frq&#39;</span><span class="p">][</span><span class="n">ind</span><span class="p">],</span>
-             <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;aux&#39;</span><span class="p">][</span><span class="s1">&#39;lind&#39;</span><span class="p">][</span><span class="n">ind</span><span class="p">],</span> <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;aux&#39;</span><span class="p">][</span><span class="s1">&#39;lat&#39;</span><span class="p">],</span> <span class="n">ngflgs</span><span class="p">,</span>
-             <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;aux&#39;</span><span class="p">][</span><span class="s1">&#39;opt&#39;</span><span class="p">][</span><span class="s1">&#39;prefilt&#39;</span><span class="p">])</span>
+    <span class="n">E</span> <span class="o">=</span> <span class="n">ut_E</span><span class="p">(</span>
+        <span class="n">t</span><span class="p">,</span>
+        <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;aux&quot;</span><span class="p">][</span><span class="s2">&quot;reftime&quot;</span><span class="p">],</span>
+        <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;aux&quot;</span><span class="p">][</span><span class="s2">&quot;frq&quot;</span><span class="p">][</span><span class="n">ind</span><span class="p">],</span>
+        <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;aux&quot;</span><span class="p">][</span><span class="s2">&quot;lind&quot;</span><span class="p">][</span><span class="n">ind</span><span class="p">],</span>
+        <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;aux&quot;</span><span class="p">][</span><span class="s2">&quot;lat&quot;</span><span class="p">],</span>
+        <span class="n">ngflgs</span><span class="p">,</span>
+        <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;aux&quot;</span><span class="p">][</span><span class="s2">&quot;opt&quot;</span><span class="p">][</span><span class="s2">&quot;prefilt&quot;</span><span class="p">],</span>
+    <span class="p">)</span>
 
     <span class="n">fit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">E</span><span class="p">,</span> <span class="n">ap</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">E</span><span class="p">),</span> <span class="n">am</span><span class="p">)</span>
 
     <span class="c1"># Mean (&amp; trend).</span>
     <span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">goodmask</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
     <span class="n">u</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
-    <span class="n">trend</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;aux&#39;</span><span class="p">][</span><span class="s1">&#39;opt&#39;</span><span class="p">][</span><span class="s1">&#39;notrend&#39;</span><span class="p">]</span>
+    <span class="n">trend</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;aux&quot;</span><span class="p">][</span><span class="s2">&quot;opt&quot;</span><span class="p">][</span><span class="s2">&quot;notrend&quot;</span><span class="p">]</span>
 
     <span class="k">if</span> <span class="n">twodim</span><span class="p">:</span>
         <span class="n">v</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="n">u</span><span class="p">[</span><span class="n">goodmask</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span> <span class="o">+</span> <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;umean&#39;</span><span class="p">]</span>
-        <span class="n">v</span><span class="p">[</span><span class="n">goodmask</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span> <span class="o">+</span> <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;vmean&#39;</span><span class="p">]</span>
+        <span class="n">u</span><span class="p">[</span><span class="n">goodmask</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span> <span class="o">+</span> <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;umean&quot;</span><span class="p">]</span>
+        <span class="n">v</span><span class="p">[</span><span class="n">goodmask</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span> <span class="o">+</span> <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;vmean&quot;</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">trend</span><span class="p">:</span>
-            <span class="n">u</span><span class="p">[</span><span class="n">goodmask</span><span class="p">]</span> <span class="o">+=</span> <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;uslope&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">t</span> <span class="o">-</span> <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;aux&#39;</span><span class="p">][</span><span class="s1">&#39;reftime&#39;</span><span class="p">])</span>
-            <span class="n">v</span><span class="p">[</span><span class="n">goodmask</span><span class="p">]</span> <span class="o">+=</span> <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;vslope&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">t</span> <span class="o">-</span> <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;aux&#39;</span><span class="p">][</span><span class="s1">&#39;reftime&#39;</span><span class="p">])</span>
+            <span class="n">u</span><span class="p">[</span><span class="n">goodmask</span><span class="p">]</span> <span class="o">+=</span> <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;uslope&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">t</span> <span class="o">-</span> <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;aux&quot;</span><span class="p">][</span><span class="s2">&quot;reftime&quot;</span><span class="p">])</span>
+            <span class="n">v</span><span class="p">[</span><span class="n">goodmask</span><span class="p">]</span> <span class="o">+=</span> <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;vslope&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">t</span> <span class="o">-</span> <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;aux&quot;</span><span class="p">][</span><span class="s2">&quot;reftime&quot;</span><span class="p">])</span>
 
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">u</span><span class="p">[</span><span class="n">goodmask</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span> <span class="o">+</span> <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;mean&#39;</span><span class="p">]</span>
+        <span class="n">u</span><span class="p">[</span><span class="n">goodmask</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span> <span class="o">+</span> <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;mean&quot;</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">trend</span><span class="p">:</span>
-            <span class="n">u</span><span class="p">[</span><span class="n">goodmask</span><span class="p">]</span> <span class="o">+=</span> <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;slope&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">t</span> <span class="o">-</span> <span class="n">coef</span><span class="p">[</span><span class="s1">&#39;aux&#39;</span><span class="p">][</span><span class="s1">&#39;reftime&#39;</span><span class="p">])</span>
+            <span class="n">u</span><span class="p">[</span><span class="n">goodmask</span><span class="p">]</span> <span class="o">+=</span> <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;slope&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">t</span> <span class="o">-</span> <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;aux&quot;</span><span class="p">][</span><span class="s2">&quot;reftime&quot;</span><span class="p">])</span>
         <span class="n">v</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;done.&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;done.&quot;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span>
 </pre></div>
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
@@ -220,13 +235,14 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">UTide 0.2.6.dev10+g93cdb9e documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="../../index.html">UTide 0.2.6.dev13+g1dbd098 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">utide._reconstruct</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2015, Dan Codiga, Wesley Bowman, and contributors.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.0.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
     </div>
   </body>
 </html>
