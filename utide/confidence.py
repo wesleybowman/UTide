@@ -224,8 +224,12 @@ def _confidence(
                     den = varXu + varYu
                     varXu = Puu[c] * varXu / den
                     varYu = Puu[c] * varYu / den
+                    if c < 2:
+                        print(f"c: {c}\n   {Puu[c]}\n    {varXu}\n    {den}\n")
                     varcov_mCc[c, :, :] = np.diag(np.array([varXu, varYu]))
                 sig1, sig2 = ut_linci(Xu[c], Yu[c], np.sqrt(varXu), np.sqrt(varYu))
+                print(f"c: {c} ut_linci {Xu[c]}, {Yu[c]}, {np.sqrt(varXu)}, {np.sqrt(varYu)}")
+                print(f"  sig1: {sig1}   sig2: {sig2}")
                 coef["A_ci"][c] = 1.96 * sig1
                 coef["g_ci"][c] = 1.96 * sig2
             else:
