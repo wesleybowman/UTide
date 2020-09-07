@@ -37,7 +37,7 @@ not yet available. For more information see:
     of Oceanography, University of Rhode Island, Narragansett, RI.
     59pp. ftp://www.po.gso.uri.edu/pub/downloads/codiga/pubs/
     2011Codiga-UTide-Report.pdf
-    
+
     UTide v1p0 9/2011 d.codiga@gso.uri.edu
      http://www.po.gso.uri.edu/~codiga/utide/utide.htm
 

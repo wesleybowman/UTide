@@ -29,19 +29,19 @@ def test_fft_ls_consistency():
 
     """
     t, x = random_ts(20, 0.5)
-    y_fft = pgram.band_psd(t, x, [1/12.42], equi=True)
-    y_ls = pgram.band_psd(t, x, [1/12.42], equi=False)
+    y_fft = pgram.band_psd(t, x, [1 / 12.42], equi=True)
+    y_ls = pgram.band_psd(t, x, [1 / 12.42], equi=False)
     # skip the last frequency bin because y_fft includes nyquist
     sl = slice(0, -1)
-    for key in ['Puu', 'Pvv', 'Puv']:
+    for key in ["Puu", "Pvv", "Puv"]:
         np.testing.assert_array_almost_equal(y_fft[key][sl], y_ls[key][sl])
 
 
 def test_uv_consistency():
     t, x = random_ts(20, 0.5, is_complex=False)
     xx = x + 1j * x
-    y_fft = pgram.band_psd(t, xx, [1/12.42], equi=True)
-    y_ls = pgram.band_psd(t, xx, [1/12.42], equi=False)
+    y_fft = pgram.band_psd(t, xx, [1 / 12.42], equi=True)
+    y_ls = pgram.band_psd(t, xx, [1 / 12.42], equi=False)
     for y in y_fft, y_ls:
         np.testing.assert_array_almost_equal(y.Puu, y.Pvv)
         np.testing.assert_array_almost_equal(y.Puu, y.Puv)

@@ -5,8 +5,8 @@ for a given set of frequencies.
 
 import numpy as np
 
-from .astronomy import ut_astron
 from ._ut_constants import ut_constants
+from .astronomy import ut_astron
 
 
 sat = ut_constants.sat
@@ -28,8 +28,7 @@ def linearized_freqs(tref):
     freq[not_shallow] = selected.squeeze()
     for i0, nshal, k in zip(ishallow, nshallow, kshallow):
         ik = i0 + np.arange(nshal)
-        freq[k] = (freq[shallow.iname[ik] - 1] *
-                   shallow.coef[ik]).sum()
+        freq[k] = (freq[shallow.iname[ik] - 1] * shallow.coef[ik]).sum()
     return freq
 
 
@@ -69,11 +68,11 @@ def ut_E(t, tref, frq, lind, lat, ngflgs, prefilt):
     if ngflgs[1] and ngflgs[3]:
         F = np.ones((nt, nc))
         U = np.zeros((nt, nc))
-        V = np.dot(24*(t-tref)[:, None], frq[:, None].T)
+        V = np.dot(24 * (t - tref)[:, None], frq[:, None].T)
     else:
         F, U, V = FUV(t, tref, lind, lat, ngflgs)
 
-    E = F * np.exp(1j*(U+V)*2*np.pi)
+    E = F * np.exp(1j * (U + V) * 2 * np.pi)
 
     # if ~isempty(prefilt)
     # if len(prefilt)!=0:
@@ -127,7 +126,7 @@ def FUV(t, tref, lind, lat, ngflgs):
         rr = sat.amprat.copy()
 
         j = sat.ilatfac == 1
-        rr[j] *= 0.36309 * (1.0 - 5.0 * slat**2)/slat
+        rr[j] *= 0.36309 * (1.0 - 5.0 * slat ** 2) / slat
 
         j = sat.ilatfac == 2
         rr[j] *= 2.59808 * slat
@@ -153,7 +152,7 @@ def FUV(t, tref, lind, lat, ngflgs):
             j = shallow.iname[ik] - 1
             exp1 = shallow.coef[ik, None]
             exp2 = np.abs(exp1)
-            F[k, :] = np.prod(F[j, :]**exp2, axis=0)
+            F[k, :] = np.prod(F[j, :] ** exp2, axis=0)
             U[k, :] = np.sum(U[j, :] * exp1, axis=0)
 
         F = F[lind, :].T
@@ -191,6 +190,6 @@ def FUV(t, tref, lind, lat, ngflgs):
 
         if ngflgs[2]:  # linearized times
             freq = linearized_freqs(tref)
-            V = V + 24*(t[:, None] - tref) * freq[None, lind]
+            V = V + 24 * (t[:, None] - tref) * freq[None, lind]
 
     return F, U, V

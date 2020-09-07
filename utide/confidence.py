@@ -25,8 +25,7 @@ def band_averaged_psd_by_constit(tin, t, e, elor, coef, opt):
         ba = band_psd(tin, e_, constits, equi=True)
 
     else:
-        ba = band_psd(t, e, constits,
-                      equi=False, frqosamp=opt.lsfrqosmp)
+        ba = band_psd(t, e, constits, equi=False, frqosamp=opt.lsfrqosmp)
 
     # power [ (e units)^2 ] from spectral density [ (e units)^2 / cph ]
     df = 1 / (elor * 24)  # inverse of record length in hours
@@ -55,9 +54,9 @@ def cluster(x, ang=360):
     """
 
     x = np.array(x)
-    ha = ang/2
-    ofs = - x[0] + ha
-    y = (x+ofs) % ang - ofs
+    ha = ang / 2
+    ofs = -x[0] + ha
+    y = (x + ofs) % ang - ofs
     return y
 
 
@@ -138,14 +137,16 @@ def nearestSPD(A):
         Ahat[np.diag_indices(n)] += np.spacing(maxeig)
         # Normally no more than one adjustment will be needed.
         if k > 100:
-            warnings.warn('adjustment in nearestSPD did not converge; '
-                          'returning diagonal')
+            warnings.warn(
+                "adjustment in nearestSPD did not converge; " "returning diagonal"
+            )
             return np.diag(np.diag(A))
     return Ahat
 
 
-def _confidence(coef, cnstit, opt, t, e, tin, elor, xraw, xmod, W, m, B,
-                Xu, Yu, Xv, Yv):
+def _confidence(
+    coef, cnstit, opt, t, e, tin, elor, xraw, xmod, W, m, B, Xu, Yu, Xv, Yv
+):
     """
     This confidence interval calculation does not correspond
     to a single ut_ matlab function, but is based on code
@@ -158,7 +159,7 @@ def _confidence(coef, cnstit, opt, t, e, tin, elor, xraw, xmod, W, m, B,
     """
 
     # Confidence Intervals.
-    if not opt['white']:
+    if not opt["white"]:
         Puu, Pvv, Puv = band_averaged_psd_by_constit(tin, t, e, elor, coef, opt)  # noqa
 
     # Make temporaries for quantities needed more than once.
@@ -173,8 +174,7 @@ def _confidence(coef, cnstit, opt, t, e, tin, elor, xraw, xmod, W, m, B,
     nm = B.shape[1]
 
     # Mean Square Misfit: Eq. 52 (mean squared error).
-    varMSM = np.real(np.dot(xraw.conj(), _Wx) -
-                     np.dot(xmod.conj(), _Wx)) / (nt-nm)
+    varMSM = np.real(np.dot(xraw.conj(), _Wx) - np.dot(xmod.conj(), _Wx)) / (nt - nm)
 
     # Gamma_C: covariance Eq. 54.
     gamC = np.linalg.inv(np.dot(B.conj().T, _WB)) * varMSM
@@ -191,7 +191,7 @@ def _confidence(coef, cnstit, opt, t, e, tin, elor, xraw, xmod, W, m, B,
 
     nc = len(Xu)
     coef.g_ci = np.nan * np.ones_like(coef.g)
-    if opt['twodim']:
+    if opt["twodim"]:
         coef.Lsmaj_ci = coef.g_ci.copy()
         coef.Lsmin_ci = coef.g_ci.copy()
         coef.theta_ci = coef.g_ci.copy()
@@ -200,51 +200,54 @@ def _confidence(coef, cnstit, opt, t, e, tin, elor, xraw, xmod, W, m, B,
         coef.A_ci = coef.g_ci.copy()
         varcov_mCw = np.nan * np.ones((nc, 2, 2))
 
-    if not opt['white']:
+    if not opt["white"]:
         varcov_mCc = np.copy(varcov_mCw)
 
     for c in range(nc):
-        G = np.array([[Gall[c, c], Gall[c, c+nc]],
-                      [Gall[c + nc, c], Gall[c+nc, c+nc]]])
-        H = np.array([[Hall[c, c], Hall[c, c+nc]],
-                      [Hall[c + nc, c], Hall[c+nc, c+nc]]])
+        G = np.array(
+            [[Gall[c, c], Gall[c, c + nc]], [Gall[c + nc, c], Gall[c + nc, c + nc]]]
+        )
+        H = np.array(
+            [[Hall[c, c], Hall[c, c + nc]], [Hall[c + nc, c], Hall[c + nc, c + nc]]]
+        )
         varXu = np.real(G[0, 0] + G[1, 1] + 2 * G[0, 1]) / 2
         varYu = np.real(H[0, 0] + H[1, 1] - 2 * H[0, 1]) / 2
 
-        if opt['twodim']:
+        if opt["twodim"]:
             varXv = np.real(H[0, 0] + H[1, 1] + 2 * H[0, 1]) / 2
             varYv = np.real(G[0, 0] + G[1, 1] - 2 * G[0, 1]) / 2
 
-        if opt['linci']:  # Linearized.
-            if not opt['twodim']:
+        if opt["linci"]:  # Linearized.
+            if not opt["twodim"]:
                 varcov_mCw[c, :, :] = np.diag(np.array([varXu, varYu]))
-                if not opt['white']:
+                if not opt["white"]:
                     den = varXu + varYu
                     varXu = Puu[c] * varXu / den
                     varYu = Puu[c] * varYu / den
                     varcov_mCc[c, :, :] = np.diag(np.array([varXu, varYu]))
-                sig1, sig2 = ut_linci(Xu[c], Yu[c], np.sqrt(varXu),
-                                      np.sqrt(varYu))
-                coef['A_ci'][c] = 1.96 * sig1
-                coef['g_ci'][c] = 1.96 * sig2
+                sig1, sig2 = ut_linci(Xu[c], Yu[c], np.sqrt(varXu), np.sqrt(varYu))
+                coef["A_ci"][c] = 1.96 * sig1
+                coef["g_ci"][c] = 1.96 * sig2
             else:
-                varcov_mCw[c, :, :] = np.diag(np.array([varXu, varYu,
-                                                        varXv, varYv]))
-                if not opt['white']:
+                varcov_mCw[c, :, :] = np.diag(np.array([varXu, varYu, varXv, varYv]))
+                if not opt["white"]:
                     den = varXv + varYv
                     varXv = Pvv[c] * varXv / den
                     varYv = Pvv[c] * varYv / den
-                    varcov_mCc[c, :, :] = np.diag(np.array([varXu, varYu,
-                                                            varXv, varYv]))
-                with np.errstate(invalid='ignore'):
-                    sig1, sig2 = ut_linci(Xu[c] + 1j * Xv[c],
-                                      Yu[c] + 1j * Yv[c],
-                                      np.sqrt(varXu) + 1j * np.sqrt(varXv),
-                                      np.sqrt(varYu) + 1j * np.sqrt(varYv))
-                coef['Lsmaj_ci'][c] = 1.96 * np.real(sig1)
-                coef['Lsmin_ci'][c] = 1.96 * np.imag(sig1)
-                coef['g_ci'][c] = 1.96 * np.real(sig2)
-                coef['theta_ci'][c] = 1.96 * np.imag(sig2)
+                    varcov_mCc[c, :, :] = np.diag(
+                        np.array([varXu, varYu, varXv, varYv])
+                    )
+                with np.errstate(invalid="ignore"):
+                    sig1, sig2 = ut_linci(
+                        Xu[c] + 1j * Xv[c],
+                        Yu[c] + 1j * Yv[c],
+                        np.sqrt(varXu) + 1j * np.sqrt(varXv),
+                        np.sqrt(varYu) + 1j * np.sqrt(varYv),
+                    )
+                coef["Lsmaj_ci"][c] = 1.96 * np.real(sig1)
+                coef["Lsmin_ci"][c] = 1.96 * np.imag(sig1)
+                coef["g_ci"][c] = 1.96 * np.real(sig2)
+                coef["theta_ci"][c] = 1.96 * np.imag(sig2)
 
         else:  # Monte Carlo.
             covXuYu = np.imag(H[0, 0] - H[0, 1] + H[1, 0] - H[1, 1]) / 2
@@ -258,18 +261,22 @@ def _confidence(coef, cnstit, opt, t, e, tin, elor, xraw, xmod, W, m, B,
             if not opt.twodim:
                 if not opt.white:
                     varcov_mCc[c, :, :] = nearestSPD(varcov_mCc[c, :, :])
-                    mCall = np.random.multivariate_normal((Xu[c], Yu[c]),
-                                                          varcov_mCc[c],
-                                                          opt.nrlzn)
+                    mCall = np.random.multivariate_normal(
+                        (Xu[c], Yu[c]), varcov_mCc[c], opt.nrlzn
+                    )
                 else:
-                    mCall = np.random.multivariate_normal((Xu[c], Yu[c]),
-                                                          varcov_mCw[c],
-                                                          opt.nrlzn)
+                    mCall = np.random.multivariate_normal(
+                        (Xu[c], Yu[c]), varcov_mCw[c], opt.nrlzn
+                    )
                 A, _, _, g = ut_cs2cep(mCall)
-                coef.A_ci[c] = 1.96 * np.median(np.abs(A - np.median(A))) / 0.6745  # noqa
+                coef.A_ci[c] = (
+                    1.96 * np.median(np.abs(A - np.median(A))) / 0.6745
+                )  # noqa
                 g[0] = coef.g[c]
                 g = cluster(g, 360)
-                coef.g_ci[c] = 1.96 * np.median(np.abs(g - np.median(g))) / 0.6745  # noqa
+                coef.g_ci[c] = (
+                    1.96 * np.median(np.abs(g - np.median(g))) / 0.6745
+                )  # noqa
             else:
                 covXvYv = np.imag(G[0, 0] - G[0, 1] + G[1, 0] - G[1, 1]) / 2
                 Dvv = np.array([[varXv, covXvYv], [covXvYv, varYv]])
@@ -278,10 +285,10 @@ def _confidence(coef, cnstit, opt, t, e, tin, elor, xraw, xmod, W, m, B,
                 if not opt.white:
                     Dvv = Pvv[c] * Dvv / np.trace(Dvv)
                     varcov_mCc[c, 2:, 2:] = Dvv
-                covXuXv = np.imag(- H[0, 0] - H[0, 1] - H[1, 0] - H[1, 1]) / 2
+                covXuXv = np.imag(-H[0, 0] - H[0, 1] - H[1, 0] - H[1, 1]) / 2
                 covXuYv = np.real(G[0, 0] - G[1, 1]) / 2
-                covYuXv = np.real(- H[0, 0] + H[1, 1]) / 2
-                covYuYv = np.imag(- G[0, 0] + G[0, 1] + G[1, 0] - G[1, 1]) / 2
+                covYuXv = np.real(-H[0, 0] + H[1, 1]) / 2
+                covYuYv = np.imag(-G[0, 0] + G[0, 1] + G[1, 0] - G[1, 1]) / 2
                 Duv = np.array([[covXuXv, covXuYv], [covYuXv, covYuYv]])
                 varcov_mCw[c, :2, 2:] = Duv
                 varcov_mCw[c, 2:, :2] = Duv.T
@@ -296,18 +303,30 @@ def _confidence(coef, cnstit, opt, t, e, tin, elor, xraw, xmod, W, m, B,
                         varcov_mCc[c, 2:, :2] = 0
 
                     varcov_mCc[c] = nearestSPD(varcov_mCc[c])
-                    mCall = np.random.multivariate_normal((Xu[c], Yu[c], Xv[c], Yv[c]), varcov_mCc[c], opt.nrlzn)  # noqa
+                    mCall = np.random.multivariate_normal(
+                        (Xu[c], Yu[c], Xv[c], Yv[c]), varcov_mCc[c], opt.nrlzn
+                    )  # noqa
                 else:
-                    mCall = np.random.multivariate_normal((Xu[c], Yu[c], Xv[c], Yv[c]), varcov_mCw[c], opt.nrlzn)  # noqa
+                    mCall = np.random.multivariate_normal(
+                        (Xu[c], Yu[c], Xv[c], Yv[c]), varcov_mCw[c], opt.nrlzn
+                    )  # noqa
                 Lsmaj, Lsmin, theta, g = ut_cs2cep(mCall)
-                coef.Lsmaj_ci[c] = 1.96 * np.median(np.abs(Lsmaj - np.median(Lsmaj))) / 0.6745  # noqa
-                coef.Lsmin_ci[c] = 1.96 * np.median(np.abs(Lsmin - np.median(Lsmin))) / 0.6745  # noqa
+                coef.Lsmaj_ci[c] = (
+                    1.96 * np.median(np.abs(Lsmaj - np.median(Lsmaj))) / 0.6745
+                )  # noqa
+                coef.Lsmin_ci[c] = (
+                    1.96 * np.median(np.abs(Lsmin - np.median(Lsmin))) / 0.6745
+                )  # noqa
                 theta[0] = coef.theta[c]
                 theta = cluster(theta, 360)
-                coef.theta_ci[c] = 1.96 * np.median(np.abs(theta - np.median(theta))) / 0.6745  # noqa
+                coef.theta_ci[c] = (
+                    1.96 * np.median(np.abs(theta - np.median(theta))) / 0.6745
+                )  # noqa
                 g[0] = coef.g[c]
                 g = cluster(g, 360)
-                coef.g_ci[c] = 1.96 * np.median(np.abs(g - np.median(g))) / 0.6745  # noqa
+                coef.g_ci[c] = (
+                    1.96 * np.median(np.abs(g - np.median(g))) / 0.6745
+                )  # noqa
 
     nNR = coef.nNR
 
@@ -323,30 +342,33 @@ def _confidence(coef, cnstit, opt, t, e, tin, elor, xraw, xmod, W, m, B,
                     varImap += 0.25 * varcov[nNR + k, 2, 2]
                 rp = ref.I.Rp
                 rm = ref.I.Rm
-                varXuHH = ((rp.real**2 + rm.real**2) * varReap +
-                           (rp.imag**2 + rm.imag**2) * varImap)
-                varYuHH = ((rp.real**2 + rm.real**2) * varImap +
-                           (rp.imag**2 + rm.imag**2) * varReap)
+                varXuHH = (rp.real ** 2 + rm.real ** 2) * varReap + (
+                    rp.imag ** 2 + rm.imag ** 2
+                ) * varImap
+                varYuHH = (rp.real ** 2 + rm.real ** 2) * varImap + (
+                    rp.imag ** 2 + rm.imag ** 2
+                ) * varReap
                 for varX, varY in zip(varXuHH, varYuHH):
                     if not opt.twodim:
-                        sig1, sig2 = ut_linci(Xu[nNR + k], Yu[nNR + k],
-                                              np.sqrt(varX), np.sqrt(varY))
+                        sig1, sig2 = ut_linci(
+                            Xu[nNR + k], Yu[nNR + k], np.sqrt(varX), np.sqrt(varY)
+                        )
                         coef.A_ci[ind] = 1.96 * sig1
                         coef.g_ci[ind] = 1.96 * sig2
                     else:
-                        sig1, sig2 = ut_linci(Xu[nNR + k] + 1j * Xv[nNR + k],
-                                              Yu[nNR + k] + 1j * Yv[nNR + k],
-                                              np.sqrt(varX) + 1j *
-                                              np.sqrt(varY),
-                                              np.sqrt(varY) + 1j *
-                                              np.sqrt(varX))
+                        sig1, sig2 = ut_linci(
+                            Xu[nNR + k] + 1j * Xv[nNR + k],
+                            Yu[nNR + k] + 1j * Yv[nNR + k],
+                            np.sqrt(varX) + 1j * np.sqrt(varY),
+                            np.sqrt(varY) + 1j * np.sqrt(varX),
+                        )
                         coef.Lsmaj_ci[ind] = 1.96 * sig1.real
                         coef.Lsmin_ci[ind] = 1.96 * sig1.imag
                         coef.g_ci[ind] = 1.96 * sig2.real
                         coef.theta_ci[ind] = 1.96 * sig2.imag
                     ind += 1
         else:
-            raise NotImplementedError('Monte Carlo inference not implemented')
+            raise NotImplementedError("Monte Carlo inference not implemented")
 
     return coef
 
@@ -388,56 +410,58 @@ def ut_linci(X, Y, sigX, sigY):
     Yv = np.imag(Y[:])
     sigYv = np.imag(sigY[:])
 
-    rp = 0.5 * np.sqrt((Xu+Yv)**2 + (Xv-Yu)**2)
-    rm = 0.5 * np.sqrt((Xu-Yv)**2 + (Xv+Yu)**2)
-    sigXu2 = sigXu**2
-    sigYu2 = sigYu**2
-    sigXv2 = sigXv**2
-    sigYv2 = sigYv**2
+    rp = 0.5 * np.sqrt((Xu + Yv) ** 2 + (Xv - Yu) ** 2)
+    rm = 0.5 * np.sqrt((Xu - Yv) ** 2 + (Xv + Yu) ** 2)
+    sigXu2 = sigXu ** 2
+    sigYu2 = sigYu ** 2
+    sigXv2 = sigXv ** 2
+    sigYv2 = sigYv ** 2
 
-    ex = (Xu+Yv) / rp
-    fx = (Xu-Yv) / rm
-    gx = (Yu-Xv) / rp
-    hx = (Yu+Xv) / rm
+    ex = (Xu + Yv) / rp
+    fx = (Xu - Yv) / rm
+    gx = (Yu - Xv) / rp
+    hx = (Yu + Xv) / rm
 
     # major axis
-    dXu2 = (0.25*(ex+fx))**2
-    dYu2 = (0.25*(gx+hx))**2
-    dXv2 = (0.25*(hx-gx))**2
-    dYv2 = (0.25*(ex-fx))**2
-    sig1 = np.sqrt(dXu2 * sigXu2 + dYu2 * sigYu2 +
-                   dXv2 * sigXv2 + dYv2 * sigYv2)
+    dXu2 = (0.25 * (ex + fx)) ** 2
+    dYu2 = (0.25 * (gx + hx)) ** 2
+    dXv2 = (0.25 * (hx - gx)) ** 2
+    dYv2 = (0.25 * (ex - fx)) ** 2
+    sig1 = np.sqrt(dXu2 * sigXu2 + dYu2 * sigYu2 + dXv2 * sigXv2 + dYv2 * sigYv2)
 
     # phase
     rn = 2 * (Xu * Yu + Xv * Yv)
-    rd = Xu**2 - Yu**2 + Xv**2 - Yv**2
-    den = rn**2 + rd**2
-    dXu2 = ((rd*Yu - rn*Xu) / den)**2
-    dYu2 = ((rd*Xu + rn*Yu) / den)**2
-    dXv2 = ((rd*Yv - rn*Xv) / den)**2
-    dYv2 = ((rd*Xv + rn*Yv) / den)**2
-    sig2 = (180/np.pi) * np.sqrt(dXu2 * sigXu2 + dYu2 * sigYu2 +
-                                 dXv2 * sigXv2 + dYv2 * sigYv2)
+    rd = Xu ** 2 - Yu ** 2 + Xv ** 2 - Yv ** 2
+    den = rn ** 2 + rd ** 2
+    dXu2 = ((rd * Yu - rn * Xu) / den) ** 2
+    dYu2 = ((rd * Xu + rn * Yu) / den) ** 2
+    dXv2 = ((rd * Yv - rn * Xv) / den) ** 2
+    dYv2 = ((rd * Xv + rn * Yv) / den) ** 2
+    sig2 = (180 / np.pi) * np.sqrt(
+        dXu2 * sigXu2 + dYu2 * sigYu2 + dXv2 * sigXv2 + dYv2 * sigYv2
+    )
 
     # if ~isreal(X)
     if not np.isreal(X):
         # Minor axis.
-        dXu2 = (0.25 * (ex-fx))**2
-        dYu2 = (0.25 * (gx-hx))**2
-        dXv2 = (0.25 * (hx+gx))**2
-        dYv2 = (0.25 * (ex+fx))**2
-        sig1 = sig1 + 1j*np.sqrt(dXu2 * sigXu2 + dYu2 * sigYu2 +
-                                 dXv2 * sigXv2 + dYv2 * sigYv2)
+        dXu2 = (0.25 * (ex - fx)) ** 2
+        dYu2 = (0.25 * (gx - hx)) ** 2
+        dXv2 = (0.25 * (hx + gx)) ** 2
+        dYv2 = (0.25 * (ex + fx)) ** 2
+        sig1 = sig1 + 1j * np.sqrt(
+            dXu2 * sigXu2 + dYu2 * sigYu2 + dXv2 * sigXv2 + dYv2 * sigYv2
+        )
 
         # Orientation.
         rn = 2.0 * (Xu * Xv + Yu * Yv)
-        rd = Xu**2 + Yu**2 - (Xv**2 + Yv**2)
-        den = rn**2 + rd**2
-        dXu2 = ((rd*Xv - rn*Xu) / den)**2
-        dYu2 = ((rd*Yv - rn*Yu) / den)**2
-        dXv2 = ((rd*Xu + rn*Xv) / den)**2
-        dYv2 = ((rd*Yu + rn*Yv) / den)**2
-        sig2 = sig2 + 1j*(180/np.pi) * np.sqrt(dXu2 * sigXu2 + dYu2 * sigYu2 +
-                                               dXv2 * sigXv2 + dYv2 * sigYv2)
+        rd = Xu ** 2 + Yu ** 2 - (Xv ** 2 + Yv ** 2)
+        den = rn ** 2 + rd ** 2
+        dXu2 = ((rd * Xv - rn * Xu) / den) ** 2
+        dYu2 = ((rd * Yv - rn * Yu) / den) ** 2
+        dXv2 = ((rd * Xu + rn * Xv) / den) ** 2
+        dYv2 = ((rd * Yu + rn * Yv) / den) ** 2
+        sig2 = sig2 + 1j * (180 / np.pi) * np.sqrt(
+            dXu2 * sigXu2 + dYu2 * sigYu2 + dXv2 * sigXv2 + dYv2 * sigYv2
+        )
 
     return sig1, sig2

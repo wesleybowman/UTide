@@ -23,15 +23,19 @@ from utide.utilities import Bunch
 
 # Frequency bands in cycles per hour for
 # estimating background noise levels.
-freq_bands = np.array([[.00010, .00417],   # fortnightly etc.
-                       [.03192, .04859],   # diurnal
-                       [.07218, .08884],   # semidiurnal
-                       [.11243, .12910],   # mk3, 2mk3
-                       [.15269, .16936],   # about 4 cpd
-                       [.19295, .20961],
-                       [.23320, .25100],   # s6
-                       [.26000, .29000],
-                       [.30000, .50000]])  # m8 is 0.322; highest is 0.487
+freq_bands = np.array(
+    [
+        [0.00010, 0.00417],  # fortnightly etc.
+        [0.03192, 0.04859],  # diurnal
+        [0.07218, 0.08884],  # semidiurnal
+        [0.11243, 0.12910],  # mk3, 2mk3
+        [0.15269, 0.16936],  # about 4 cpd
+        [0.19295, 0.20961],
+        [0.23320, 0.25100],  # s6
+        [0.26000, 0.29000],
+        [0.30000, 0.50000],
+    ]
+)  # m8 is 0.322; highest is 0.487
 
 
 def fbndavg(P, freq, cfreq=None, fbands=None):
@@ -79,7 +83,7 @@ def fbndavg(P, freq, cfreq=None, fbands=None):
 
     for k, (f0, f1) in enumerate(fbands):
         i0, i1 = np.searchsorted(freq, [f0, f1])
-        i1 = min(nfreq, i1+1)
+        i1 = min(nfreq, i1 + 1)
         inband = slice(i0, i1)
         avP[k] = P[inband].mean()
 
@@ -101,22 +105,22 @@ def _lomb_freqs(t, fbands=None, ofac=1, max_per_band=500):
     # Estimated record length as n delta-t, where delta-t
     # is the *average* time per sample.
     n = len(t)
-    delta_t = (t[-1] - t[0]) / (n-1)
+    delta_t = (t[-1] - t[0]) / (n - 1)
     reclen = n * delta_t
 
     nf = n * ofac  # number of "Fourier frequencies" based on oversampling
     # Simplify by ignoring the 0 and Nyquist frequencies.
     # Divide by reclen to convert cycles/record to cycles/time unit.
-    freq = np.arange(1, nf//2) / reclen
+    freq = np.arange(1, nf // 2) / reclen
     nfreq = len(freq)
 
     freqs = []
     for k, (f0, f1) in enumerate(fbands):
         i0, i1 = np.searchsorted(freq, [f0, f1])
-        i1 = min(nfreq, i1+1)
+        i1 = min(nfreq, i1 + 1)
         inband = slice(i0, i1)
         if i1 - i0 > max_per_band:
-            band = np.linspace(freq[i0], freq[i1-1], max_per_band)
+            band = np.linspace(freq[i0], freq[i1 - 1], max_per_band)
         else:
             band = freq[inband]
         freqs.append(band)
@@ -185,7 +189,7 @@ def _psd_lomb(t, x, window=None, freq=None, ofac=1):
 
     # Estimated record length as n delta-t, where delta-t
     # is the *average* time per sample.
-    delta_t = (t[-1] - t[0]) / (n-1)
+    delta_t = (t[-1] - t[0]) / (n - 1)
     reclen = n * delta_t
 
     if freq is None:
@@ -193,7 +197,7 @@ def _psd_lomb(t, x, window=None, freq=None, ofac=1):
         nf = n * ofac  # number of "Fourier frequencies" based on oversampling
         # Simplify by ignoring the 0 and Nyquist frequencies.
         # Divide by reclen to convert cycles/record to cycles/time unit.
-        freq = np.arange(1, nf//2) / reclen
+        freq = np.arange(1, nf // 2) / reclen
 
     out.F = freq
 
@@ -203,10 +207,10 @@ def _psd_lomb(t, x, window=None, freq=None, ofac=1):
     # with amplitude A for sufficiently large N."
     # It takes *angular* frequencies as 3rd argument.
     freq_radian = freq * 2 * np.pi
-    psdnorm = 2 * delta_t * n / (w**2).sum()
+    psdnorm = 2 * delta_t * n / (w ** 2).sum()
     out.Pxx = psdnorm * signal.lombscargle(t, xr, freq_radian)
 
-    if x.dtype.kind == 'f':
+    if x.dtype.kind == "f":
         return out
 
     out.Pyy = psdnorm * signal.lombscargle(t, x.imag, freq_radian)
@@ -232,7 +236,7 @@ def _ls_cross(t, x, fr):
     tau = 0.5 * np.arctan2(np.sin(arg).sum(axis=0), np.cos(arg).sum(axis=0))
 
     # Phase-shifted argument of sine, cosine:
-    arg *= 0.5   # from double frequency back to original frequency
+    arg *= 0.5  # from double frequency back to original frequency
     arg -= tau
 
     xr, xi = x.real, x.imag
@@ -243,14 +247,14 @@ def _ls_cross(t, x, fr):
     tmpy = np.empty(fr.shape, dtype=complex)
 
     c = np.cos(arg)
-    a = 1 / np.sqrt(sum(c**2))
+    a = 1 / np.sqrt(sum(c ** 2))
     tmpx.real = a * (xr[:, np.newaxis] * c).sum(axis=0)
     tmpy.real = a * (xi[:, np.newaxis] * c).sum(axis=0)
 
     del c
 
     s = np.sin(arg)
-    b = 1 / np.sqrt(sum(s**2))
+    b = 1 / np.sqrt(sum(s ** 2))
     tmpx.imag = b * (xr[:, np.newaxis] * s).sum(axis=0)
     tmpy.imag = -b * (xi[:, np.newaxis] * s).sum(axis=0)
 
@@ -278,14 +282,14 @@ def _psd(e, window, fs):
     # Detrending: just remove the mean.
     e = e - e.mean()
     e *= window
-    if e.dtype.kind == 'c':
+    if e.dtype.kind == "c":
         cs = np.conj(np.fft.rfft(e.real)) * np.fft.rfft(e.imag)
     else:
-        cs = np.abs(np.fft.rfft(e.real))**2
+        cs = np.abs(np.fft.rfft(e.real)) ** 2
 
     # cs = cs[:iny]
     cs[1:-1] *= 2
-    psdnorm = (1/fs) * (1/(window**2).sum())  # dt / sum of win squared.
+    psdnorm = (1 / fs) * (1 / (window ** 2).sum())  # dt / sum of win squared.
     return cs * psdnorm
 
 
@@ -337,9 +341,9 @@ def band_psd(t, e, cfrq, equi=True, frqosamp=1):
         # sample interval in hours; t is in days
         dt = 24 * (t[1] - t[0])
 
-        fs = 1/dt  # sampling frequency: cycles (samples) per hour
+        fs = 1 / dt  # sampling frequency: cycles (samples) per hour
         Puu1s = _psd(np.real(e), hn, fs)
-        allfrq = np.arange(nt//2 + 1) / (nt * dt)
+        allfrq = np.arange(nt // 2 + 1) / (nt * dt)
 
     else:  # If uneven, Lomb-scargle.
         # time in hours, for output in CPH and x^2 per CPH
@@ -351,11 +355,11 @@ def band_psd(t, e, cfrq, equi=True, frqosamp=1):
     P.Puu = fbndavg(Puu1s, allfrq, cfrq)
 
     # If e is complex, handle imaginary part.
-    if e.dtype.kind == 'c':
+    if e.dtype.kind == "c":
 
         if equi:  # If even sampling, Welch.
             Pvv1s = _psd(e.imag, hn, fs)
-            Puv1s = _psd(e, hn, fs)       # complex cross-periodogram
+            Puv1s = _psd(e, hn, fs)  # complex cross-periodogram
 
         else:  # If uneven, lomscargle.
             Pvv1s = ls_spec.Pyy

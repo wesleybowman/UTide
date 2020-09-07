@@ -4,30 +4,32 @@ Central module for calculating the tidal amplitudes, phases, etc.
 
 import numpy as np
 
-from .harmonics import ut_E
+from ._time_conversion import _normalize_time
+from ._ut_constants import constit_index_dict
+from .confidence import _confidence
+from .constituent_selection import ut_cnstitsel
 from .diagnostics import ut_diagn
 from .ellipse_params import ut_cs2cep
-from .constituent_selection import ut_cnstitsel
-from .confidence import _confidence
-from .utilities import Bunch
-from ._ut_constants import constit_index_dict
+from .harmonics import ut_E
 from .robustfit import robustfit
-from ._time_conversion import _normalize_time
+from .utilities import Bunch
 
-default_opts = dict(constit='auto',
-                    conf_int='linear',
-                    method='ols',
-                    trend=True,
-                    phase='Greenwich',
-                    nodal=True,
-                    infer=None,
-                    MC_n=200,
-                    Rayleigh_min=1,
-                    robust_kw=dict(weight_function='cauchy'),
-                    white=False,
-                    verbose=True,
-                    epoch='python',
-                    )
+
+default_opts = {
+    "constit": "auto",
+    "conf_int": "linear",
+    "method": "ols",
+    "trend": True,
+    "phase": "Greenwich",
+    "nodal": True,
+    "infer": None,
+    "MC_n": 200,
+    "Rayleigh_min": 1,
+    "robust_kw": {"weight_function": "cauchy"},
+    "white": False,
+    "verbose": True,
+    "epoch": "python",
+}
 
 
 def _process_opts(opts, is_2D):
@@ -46,59 +48,55 @@ def _translate_opts(opts):
     # Here or elsewhere, proper validation remains to be added.
     oldopts = Bunch()
     oldopts.cnstit = opts.constit
-    oldopts.infer = opts.infer     # we will not use the matlab names, though
+    oldopts.infer = opts.infer  # we will not use the matlab names, though
 
     oldopts.conf_int = True
-    if opts.conf_int == 'linear':
+    if opts.conf_int == "linear":
         oldopts.linci = True
-    elif opts.conf_int == 'MC':
+    elif opts.conf_int == "MC":
         oldopts.linci = False
-    elif opts.conf_int == 'none':
+    elif opts.conf_int == "none":
         oldopts.conf_int = False
         oldopts.nodiagn = 1
     else:
         raise ValueError("'conf_int' must be 'linear', 'MC', or 'none'")
 
     oldopts.notrend = not opts.trend
-    oldopts['nodesatlint'] = False
-    oldopts['nodesatnone'] = False
-    oldopts['gwchlint'] = False
-    oldopts['gwchnone'] = False
-    if opts.nodal == 'linear_time':
-        oldopts['nodsatlint'] = True
+    oldopts["nodesatlint"] = False
+    oldopts["nodesatnone"] = False
+    oldopts["gwchlint"] = False
+    oldopts["gwchnone"] = False
+    if opts.nodal == "linear_time":
+        oldopts["nodsatlint"] = True
     elif not opts.nodal:
-        oldopts['nodsatnone'] = True
-    if opts.phase == 'linear_time':
-        oldopts['gwchlint'] = True
-    elif opts.phase == 'raw':
-        oldopts['gwchnone'] = True
+        oldopts["nodsatnone"] = True
+    if opts.phase == "linear_time":
+        oldopts["gwchlint"] = True
+    elif opts.phase == "raw":
+        oldopts["gwchnone"] = True
     # Otherwise it should be default, 'Greenwich.'
     oldopts.rmin = opts.Rayleigh_min
     oldopts.white = opts.white
     oldopts.newopts = opts  # So we can access new opts via the single "opt."
-    oldopts['RunTimeDisp'] = opts.verbose
+    oldopts["RunTimeDisp"] = opts.verbose
     oldopts.epoch = opts.epoch
     return oldopts
 
 
 def validate_infer(infer, is_2D):
-    if infer is None or infer == 'none':
+    if infer is None or infer == "none":
         return None
-    required_keys = {'inferred_names', 'reference_names', 'amp_ratios',
-                     'phase_offsets'}
+    required_keys = {"inferred_names", "reference_names", "amp_ratios", "phase_offsets"}
     keys = set(infer.keys())
     if keys < required_keys:
         raise ValueError("infer option must include %s" % required_keys)
     nI = len(infer.inferred_names)
     if len(infer.reference_names) != nI:
-        raise ValueError("inferred_names must be same"
-                         "  length as reference_names")
+        raise ValueError("inferred_names must be same" "  length as reference_names")
     nratios = 2 * nI if is_2D else nI
-    if (len(infer.amp_ratios) != nratios or
-            len(infer.phase_offsets) != nratios):
-        raise ValueError("ratios and offsets need to have length %d" %
-                         nratios)
-    if 'approximate' not in infer:
+    if len(infer.amp_ratios) != nratios or len(infer.phase_offsets) != nratios:
+        raise ValueError("ratios and offsets need to have length %d" % nratios)
+    if "approximate" not in infer:
         infer.approximate = False
     return infer
 
@@ -208,12 +206,13 @@ def _solv1(tin, uin, vin, lat, **opts):
     packed = _slvinit(tin, uin, vin, lat, **opts)
     tin, t, u, v, tref, lor, elor, opt = packed
     nt = len(t)
-    if opt['RunTimeDisp']:
-        print('solve: ', end='')
+    if opt["RunTimeDisp"]:
+        print("solve: ", end="")
 
     # opt['cnstit'] = cnstit
-    cnstit, coef = ut_cnstitsel(tref, opt['rmin']/(24*lor),
-                                opt['cnstit'], opt['infer'])
+    cnstit, coef = ut_cnstitsel(
+        tref, opt["rmin"] / (24 * lor), opt["cnstit"], opt["infer"]
+    )
 
     # a function we don't need
     # coef.aux.rundescr = ut_rundescr(opt,nNR,nR,nI,t,tgd,uvgd,lat)
@@ -221,11 +220,10 @@ def _solv1(tin, uin, vin, lat, **opts):
     coef.aux.opt = opt
     coef.aux.lat = lat
 
-    if opt['RunTimeDisp']:
-        print('matrix prep ... ', end='')
+    if opt["RunTimeDisp"]:
+        print("matrix prep ... ", end="")
 
-    ngflgs = [opt['nodsatlint'], opt['nodsatnone'],
-              opt['gwchlint'], opt['gwchnone']]
+    ngflgs = [opt["nodsatlint"], opt["nodsatnone"], opt["gwchlint"], opt["gwchnone"]]
 
     E_args = (lat, ngflgs, opt.prefilt)
 
@@ -262,8 +260,8 @@ def _solv1(tin, uin, vin, lat, **opts):
                 Etilm[:, k] = E
                 num = ut_E(tref, tref, ref.I.frq, ref.I.lind, *E_args).real
                 den = ut_E(tref, tref, ref.frq, ref.lind, *E_args).real
-                Q[k] = ((num/den))[0, 0]
-                arg = np.pi*lor*24*(ref.I.frq - ref.frq)*(nt+1) / nt
+                Q[k] = ((num / den))[0, 0]
+                arg = np.pi * lor * 24 * (ref.I.frq - ref.frq) * (nt + 1) / nt
                 beta[k] = np.sin(arg) / arg
 
         B = np.hstack((B, Etilp, np.conj(Etilm)))
@@ -271,20 +269,20 @@ def _solv1(tin, uin, vin, lat, **opts):
     # add the mean
     B = np.hstack((B, np.ones((nt, 1))))
 
-    if not opt['notrend']:
-        B = np.hstack((B, ((t-tref)/lor)[:, np.newaxis]))
+    if not opt["notrend"]:
+        B = np.hstack((B, ((t - tref) / lor)[:, np.newaxis]))
 
     # nm = B.shape[1]  # 2*(nNR + nR) + 1, plus 1 if trend is included.
 
-    if opt['RunTimeDisp']:
-        print('solution ... ', end='')
+    if opt["RunTimeDisp"]:
+        print("solution ... ", end="")
 
-    if opt['twodim']:
-        xraw = u + 1j*v
+    if opt["twodim"]:
+        xraw = u + 1j * v
     else:
         xraw = u
 
-    if opt.newopts.method == 'ols':
+    if opt.newopts.method == "ols":
         # Model coefficients.
         try:
             m = np.linalg.lstsq(B, xraw, rcond=None)[0]
@@ -300,47 +298,47 @@ def _solv1(tin, uin, vin, lat, **opts):
 
     xmod = np.dot(B, m)  # Model fit.
 
-    if not opt['twodim']:
+    if not opt["twodim"]:
         xmod = np.real(xmod)
 
-    e = W*(xraw-xmod)  # Weighted residuals.
+    e = W * (xraw - xmod)  # Weighted residuals.
 
     nI, nR, nNR = coef.nI, coef.nR, coef.nNR
 
-    ap = np.hstack((m[:nNR], m[2*nNR:2*nNR+nR]))
-    i0 = 2*nNR + nR
-    am = np.hstack((m[nNR:2*nNR], m[i0:i0+nR]))
+    ap = np.hstack((m[:nNR], m[2 * nNR : 2 * nNR + nR]))
+    i0 = 2 * nNR + nR
+    am = np.hstack((m[nNR : 2 * nNR], m[i0 : i0 + nR]))
 
     Xu = np.real(ap + am)
     Yu = -np.imag(ap - am)
 
-    if not opt['twodim']:
-        coef['A'], _, _, coef['g'] = ut_cs2cep(Xu, Yu)
+    if not opt["twodim"]:
+        coef["A"], _, _, coef["g"] = ut_cs2cep(Xu, Yu)
         Xv = []
         Yv = []
 
     else:
-        Xv = np.imag(ap+am)
-        Yv = np.real(ap-am)
+        Xv = np.imag(ap + am)
+        Yv = np.real(ap - am)
         packed = ut_cs2cep(Xu, Yu, Xv, Yv)
-        coef['Lsmaj'], coef['Lsmin'], coef['theta'], coef['g'] = packed
+        coef["Lsmaj"], coef["Lsmin"], coef["theta"], coef["g"] = packed
 
     # Mean and trend.
-    if opt['twodim']:
-        if opt['notrend']:
-            coef['umean'] = np.real(m[-1])
-            coef['vmean'] = np.imag(m[-1])
+    if opt["twodim"]:
+        if opt["notrend"]:
+            coef["umean"] = np.real(m[-1])
+            coef["vmean"] = np.imag(m[-1])
         else:
-            coef['umean'] = np.real(m[-2])
-            coef['vmean'] = np.imag(m[-2])
-            coef['uslope'] = np.real(m[-1])/lor
-            coef['vslope'] = np.imag(m[-1])/lor
+            coef["umean"] = np.real(m[-2])
+            coef["vmean"] = np.imag(m[-2])
+            coef["uslope"] = np.real(m[-1]) / lor
+            coef["vslope"] = np.imag(m[-1]) / lor
     else:
-        if opt['notrend']:
-            coef['mean'] = np.real(m[-1])
+        if opt["notrend"]:
+            coef["mean"] = np.real(m[-1])
         else:
-            coef['mean'] = np.real(m[-2])
-            coef['slope'] = np.real(m[-1])/lor
+            coef["mean"] = np.real(m[-2])
+            coef["slope"] = np.real(m[-1]) / lor
 
     if opt.infer:
         # complex coefficients
@@ -349,8 +347,8 @@ def _solv1(tin, uin, vin, lat, **opts):
         ind = 0
 
         for k, ref in enumerate(cnstit.R):
-            apI[ind:ind + ref.nI] = ref.I.Rp * ap[nNR + k]
-            amI[ind:ind + ref.nI] = ref.I.Rm * am[nNR + k]
+            apI[ind : ind + ref.nI] = ref.I.Rp * ap[nNR + k]
+            amI[ind : ind + ref.nI] = ref.I.Rm * am[nNR + k]
             ind += ref.nI
 
         XuI = (apI + amI).real
@@ -369,67 +367,68 @@ def _solv1(tin, uin, vin, lat, **opts):
             coef.theta = np.hstack((coef.theta, theta))
             coef.g = np.hstack((coef.g, g))
 
-    if opt['conf_int'] is True:
-        coef = _confidence(coef, cnstit, opt, t, e, tin, elor, xraw, xmod,
-                           W, m, B, Xu, Yu, Xv, Yv)
+    if opt["conf_int"] is True:
+        coef = _confidence(
+            coef, cnstit, opt, t, e, tin, elor, xraw, xmod, W, m, B, Xu, Yu, Xv, Yv
+        )
 
     # Diagnostics.
-    if not opt['nodiagn']:
+    if not opt["nodiagn"]:
         coef, indPE = ut_diagn(coef, opt)
 
     # Re-order constituents.
-    if opt['ordercnstit'] is not None:
+    if opt["ordercnstit"] is not None:
 
-        if opt['ordercnstit'] == 'frq':
-            ind = coef['aux']['frq'].argsort()
+        if opt["ordercnstit"] == "frq":
+            ind = coef["aux"]["frq"].argsort()
 
-        elif opt['ordercnstit'] == 'snr':
-            if not opt['nodiagn']:
-                ind = coef['diagn']['SNR'].argsort()[::-1]
+        elif opt["ordercnstit"] == "snr":
+            if not opt["nodiagn"]:
+                ind = coef["diagn"]["SNR"].argsort()[::-1]
             else:
-                if opt['twodim']:
-                    SNR = (coef['Lsmaj']**2 + coef['Lsmin']**2) / (
-                        (coef['Lsmaj_ci']/1.96)**2 +
-                        (coef['Lsmin_ci']/1.96)**2)
+                if opt["twodim"]:
+                    SNR = (coef["Lsmaj"] ** 2 + coef["Lsmin"] ** 2) / (
+                        (coef["Lsmaj_ci"] / 1.96) ** 2 + (coef["Lsmin_ci"] / 1.96) ** 2
+                    )
 
                 else:
-                    SNR = (coef['A']**2) / (coef['A_ci']/1.96)**2
+                    SNR = (coef["A"] ** 2) / (coef["A_ci"] / 1.96) ** 2
 
                 ind = SNR.argsort()[::-1]
 
         else:
-            ilist = [constit_index_dict[name] for name in opt['ordercnstit']]
+            ilist = [constit_index_dict[name] for name in opt["ordercnstit"]]
             ind = np.array(ilist, dtype=int)
 
     else:  # Default: order by decreasing energy.
-        if not opt['nodiagn']:
+        if not opt["nodiagn"]:
             ind = indPE
         else:
-            if opt['twodim']:
-                PE = np.sum(coef['Lsmaj']**2 + coef['Lsmin']**2)
-                PE = 100 * (coef['Lsmaj']**2 + coef['Lsmin']**2) / PE
+            if opt["twodim"]:
+                PE = np.sum(coef["Lsmaj"] ** 2 + coef["Lsmin"] ** 2)
+                PE = 100 * (coef["Lsmaj"] ** 2 + coef["Lsmin"] ** 2) / PE
             else:
-                PE = 100 * coef['A']**2 / np.sum(coef['A']**2)
+                PE = 100 * coef["A"] ** 2 / np.sum(coef["A"] ** 2)
 
             ind = PE.argsort()[::-1]
 
-    reorderlist = ['g', 'name']
+    reorderlist = ["g", "name"]
     if opt.twodim:
-        reorderlist.extend(['Lsmaj', 'Lsmin', 'theta'])
+        reorderlist.extend(["Lsmaj", "Lsmin", "theta"])
         if opt.conf_int:
-            reorderlist.extend(['Lsmaj_ci', 'Lsmin_ci', 'theta_ci', 'g_ci'])
+            reorderlist.extend(["Lsmaj_ci", "Lsmin_ci", "theta_ci", "g_ci"])
     else:
-        reorderlist.append('A')
+        reorderlist.append("A")
         if opt.conf_int:
-            reorderlist.extend(['A_ci', 'g_ci'])
+            reorderlist.extend(["A_ci", "g_ci"])
 
     for key in reorderlist:
         coef[key] = coef[key][ind]
 
-    coef['aux']['frq'] = coef['aux']['frq'][ind]
-    coef['aux']['lind'] = coef['aux']['lind'][ind]
+    coef["aux"]["frq"] = coef["aux"]["frq"][ind]
+    coef["aux"]["lind"] = coef["aux"]["lind"][ind]
 
-    if opt['RunTimeDisp']:
+    if opt["RunTimeDisp"]:
         print("done.")
 
     return coef
@@ -451,7 +450,7 @@ def _slvinit(tin, uin, vin, lat, **opts):
     opt = Bunch(twodim=(vin is not None))
 
     # Step 0: apply epoch to time.
-    tin = _normalize_time(tin, opts['epoch'])
+    tin = _normalize_time(tin, opts["epoch"])
 
     # Step 1: remove invalid times from tin, uin, vin
     tin = np.ma.masked_invalid(tin)
@@ -489,41 +488,41 @@ def _slvinit(tin, uin, vin, lat, **opts):
     # Are the times equally spaced?
     eps = np.finfo(np.float64).eps
     if np.var(np.unique(np.diff(tin))) < eps:
-        opt['equi'] = True  # based on times; u/v can still have nans ("gappy")
+        opt["equi"] = True  # based on times; u/v can still have nans ("gappy")
         lor = np.ptp(tin)
         ntgood = len(tin)
-        elor = lor*ntgood / (ntgood-1)
-        tref = 0.5*(tin[0] + tin[-1])
+        elor = lor * ntgood / (ntgood - 1)
+        tref = 0.5 * (tin[0] + tin[-1])
     else:
-        opt['equi'] = False
+        opt["equi"] = False
         lor = np.ptp(t)
         nt = len(t)
-        elor = lor*nt / (nt-1)
-        tref = 0.5*(t[0]+t[-1])
+        elor = lor * nt / (nt - 1)
+        tref = 0.5 * (t[0] + t[-1])
 
     # Options.
-    opt['conf_int'] = True
-    opt['cnstit'] = 'auto'
-    opt['notrend'] = 0
-    opt['prefilt'] = []
-    opt['nodsatlint'] = 0
-    opt['nodsatnone'] = 0
-    opt['gwchlint'] = 0
-    opt['gwchnone'] = 0
-    opt['infer'] = None
-    opt['inferaprx'] = 0
-    opt['rmin'] = 1
-    opt['method'] = 'ols'
-    opt['tunrdn'] = 1
-    opt['linci'] = 0
-    opt['white'] = 0
-    opt['nrlzn'] = 200
-    opt['lsfrqosmp'] = 1
-    opt['nodiagn'] = 0
-    opt['diagnplots'] = 0
-    opt['diagnminsnr'] = 2
-    opt['ordercnstit'] = None
-    opt['runtimedisp'] = 'yyy'
+    opt["conf_int"] = True
+    opt["cnstit"] = "auto"
+    opt["notrend"] = 0
+    opt["prefilt"] = []
+    opt["nodsatlint"] = 0
+    opt["nodsatnone"] = 0
+    opt["gwchlint"] = 0
+    opt["gwchnone"] = 0
+    opt["infer"] = None
+    opt["inferaprx"] = 0
+    opt["rmin"] = 1
+    opt["method"] = "ols"
+    opt["tunrdn"] = 1
+    opt["linci"] = 0
+    opt["white"] = 0
+    opt["nrlzn"] = 200
+    opt["lsfrqosmp"] = 1
+    opt["nodiagn"] = 0
+    opt["diagnplots"] = 0
+    opt["diagnminsnr"] = 2
+    opt["ordercnstit"] = None
+    opt["runtimedisp"] = "yyy"
 
     # Update the default opt dictionary with the kwargs,
     # ensuring that every kwarg key matches a key in opt.
@@ -531,6 +530,6 @@ def _slvinit(tin, uin, vin, lat, **opts):
         try:
             opt[key] = item
         except KeyError:
-            print('solve: unrecognized input: {0}'.format(key))
+            print("solve: unrecognized input: {0}".format(key))
 
     return tin, t, u, v, tref, lor, elor, opt

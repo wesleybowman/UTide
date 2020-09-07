@@ -1,15 +1,13 @@
 import numpy as np
+
+from ._time_conversion import _normalize_time
 from .harmonics import ut_E
 from .utilities import Bunch
-from ._time_conversion import _normalize_time
 
 
-def reconstruct(t, coef,
-                epoch='python',
-                verbose=True,
-                constit=None,
-                min_SNR=2,
-                min_PE=0):
+def reconstruct(
+    t, coef, epoch="python", verbose=True, constit=None, min_SNR=2, min_PE=0
+):
     """
     Reconstruct a tidal signal.
 
@@ -56,13 +54,12 @@ def reconstruct(t, coef,
 
     """
 
-    out = Bunch(t_in=t, epoch=epoch, constit=constit, min_SNR=min_SNR,
-                min_PE=min_PE)
+    out = Bunch(t_in=t, epoch=epoch, constit=constit, min_SNR=min_SNR, min_PE=min_PE)
     t = np.atleast_1d(t)
     if t.ndim != 1:
         raise ValueError("t must be a 1-D array")
     t = _normalize_time(t, epoch)
-    if epoch == 'python':
+    if epoch == "python":
         out.t_mpl = out.t_in
     else:
         out.t_mpl = t
@@ -70,11 +67,15 @@ def reconstruct(t, coef,
     goodmask = ~np.ma.getmaskarray(t)
     t = t.compressed()
 
-    u, v = _reconstruct(t, goodmask, coef,
-                        verbose=verbose,
-                        constit=constit,
-                        min_SNR=min_SNR,
-                        min_PE=min_PE)
+    u, v = _reconstruct(
+        t,
+        goodmask,
+        coef,
+        verbose=verbose,
+        constit=constit,
+        min_SNR=min_SNR,
+        min_PE=min_PE,
+    )
 
     if v is not None:
         out.u, out.v = u, v
@@ -85,71 +86,82 @@ def reconstruct(t, coef,
 
 def _reconstruct(t, goodmask, coef, verbose, constit, min_SNR, min_PE):
 
-    twodim = coef['aux']['opt']['twodim']
+    twodim = coef["aux"]["opt"]["twodim"]
 
     # Determine constituents to include.
     if constit is not None:
-        ind = [i for i, c in enumerate(coef['name']) if c in constit]
-    elif (min_SNR == 0 and min_PE == 0) or coef['aux']['opt']['nodiagn']:
+        ind = [i for i, c in enumerate(coef["name"]) if c in constit]
+    elif (min_SNR == 0 and min_PE == 0) or coef["aux"]["opt"]["nodiagn"]:
         ind = slice(None)
     else:
         if twodim:
-            E = coef['Lsmaj']**2 + coef['Lsmin']**2
-            N = (coef['Lsmaj_ci']/1.96)**2 + (coef['Lsmin_ci']/1.96)**2
+            E = coef["Lsmaj"] ** 2 + coef["Lsmin"] ** 2
+            N = (coef["Lsmaj_ci"] / 1.96) ** 2 + (coef["Lsmin_ci"] / 1.96) ** 2
         else:
-            E = coef['A']**2
-            N = (coef['A_ci']/1.96)**2
+            E = coef["A"] ** 2
+            N = (coef["A_ci"] / 1.96) ** 2
         SNR = E / N
         PE = 100 * E / E.sum()
-        with np.errstate(invalid='ignore'):
+        with np.errstate(invalid="ignore"):
             ind = np.logical_and(SNR >= min_SNR, PE >= min_PE)
 
     # Complex coefficients.
-    rpd = np.pi/180
+    rpd = np.pi / 180
     if twodim:
-        ap = 0.5 * ((coef['Lsmaj'][ind] + coef['Lsmin'][ind]) *
-                    np.exp(1j*(coef['theta'][ind] - coef['g'][ind]) * rpd))
-        am = 0.5 * ((coef['Lsmaj'][ind] - coef['Lsmin'][ind]) *
-                    np.exp(1j*(coef['theta'][ind] + coef['g'][ind]) * rpd))
+        ap = 0.5 * (
+            (coef["Lsmaj"][ind] + coef["Lsmin"][ind])
+            * np.exp(1j * (coef["theta"][ind] - coef["g"][ind]) * rpd)
+        )
+        am = 0.5 * (
+            (coef["Lsmaj"][ind] - coef["Lsmin"][ind])
+            * np.exp(1j * (coef["theta"][ind] + coef["g"][ind]) * rpd)
+        )
     else:
-        ap = 0.5 * coef['A'][ind] * np.exp(-1j*coef['g'][ind] * rpd)
+        ap = 0.5 * coef["A"][ind] * np.exp(-1j * coef["g"][ind] * rpd)
         am = np.conj(ap)
 
-    ngflgs = [coef['aux']['opt']['nodsatlint'],
-              coef['aux']['opt']['nodsatnone'],
-              coef['aux']['opt']['gwchlint'],
-              coef['aux']['opt']['gwchnone']]
+    ngflgs = [
+        coef["aux"]["opt"]["nodsatlint"],
+        coef["aux"]["opt"]["nodsatnone"],
+        coef["aux"]["opt"]["gwchlint"],
+        coef["aux"]["opt"]["gwchnone"],
+    ]
 
     if verbose:
-        print('prep/calcs ... ', end='')
+        print("prep/calcs ... ", end="")
 
-    E = ut_E(t,
-             coef['aux']['reftime'], coef['aux']['frq'][ind],
-             coef['aux']['lind'][ind], coef['aux']['lat'], ngflgs,
-             coef['aux']['opt']['prefilt'])
+    E = ut_E(
+        t,
+        coef["aux"]["reftime"],
+        coef["aux"]["frq"][ind],
+        coef["aux"]["lind"][ind],
+        coef["aux"]["lat"],
+        ngflgs,
+        coef["aux"]["opt"]["prefilt"],
+    )
 
     fit = np.dot(E, ap) + np.dot(np.conj(E), am)
 
     # Mean (& trend).
     u = np.empty(goodmask.shape, dtype=float)
     u.fill(np.nan)
-    trend = not coef['aux']['opt']['notrend']
+    trend = not coef["aux"]["opt"]["notrend"]
 
     if twodim:
         v = u.copy()
-        u[goodmask] = np.real(fit) + coef['umean']
-        v[goodmask] = np.imag(fit) + coef['vmean']
+        u[goodmask] = np.real(fit) + coef["umean"]
+        v[goodmask] = np.imag(fit) + coef["vmean"]
         if trend:
-            u[goodmask] += coef['uslope'] * (t - coef['aux']['reftime'])
-            v[goodmask] += coef['vslope'] * (t - coef['aux']['reftime'])
+            u[goodmask] += coef["uslope"] * (t - coef["aux"]["reftime"])
+            v[goodmask] += coef["vslope"] * (t - coef["aux"]["reftime"])
 
     else:
-        u[goodmask] = np.real(fit) + coef['mean']
+        u[goodmask] = np.real(fit) + coef["mean"]
         if trend:
-            u[goodmask] += coef['slope'] * (t - coef['aux']['reftime'])
+            u[goodmask] += coef["slope"] * (t - coef["aux"]["reftime"])
         v = None
 
     if verbose:
-        print('done.')
+        print("done.")
 
     return u, v

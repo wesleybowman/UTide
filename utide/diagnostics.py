@@ -3,27 +3,27 @@ import numpy as np
 
 def ut_diagn(coef, opt):
 
-    if opt['RunTimeDisp']:
-        print('diagnostics ... ', end='')
-    coef['diagn'] = {}
+    if opt["RunTimeDisp"]:
+        print("diagnostics ... ", end="")
+    coef["diagn"] = {}
 
-    if opt['twodim']:
-        PE = np.sum(coef['Lsmaj']**2 + coef['Lsmin']**2)
-        PE = 100 * (coef['Lsmaj']**2 + coef['Lsmin']**2) / PE
+    if opt["twodim"]:
+        PE = np.sum(coef["Lsmaj"] ** 2 + coef["Lsmin"] ** 2)
+        PE = 100 * (coef["Lsmaj"] ** 2 + coef["Lsmin"] ** 2) / PE
 
-        SNR = (coef['Lsmaj']**2 + coef['Lsmin']**2) / (
-            (coef['Lsmaj_ci']/1.96)**2 +
-            (coef['Lsmin_ci']/1.96)**2)
+        SNR = (coef["Lsmaj"] ** 2 + coef["Lsmin"] ** 2) / (
+            (coef["Lsmaj_ci"] / 1.96) ** 2 + (coef["Lsmin_ci"] / 1.96) ** 2
+        )
 
     else:
-        PE = 100 * coef['A']**2 / np.sum(coef['A']**2)
-        SNR = (coef['A']**2) / (coef['A_ci']/1.96)**2
+        PE = 100 * coef["A"] ** 2 / np.sum(coef["A"] ** 2)
+        SNR = (coef["A"] ** 2) / (coef["A_ci"] / 1.96) ** 2
 
     indPE = PE.argsort()[::-1]
 
-    coef['diagn']['name'] = coef['name'][indPE]
-    coef['diagn']['PE'] = PE[indPE]
-    coef['diagn']['SNR'] = SNR[indPE]
+    coef["diagn"]["name"] = coef["name"][indPE]
+    coef["diagn"]["PE"] = PE[indPE]
+    coef["diagn"]["SNR"] = SNR[indPE]
 
     return coef, indPE
 

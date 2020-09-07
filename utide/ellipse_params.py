@@ -53,7 +53,7 @@ def ut_cs2cep(Xu, Yu=None, Xv=None, Yv=None):
         Xu = Xu[:, 0]
 
     if Xv is None:
-        ap = Xu - 1j*Yu
+        ap = Xu - 1j * Yu
         Lsmaj = np.abs(ap)
         Lsmin = np.zeros_like(Xu)
         theta = np.zeros_like(Xu)
@@ -61,8 +61,8 @@ def ut_cs2cep(Xu, Yu=None, Xv=None, Yv=None):
         return Lsmaj, Lsmin, theta, g
 
     # 2-D case
-    ap = ((Xu+Yv) + 1j * (Xv-Yu))/2
-    am = ((Xu-Yv) + 1j * (Xv+Yu))/2
+    ap = ((Xu + Yv) + 1j * (Xv - Yu)) / 2
+    am = ((Xu - Yv) + 1j * (Xv + Yu)) / 2
     Ap = np.abs(ap)
     Am = np.abs(am)
     Lsmaj = Ap + Am
@@ -70,7 +70,7 @@ def ut_cs2cep(Xu, Yu=None, Xv=None, Yv=None):
     epsp = np.angle(ap, deg=True)
     epsm = np.angle(am, deg=True)
 
-    theta = ((epsp+epsm)/2) % 180
-    g = (-epsp+theta) % 360
+    theta = ((epsp + epsm) / 2) % 180
+    g = (-epsp + theta) % 360
 
     return Lsmaj, Lsmin, theta, g

@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
+
 from scipy.io import loadmat
+
 
 # This module began as an excerpt from the one in python-gsw.
 
@@ -11,10 +13,10 @@ from scipy.io import loadmat
 
 
 def complex_interp(x, xp, fp, **kw):
-    if fp.dtype.kind == 'c':
+    if fp.dtype.kind == "c":
         fr = np.interp(x, xp, fp.real, **kw)
         fi = np.interp(x, xp, fp.imag, **kw)
-        return fr + 1j*fi
+        return fr + 1j * fi
     return np.interp(x, xp, fp, **kw)
 
 
@@ -96,9 +98,8 @@ class Bunch(dict):
 
         klen = min(20, max(klens))
         vlen = min(40, max(vlens))
-        slist = [fmt.format(key, value, klen=klen, vlen=vlen) for
-                 key, value in items]
-        return ''.join(slist)
+        slist = [fmt.format(key, value, klen=klen, vlen=vlen) for key, value in items]
+        return "".join(slist)
 
     def from_pyfile(self, filename):
         """
@@ -112,11 +113,15 @@ class Bunch(dict):
         lines = ["def _temp_func():\n"]
         with open(filename) as f:
             lines.extend(["    " + line for line in f])
-        lines.extend(["\n    return(locals())\n",
-                      "_temp_out = _temp_func()\n",
-                      "del(_temp_func)\n"])
+        lines.extend(
+            [
+                "\n    return(locals())\n",
+                "_temp_out = _temp_func()\n",
+                "del(_temp_func)\n",
+            ]
+        )
         codetext = "".join(lines)
-        code = compile(codetext, filename, 'exec')
+        code = compile(codetext, filename, "exec")
         exec(code, globals(), d)
         self.update(d["_temp_out"])
         return self
@@ -151,8 +156,9 @@ class Bunch(dict):
             newkw.update(d)
         newkw.update(kw)
         self._check_strict(strict, newkw)
-        dsub = dict([(k, v) for (k, v) in newkw.items()
-                     if k in self and self[k] is None])
+        dsub = dict(
+            [(k, v) for (k, v) in newkw.items() if k in self and self[k] is None]
+        )
         self.update(dsub)
 
     def _check_strict(self, strict, kw):
@@ -163,14 +169,14 @@ class Bunch(dict):
                 bk.sort()
                 ek = list(self.keys())
                 ek.sort()
-                raise KeyError(
-                    "Update keys %s don't match existing keys %s" % (bk, ek))
+                raise KeyError("Update keys %s don't match existing keys %s" % (bk, ek))
 
 
 # The following functions ending with loadbunch() and showmatbunch()
 # are taken from the repo
 #     http://currents.soest.hawaii.edu/hgstage/pycurrents/,
 # pycurrents/file/matfile.py.
+
 
 def _crunch(arr, masked=True):
     """
@@ -184,7 +190,7 @@ def _crunch(arr, masked=True):
     # we might want to make it optional.
     arr = arr.squeeze()
 
-    if masked and arr.dtype.kind == 'f':  # Check for complex also.
+    if masked and arr.dtype.kind == "f":  # Check for complex also.
         arrm = np.ma.masked_invalid(arr)
         if arrm.count() < arrm.size:
             arr = arrm
@@ -209,7 +215,7 @@ def _structured_to_bunch(arr, masked=True):
     # Each Matlab structure field corresponds to a field in
     # a numpy structured dtype.
 
-    if arr.dtype.kind == 'V' and arr.shape == (1, 1):
+    if arr.dtype.kind == "V" and arr.shape == (1, 1):
         b = Bunch()
         x = arr[0, 0]
         for name in x.dtype.names:
@@ -223,7 +229,7 @@ def _showmatbunch(b, elements=None, origin=None):
     if elements is None:
         elements = []
     if origin is None:
-        origin = ''
+        origin = ""
     items = list(b.items())
     for k, v in items:
         _origin = "%s.%s" % (origin, k)
@@ -235,14 +241,14 @@ def _showmatbunch(b, elements=None, origin=None):
                 if slen < 50:
                     entry = v
                 else:
-                    entry = 'string, %d characters' % slen
+                    entry = "string, %d characters" % slen
             elif isinstance(v, np.ndarray):
                 if np.ma.isMA(v):
-                    entry = 'masked array, shape %s, dtype %s' % (v.shape, v.dtype)
+                    entry = "masked array, shape %s, dtype %s" % (v.shape, v.dtype)
                 else:
-                    entry = 'ndarray, shape %s, dtype %s' % (v.shape, v.dtype)
+                    entry = "ndarray, shape %s, dtype %s" % (v.shape, v.dtype)
             else:
-                entry = '%s %s' % (type(v).__name__, v)
+                entry = "%s %s" % (type(v).__name__, v)
             elements.append((_origin, entry))
     elements.sort()
     return elements
@@ -264,7 +270,7 @@ def showmatbunch(b):
     namelen = min(40, max([len(n) for n in names]))
     str_fmt = "{0!s:<{namelen}} : {1!s}\n"
     strlist = [str_fmt.format(n[1:], v, namelen=namelen) for (n, v) in elist]
-    return ''.join(strlist)
+    return "".join(strlist)
 
 
 def loadbunch(fname, masked=True):
@@ -274,13 +280,13 @@ def loadbunch(fname, masked=True):
     nested Bunch objects in place of the matlab structures.
     """
     out = Bunch()
-    if fname.endswith('.mat'):
-        with open(fname, 'rb') as fobj:
+    if fname.endswith(".mat"):
+        with open(fname, "rb") as fobj:
             xx = loadmat(fobj, chars_as_strings=True)
-    elif fname.endswith('.npz'):
-        xx = np.load(fname, encoding='latin1', allow_pickle=True)
+    elif fname.endswith(".npz"):
+        xx = np.load(fname, encoding="latin1", allow_pickle=True)
     else:
-        raise ValueError('Unrecognized file {}'.format(fname))
+        raise ValueError("Unrecognized file {}".format(fname))
     keys = [k for k in xx.keys() if not k.startswith("__")]
     for k in keys:
         out[k] = _structured_to_bunch(xx[k], masked=masked)
@@ -297,14 +303,18 @@ def convert_unicode_arrays(b):
     out = Bunch()
     for key, val in b.items():
         if isinstance(val, np.ndarray):
-            if val.dtype.kind == 'O':
+            if val.dtype.kind == "O":
                 newval = np.empty(shape=val.shape, dtype=val.dtype)
                 for k, x in enumerate(val):
-                    if isinstance(x, np.ndarray) and x.dtype.kind == 'U' and x.size == 1:
+                    if (
+                        isinstance(x, np.ndarray)
+                        and x.dtype.kind == "U"
+                        and x.size == 1
+                    ):
                         newval[k] = x.item()
                     else:
                         newval[k] = x
-            elif val.dtype.kind == 'U' and val.ndim == 1:
+            elif val.dtype.kind == "U" and val.ndim == 1:
                 newval = np.array([s.rstrip() for s in val], dtype=object)
             else:
                 newval = val
