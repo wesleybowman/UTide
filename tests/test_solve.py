@@ -73,6 +73,8 @@ def test_roundtrip(conf_int):
     err = np.sqrt(np.mean((time_series - ts_recon) ** 2))
 
     print(amp_err, phase_err, err)
+    print(time_series[:10])
+    print(ts_recon[:10])
     print(elev_coef["aux"]["reftime"], tref)
     print(elev_coef["aux"]["opt"])
 
