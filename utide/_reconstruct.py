@@ -141,6 +141,10 @@ def _reconstruct(t, goodmask, coef, verbose, constit, min_SNR, min_PE):
     )
 
     fit = np.dot(E, ap) + np.dot(np.conj(E), am)
+    print(f"E.shape: {E.shape},  ap.shape: {ap.shape}")
+    print(f"E[0]: {E[0]}")
+    print(f"ap: {ap}")
+    print(f"fit[:5]: {fit[:5]}")
 
     # Mean (& trend).
     u = np.empty(goodmask.shape, dtype=float)
