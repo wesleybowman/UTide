@@ -101,6 +101,7 @@ def _reconstruct(t, goodmask, coef, verbose, constit, min_SNR, min_PE):
         else:
             E = coef["A"] ** 2
             N = (coef["A_ci"] / 1.96) ** 2
+            print(f"A_ci: {coef['A_ci']}")
         SNR = E / N
         PE = 100 * E / E.sum()
         print(f"SNR: {SNR}, PE: {PE}")
