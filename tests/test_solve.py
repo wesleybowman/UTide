@@ -38,7 +38,7 @@ def test_roundtrip(conf_int):
 
     arg = 2 * np.pi * (time - tref) * freq_cpd[jj] - np.deg2rad(phase)
     np.random.seed(int(np.pi * 9))
-    time_series = amp * np.cos(arg) + 1e-10 * np.random.randn(len(time))
+    time_series = amp * np.cos(arg) + 0 * np.random.randn(len(time))
 
     opts = {
         "constit": "auto",
