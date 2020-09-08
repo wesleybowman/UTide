@@ -31,6 +31,7 @@ def test_roundtrip(conf_int):
     amp = 1.0
     phase = 53
     lat = 45.5
+    noise_amp = 1e-5
 
     freq_cpd = 24 * const.freq
 
@@ -38,7 +39,9 @@ def test_roundtrip(conf_int):
 
     arg = 2 * np.pi * (time - tref) * freq_cpd[jj] - np.deg2rad(phase)
     np.random.seed(int(np.pi * 9))
-    time_series = amp * np.cos(arg) + 0 * np.random.randn(len(time))
+    tide = amp * np.cos(arg)
+    noise = noise_amp * np.random.randn(len(time))
+    time_series = tide + noise
 
     opts = {
         "constit": "auto",
@@ -71,7 +74,7 @@ def test_roundtrip(conf_int):
     # assert isinstance(htmp, Bunch)
 
     # Now the round-trip check, just for the elevation.
-    err = np.sqrt(np.mean((time_series - ts_recon) ** 2))
+    err = np.std(tide - ts_recon)
 
     print(amp_err, phase_err, err)
     print(time_series[:10])
@@ -79,9 +82,9 @@ def test_roundtrip(conf_int):
     print(elev_coef["aux"]["reftime"], tref)
     print(elev_coef["aux"]["opt"])
 
-    np.testing.assert_almost_equal(amp_err, 0)
-    np.testing.assert_almost_equal(phase_err, 0)
-    np.testing.assert_almost_equal(err, 0)
+    np.testing.assert_almost_equal(amp_err, 0, decimal=4)
+    np.testing.assert_almost_equal(phase_err, 0, decimal=4)
+    np.testing.assert_almost_equal(err, 0, decimal=4)
 
 
 def test_masked_input():
