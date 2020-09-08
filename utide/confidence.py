@@ -177,10 +177,10 @@ def _confidence(
     varMSM = np.real(np.dot(xraw.conj(), _Wx) - np.dot(xmod.conj(), _Wx)) / (nt - nm)
 
     # Gamma_C: covariance Eq. 54.
-    gamC = np.linalg.inv(np.dot(B.conj().T, _WB)) * varMSM
+    gamC = np.linalg.pinv(np.dot(B.conj().T, _WB)) * varMSM  # inv -> pinv
 
     # Gamma_P: pseudo-covariance Eq. 54.
-    gamP = np.linalg.inv(np.dot(B.T, _WB))
+    gamP = np.linalg.pinv(np.dot(B.T, _WB))                  # inv -> pinv
     gamP *= (np.dot(xraw, _Wx) - np.dot(xmod, _Wx)) / (nt - nm)
 
     del _Wx, _WB
