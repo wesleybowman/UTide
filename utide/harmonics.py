@@ -158,11 +158,6 @@ def FUV(t, tref, lind, lat, ngflgs):
         F = F[lind, :].T
         U = U[lind, :].T
 
-        # if ngflgs[0]:  # Nodal/satellite with linearized times.
-        #    F = F[np.ones((nt, 1)), :]
-        #    U = U[np.ones((nt, 1)), :]
-        # Let's try letting broadcasting take care of it.
-
     # gwch (astron arg)
     if ngflgs[3]:  # None (raw phase lags not Greenwich phase lags).
         freq = linearized_freqs(tref)
@@ -178,7 +173,9 @@ def FUV(t, tref, lind, lat, ngflgs):
         astro, ader = ut_astron(tt)
 
         V = np.dot(const.doodson, astro) + const.semi[:, None]
-        np.fmod(V, 1, out=V)
+        # V has nan values from both const.* arrays
+        with np.errstate(invalid="ignore"):
+            np.fmod(V, 1, out=V)
 
         for i0, nshal, k in zip(ishallow, nshallow, kshallow):
             ik = i0 + np.arange(nshal)

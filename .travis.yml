@@ -9,10 +9,10 @@ env:
 matrix:
   fast_finish: true
   include:
+    - name: "python-3.9 numpy 1.20"
+      env: PY=3.9 NP=1.20
     - name: "python-3.8 numpy=1.17"
       env: PY=3.8 NP=1.17
-    - name: "python-3.8 numpy=1.14"
-      env: PY=3.8 NP=1.14
     - name: "python-3.7"
       env: PY=3.7
     - name: "coding_standards"

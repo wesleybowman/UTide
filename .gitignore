@@ -26,6 +26,7 @@ var/
 # Installer logs
 pip-log.txt
 pip-delete-this-directory.txt
+pip-wheel-metadata/
 
 # Unit test / coverage reports
 htmlcov/
@@ -68,3 +69,4 @@ doc/_build/
 *.kdev4
 .project
 .pydevproject
+.vscode/
