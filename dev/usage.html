@@ -5,14 +5,13 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Usage &#8212; UTide 0.2.6.dev15+g8561204 documentation</title>
-    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <title>Usage &#8212; UTide 0.2.6.dev17+gf915de2 documentation</title>
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
-    <script src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Internal details" href="internals/index.html" />
@@ -33,7 +32,7 @@
         <li class="right" >
           <a href="strategy.html" title="Strategy"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">UTide 0.2.6.dev15+g8561204 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">UTide 0.2.6.dev17+gf915de2 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Usage</a></li> 
       </ul>
     </div>  
@@ -51,7 +50,7 @@
 <h2>solve<a class="headerlink" href="#solve" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt id="utide.solve">
-<code class="sig-prename descclassname">utide.</code><code class="sig-name descname">solve</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">t</span></em>, <em class="sig-param"><span class="n">u</span></em>, <em class="sig-param"><span class="n">v</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">lat</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">opts</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utide/_solve.html#solve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#utide.solve" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">utide.</span></code><code class="sig-name descname"><span class="pre">solve</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">opts</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utide/_solve.html#solve"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utide.solve" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate amplitude, phase, confidence intervals of tidal constituents.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
@@ -59,11 +58,11 @@
 <li><p><strong>t</strong> (<em>array_like</em>) – Time in days since <code class="xref py py-obj docutils literal notranslate"><span class="pre">epoch</span></code>.</p></li>
 <li><p><strong>u</strong> (<em>array_like</em>) – Sea-surface height, velocity component, etc.</p></li>
 <li><p><strong>v</strong> (<em>{None</em><em>, </em><em>array_like}</em><em>, </em><em>optional</em>) – If <code class="xref py py-obj docutils literal notranslate"><span class="pre">u</span></code> is a velocity component, <code class="xref py py-obj docutils literal notranslate"><span class="pre">v</span></code> is the orthogonal component.</p></li>
-<li><p><strong>lat</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>required</em>) – Latitude in degrees.</p></li>
-<li><p><strong>epoch</strong> ({string, <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.date" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime.date</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime.datetime</span></code></a>}, optional) – Valid strings are ‘python’ (default); ‘matlab’ if <code class="xref py py-obj docutils literal notranslate"><span class="pre">t</span></code> is
+<li><p><strong>lat</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>required</em>) – Latitude in degrees.</p></li>
+<li><p><strong>epoch</strong> ({string, <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.date" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime.date</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime.datetime</span></code></a>}, optional) – Valid strings are ‘python’ (default); ‘matlab’ if <code class="xref py py-obj docutils literal notranslate"><span class="pre">t</span></code> is
 an array of Matlab datenums; or an arbitrary date in the
 form ‘YYYY-MM-DD’.  The default corresponds to the Python
-standard library <a class="reference external" href="https://docs.python.org/3/library/datetime.html#module-datetime" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime</span></code></a> proleptic Gregorian calendar,
+standard library <a class="reference external" href="https://docs.python.org/3/library/datetime.html#module-datetime" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime</span></code></a> proleptic Gregorian calendar,
 starting with 1 at 00:00 on January 1 of year 1; this is
 the ‘datenum’ used by Matplotlib.</p></li>
 <li><p><strong>constit</strong> (<em>{'auto'</em><em>, </em><em>array_like}</em><em>, </em><em>optional</em>) – List of strings with standard letter abbreviations of
@@ -72,7 +71,7 @@ based on the time span.</p></li>
 <li><p><strong>conf_int</strong> (<em>{'linear'</em><em>, </em><em>'MC'</em><em>, </em><em>'none'}</em><em>, </em><em>optional</em>) – If not ‘none’ (string), calculate linearized confidence
 intervals, or use a Monte-Carlo simulation.</p></li>
 <li><p><strong>method</strong> (<em>{'ols'</em><em>, </em><em>'robust'}</em><em>, </em><em>optional</em>) – Solve with ordinary least squares, or with a robust algorithm.</p></li>
-<li><p><strong>trend</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – True (default) to include a linear trend in the model.</p></li>
+<li><p><strong>trend</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – True (default) to include a linear trend in the model.</p></li>
 <li><p><strong>phase</strong> (<em>{'Greenwich'</em><em>, </em><em>'linear_time'</em><em>, </em><em>'raw'}</em><em>, </em><em>optional</em>) – Give Greenwich-referenced phase lags, an approximation
 using linearized times, or raw lags.</p></li>
 <li><p><strong>nodal</strong> (<em>{True</em><em>, </em><em>False</em><em>, </em><em>'linear_time'}</em><em>, </em><em>optional</em>) – True (default) to include nodal/satellite corrections;
@@ -129,27 +128,27 @@ assume a white background spectrum.</p></li>
 <h2>reconstruct<a class="headerlink" href="#reconstruct" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt id="utide.reconstruct">
-<code class="sig-prename descclassname">utide.</code><code class="sig-name descname">reconstruct</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">t</span></em>, <em class="sig-param"><span class="n">coef</span></em>, <em class="sig-param"><span class="n">epoch</span><span class="o">=</span><span class="default_value">'python'</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">constit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">min_SNR</span><span class="o">=</span><span class="default_value">2</span></em>, <em class="sig-param"><span class="n">min_PE</span><span class="o">=</span><span class="default_value">0</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utide/_reconstruct.html#reconstruct"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#utide.reconstruct" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">utide.</span></code><code class="sig-name descname"><span class="pre">reconstruct</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coef</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epoch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'python'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_SNR</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_PE</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utide/_reconstruct.html#reconstruct"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utide.reconstruct" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reconstruct a tidal signal.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>t</strong> (<em>array_like</em>) – Time in days since <code class="docutils literal notranslate"><span class="pre">epoch</span></code>.</p></li>
 <li><p><strong>coef</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">Bunch</span></code>) – Data structure returned by <a class="reference internal" href="#utide.solve" title="utide.solve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">utide.solve</span></code></a>.</p></li>
-<li><p><strong>epoch</strong> ({string, <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.date" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime.date</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime.datetime</span></code></a>}, optional) – Valid strings are ‘python’ (default); ‘matlab’ if <code class="xref py py-obj docutils literal notranslate"><span class="pre">t</span></code> is
+<li><p><strong>epoch</strong> ({string, <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.date" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime.date</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime.datetime</span></code></a>}, optional) – Valid strings are ‘python’ (default); ‘matlab’ if <code class="xref py py-obj docutils literal notranslate"><span class="pre">t</span></code> is
 an array of Matlab datenums; or an arbitrary date in the
 form ‘YYYY-MM-DD’.  The default corresponds to the Python
-standard library <a class="reference external" href="https://docs.python.org/3/library/datetime.html#module-datetime" title="(in Python v3.8)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime</span></code></a> proleptic Gregorian calendar,
+standard library <a class="reference external" href="https://docs.python.org/3/library/datetime.html#module-datetime" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime</span></code></a> proleptic Gregorian calendar,
 starting with 1 on January 1 of year 1.</p></li>
 <li><p><strong>verbose</strong> (<em>{True</em><em>, </em><em>False}</em><em>, </em><em>optional</em>) – True to enable output message (default). False turns off all
 messages.</p></li>
 <li><p><strong>constit</strong> (<em>{None</em><em>, </em><em>array_like}</em><em>, </em><em>optional</em>) – List of strings with standard letter abbreviations of
 tidal constituents, to be used in reconstruction if present
 in coef; alternative to the SNR and PE criteria.</p></li>
-<li><p><strong>min_SNR</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>optional</em><em>, </em><em>default 2</em>) – Include only the constituents with signal-to-noise SNR &gt;= min_SNR,
+<li><p><strong>min_SNR</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em><em>, </em><em>default 2</em>) – Include only the constituents with signal-to-noise SNR &gt;= min_SNR,
 where SNR is based on the constituent confidence intervals in
 <code class="docutils literal notranslate"><span class="pre">coef</span></code>.</p></li>
-<li><p><strong>min_PE</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>optional</em><em>, </em><em>default 0</em>) – Include only the constituents with percent energy PE &gt;= min_PE,
+<li><p><strong>min_PE</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em><em>, </em><em>default 0</em>) – Include only the constituents with percent energy PE &gt;= min_PE,
 where PE is based on the amplitudes in <code class="docutils literal notranslate"><span class="pre">coef</span></code>.</p></li>
 </ul>
 </dd>
@@ -180,7 +179,7 @@ attribute access to its data.  For example, <code class="docutils literal notran
 <code class="docutils literal notranslate"><span class="pre">coef.aux</span></code> can be used interchangeably.</p>
 <dl class="py function">
 <dt id="utide.utilities.Bunch">
-<code class="sig-prename descclassname">utide.utilities.</code><code class="sig-name descname">Bunch</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utide/utilities.html#Bunch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#utide.utilities.Bunch" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname"><span class="pre">utide.utilities.</span></code><code class="sig-name descname"><span class="pre">Bunch</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utide/utilities.html#Bunch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utide.utilities.Bunch" title="Permalink to this definition">¶</a></dt>
 <dd><p>A dictionary that also provides access via attributes.</p>
 <p>Additional methods update_values and update_None provide
 control over whether new keys are added to the dictionary
@@ -261,13 +260,13 @@ formatted() method.</p>
         <li class="right" >
           <a href="strategy.html" title="Strategy"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">UTide 0.2.6.dev15+g8561204 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">UTide 0.2.6.dev17+gf915de2 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Usage</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2015, Dan Codiga, Wesley Bowman, and contributors.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.2.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.2.
     </div>
   </body>
 </html>
