@@ -1,4 +1,4 @@
-name: Tests
+name: Tarball tests
 
 on:
   pull_request:
@@ -25,7 +25,7 @@ jobs:
         conda info --all
         conda list
 
-    - name: Tarball tests
+    - name: Tarball
       shell: bash -l {0}
       run: |
         source activate TEST
