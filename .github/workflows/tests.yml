@@ -6,7 +6,7 @@ on:
     branches: [master]
 
 jobs:
-  run-serial:
+  run:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -25,7 +25,7 @@ jobs:
         activate-conda: false
         conda-channels: conda-forge
 
-    - name: Python ${{ matrix.python-version }} ${{ matrix.numpy-version }}
+    - name: Python ${{ matrix.python-version }} numpy ${{ matrix.numpy-version }}
       shell: bash -l {0}
       run: |
         conda create --name TEST python=${{ matrix.python-version }} --file requirements.txt --file requirements-dev.txt
