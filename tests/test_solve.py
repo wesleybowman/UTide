@@ -203,3 +203,45 @@ def test_MC():
             "%5s %10.4g %10.4g  %10.4g %10.4g  %10.4g %10.4g  %10.4g %10.4g"
             % (name, Lsmaj, Lsmaj_ci, Lsmin, Lsmin_ci, theta, theta_ci, gg, gg_ci)
         )
+
+
+def test_ordercnstit():
+    # Add noise
+    np.random.seed(1)
+    noisy = tide + 0.01 * np.random.randn(len(time))
+
+    opts = {
+        "constit": "auto",
+        "phase": "raw",
+        "nodal": False,
+        "trend": False,
+        "method": "ols",
+        "conf_int": "MC",
+        "white": False,
+        "Rayleigh_min": 0.95,
+        "ordercnstit": "frq",
+    }
+
+    speed_coef = solve(time, noisy, noisy, lat=lat, **opts)
+    elev_coef = solve(time, noisy, lat=lat, **opts)
+
+    for name, AA, AA_ci, gg, gg_ci in zip(
+        elev_coef.name, elev_coef.A, elev_coef.A_ci, elev_coef.g, elev_coef.g_ci
+    ):
+        print("%5s %10.4g %10.4g  %10.4g %10.4g" % (name, AA, AA_ci, gg, gg_ci))
+
+    for (name, Lsmaj, Lsmaj_ci, Lsmin, Lsmin_ci, theta, theta_ci, gg, gg_ci) in zip(
+        speed_coef.name,
+        speed_coef.Lsmaj,
+        speed_coef.Lsmaj_ci,
+        speed_coef.Lsmin,
+        speed_coef.Lsmin_ci,
+        speed_coef.theta,
+        speed_coef.theta_ci,
+        speed_coef.g,
+        speed_coef.g_ci,
+    ):
+        print(
+            "%5s %10.4g %10.4g  %10.4g %10.4g  %10.4g %10.4g  %10.4g %10.4g"
+            % (name, Lsmaj, Lsmaj_ci, Lsmin, Lsmin_ci, theta, theta_ci, gg, gg_ci)
+        )
