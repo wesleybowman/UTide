@@ -11,4 +11,3 @@ robustfit
    :private-members:
    :undoc-members:
    :show-inheritance:
-

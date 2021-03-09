@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>utide.robustfit &#8212; UTide 0.2.6.dev26+gdf2f77b documentation</title>
+    <title>utide.robustfit &#8212; UTide 0.2.6.dev29+g5f15bcb documentation</title>
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
     <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
@@ -24,7 +24,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">UTide 0.2.6.dev26+gdf2f77b documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">UTide 0.2.6.dev29+g5f15bcb documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">utide.robustfit</a></li> 
       </ul>
@@ -158,7 +158,13 @@
 
 
 <div class="viewcode-block" id="robustfit"><a class="viewcode-back" href="../../internals/robustfit.html#utide.robustfit.robustfit">[docs]</a><span class="k">def</span> <span class="nf">robustfit</span><span class="p">(</span>
-    <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">weight_function</span><span class="o">=</span><span class="s2">&quot;bisquare&quot;</span><span class="p">,</span> <span class="n">tune</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rcond</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">maxit</span><span class="o">=</span><span class="mi">50</span>
+    <span class="n">X</span><span class="p">,</span>
+    <span class="n">y</span><span class="p">,</span>
+    <span class="n">weight_function</span><span class="o">=</span><span class="s2">&quot;bisquare&quot;</span><span class="p">,</span>
+    <span class="n">tune</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">rcond</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">tol</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span>
+    <span class="n">maxit</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Multiple linear regression via iteratively reweighted least squares.</span>
@@ -279,7 +285,14 @@
     <span class="n">rms_resid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">resid</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
 
     <span class="n">out</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
-        <span class="nb">dict</span><span class="p">(</span><span class="n">iterations</span><span class="o">=</span><span class="n">iterations</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">b</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">sing</span><span class="p">,</span> <span class="n">w</span><span class="o">=</span><span class="n">w</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="n">rank</span><span class="p">,</span> <span class="n">rms_resid</span><span class="o">=</span><span class="n">rms_resid</span><span class="p">,)</span>
+        <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">iterations</span><span class="o">=</span><span class="n">iterations</span><span class="p">,</span>
+            <span class="n">b</span><span class="o">=</span><span class="n">b</span><span class="p">,</span>
+            <span class="n">s</span><span class="o">=</span><span class="n">sing</span><span class="p">,</span>
+            <span class="n">w</span><span class="o">=</span><span class="n">w</span><span class="p">,</span>
+            <span class="n">rank</span><span class="o">=</span><span class="n">rank</span><span class="p">,</span>
+            <span class="n">rms_resid</span><span class="o">=</span><span class="n">rms_resid</span><span class="p">,</span>
+        <span class="p">),</span>
     <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">out</span></div>
@@ -364,7 +377,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">UTide 0.2.6.dev26+gdf2f77b documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">UTide 0.2.6.dev29+g5f15bcb documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">utide.robustfit</a></li> 
       </ul>

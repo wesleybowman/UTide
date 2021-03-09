@@ -21,4 +21,3 @@ attribute access to its data.  For example, ``coef['aux']`` and
 ``coef.aux`` can be used interchangeably.
 
 .. autofunction:: utide.utilities.Bunch
-
