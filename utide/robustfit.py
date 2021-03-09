@@ -120,7 +120,13 @@ def r_normed(R, rfac):
 
 
 def robustfit(
-    X, y, weight_function="bisquare", tune=None, rcond=1, tol=0.001, maxit=50
+    X,
+    y,
+    weight_function="bisquare",
+    tune=None,
+    rcond=1,
+    tol=0.001,
+    maxit=50,
 ):
     """
     Multiple linear regression via iteratively reweighted least squares.
@@ -241,7 +247,14 @@ def robustfit(
     rms_resid = np.sqrt(np.mean(np.abs(resid) ** 2))
 
     out.update(
-        dict(iterations=iterations, b=b, s=sing, w=w, rank=rank, rms_resid=rms_resid,)
+        dict(
+            iterations=iterations,
+            b=b,
+            s=sing,
+            w=w,
+            rank=rank,
+            rms_resid=rms_resid,
+        ),
     )
 
     return out

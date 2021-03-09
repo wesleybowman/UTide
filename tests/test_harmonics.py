@@ -26,7 +26,7 @@ def test_FUV():
 
     for i, flag in enumerate(x.flags):
         F, U, V = FUV(x.t, x.t0, x.lind - 1, x.lat, flag)
-        print("i: {} ngflags: {}".format(i, flag))
+        print(f"i: {i} ngflags: {flag}")
 
         # We use broadcasting instead of replication, so
         # we need to test only against the first row of

@@ -6,7 +6,13 @@ from .utilities import Bunch
 
 
 def reconstruct(
-    t, coef, epoch="python", verbose=True, constit=None, min_SNR=2, min_PE=0
+    t,
+    coef,
+    epoch="python",
+    verbose=True,
+    constit=None,
+    min_SNR=2,
+    min_PE=0,
 ):
     """
     Reconstruct a tidal signal.

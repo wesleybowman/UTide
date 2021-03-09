@@ -7,4 +7,3 @@ Internal details
 
    periodogram.rst
    robustfit.rst
-

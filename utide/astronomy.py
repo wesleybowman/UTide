@@ -77,7 +77,7 @@ def ut_astron(jd):
 
     # derivatives (polynomial)
     dargs = np.vstack(
-        (np.zeros(jd.shape), np.ones(jd.shape), 2.0e-4 * D, 3.0e-4 * D * D)
+        (np.zeros(jd.shape), np.ones(jd.shape), 2.0e-4 * D, 3.0e-4 * D * D),
     )
 
     ader = np.dot(_coefs, dargs) / 360.0

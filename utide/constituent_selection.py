@@ -87,12 +87,12 @@ def ut_cnstitsel(tref, minres, incnstit, infer):
             for lk, ilk in enumerate(ind):
                 refstruct.I.Rp.append(
                     infer.amp_ratios[ilk]
-                    * np.exp(1j * infer.phase_offsets[ilk] * np.pi / 180)
+                    * np.exp(1j * infer.phase_offsets[ilk] * np.pi / 180),
                 )
                 if len(infer.amp_ratios) > nI:
                     refstruct.I.Rm.append(
                         infer.amp_ratios[ilk + nI]
-                        * np.exp(-1j * infer.phase_offsets[ilk + nI] * np.pi / 180)
+                        * np.exp(-1j * infer.phase_offsets[ilk + nI] * np.pi / 180),
                     )
                 else:
                     refstruct.I.Rm.append(np.conj(refstruct.I.Rp[lk]))
@@ -109,7 +109,9 @@ def ut_cnstitsel(tref, minres, incnstit, infer):
 
     coef.name = list(cnstit.NR.name[:])
     coef.aux = Bunch(
-        frq=list(cnstit.NR.frq[:]), lind=list(cnstit.NR.lind[:]), reftime=tref
+        frq=list(cnstit.NR.frq[:]),
+        lind=list(cnstit.NR.lind[:]),
+        reftime=tref,
     )
 
     if infer is not None:
