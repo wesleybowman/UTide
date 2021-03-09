@@ -9,20 +9,7 @@ env:
 matrix:
   fast_finish: true
   include:
-    - name: "python-3.9 numpy 1.20"
-      env: PY=3.9 NP=1.20
-    - name: "python-3.8 numpy=1.17"
-      env: PY=3.8 NP=1.17
-    - name: "python-3.7"
-      env: PY=3.7
-    - name: "coding_standards"
-      env: PY=3
     - name: "docs"
-      env: PY=3
-    - name: "tarball"
-      env: PY=3
-  allow_failures:
-    - name: "coding_standards"
       env: PY=3
 
 before_install:
@@ -38,30 +25,11 @@ before_install:
     conda config --set safety_checks disabled
     conda create --name TEST python=$PY --file requirements.txt --file requirements-dev.txt
     source activate TEST
-    if [[ -n "$NP" ]]; then
-      conda install numpy=$NP
-    fi
 
 install:
   - pip install -e . --no-deps --force-reinstall
 
 script:
-  - if [[ $TRAVIS_JOB_NAME == python-* ]]; then
-      cp -r tests/ /tmp ;
-      pushd /tmp && pytest -n 2 -rxs --cov=utide tests && popd ;
-    fi
-
-  - if [[ $TRAVIS_JOB_NAME == 'tarball' ]]; then
-      python setup.py --version ;
-      pip wheel . -w dist --no-deps ;
-      check-manifest --verbose ;
-      twine check dist/* ;
-    fi
-
-  - if [[ $TRAVIS_JOB_NAME == 'coding_standards' ]]; then
-      pytest --flake8 -m flake8 ;
-    fi
-
   - |
     if [[ $TRAVIS_JOB_NAME == 'docs' ]]; then
       set -e
