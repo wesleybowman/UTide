@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import numpy as np
 
 from scipy.io import loadmat
@@ -118,7 +116,7 @@ class Bunch(dict):
                 "\n    return(locals())\n",
                 "_temp_out = _temp_func()\n",
                 "del(_temp_func)\n",
-            ]
+            ],
         )
         codetext = "".join(lines)
         code = compile(codetext, filename, "exec")
@@ -142,7 +140,7 @@ class Bunch(dict):
             newkw.update(d)
         newkw.update(kw)
         self._check_strict(strict, newkw)
-        dsub = dict([(k, v) for (k, v) in newkw.items() if k in self])
+        dsub = {k: v for (k, v) in newkw.items() if k in self}
         self.update(dsub)
 
     def update_None(self, *args, **kw):
@@ -156,9 +154,7 @@ class Bunch(dict):
             newkw.update(d)
         newkw.update(kw)
         self._check_strict(strict, newkw)
-        dsub = dict(
-            [(k, v) for (k, v) in newkw.items() if k in self and self[k] is None]
-        )
+        dsub = {k: v for (k, v) in newkw.items() if k in self and self[k] is None}
         self.update(dsub)
 
     def _check_strict(self, strict, kw):
@@ -169,7 +165,7 @@ class Bunch(dict):
                 bk.sort()
                 ek = list(self.keys())
                 ek.sort()
-                raise KeyError("Update keys %s don't match existing keys %s" % (bk, ek))
+                raise KeyError(f"Update keys {bk} don't match existing keys {ek}")
 
 
 # The following functions ending with loadbunch() and showmatbunch()
@@ -232,7 +228,7 @@ def _showmatbunch(b, elements=None, origin=None):
         origin = ""
     items = list(b.items())
     for k, v in items:
-        _origin = "%s.%s" % (origin, k)
+        _origin = f"{origin}.{k}"
         if isinstance(v, Bunch):
             _showmatbunch(v, elements, _origin)
         else:
@@ -244,11 +240,11 @@ def _showmatbunch(b, elements=None, origin=None):
                     entry = "string, %d characters" % slen
             elif isinstance(v, np.ndarray):
                 if np.ma.isMA(v):
-                    entry = "masked array, shape %s, dtype %s" % (v.shape, v.dtype)
+                    entry = f"masked array, shape {v.shape}, dtype {v.dtype}"
                 else:
-                    entry = "ndarray, shape %s, dtype %s" % (v.shape, v.dtype)
+                    entry = f"ndarray, shape {v.shape}, dtype {v.dtype}"
             else:
-                entry = "%s %s" % (type(v).__name__, v)
+                entry = "{} {}".format(type(v).__name__, v)
             elements.append((_origin, entry))
     elements.sort()
     return elements
@@ -286,7 +282,7 @@ def loadbunch(fname, masked=True):
     elif fname.endswith(".npz"):
         xx = np.load(fname, encoding="latin1", allow_pickle=True)
     else:
-        raise ValueError("Unrecognized file {}".format(fname))
+        raise ValueError(f"Unrecognized file {fname}")
     keys = [k for k in xx.keys() if not k.startswith("__")]
     for k in keys:
         out[k] = _structured_to_bunch(xx[k], masked=masked)

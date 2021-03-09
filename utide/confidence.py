@@ -138,14 +138,29 @@ def nearestSPD(A):
         # Normally no more than one adjustment will be needed.
         if k > 100:
             warnings.warn(
-                "adjustment in nearestSPD did not converge; " "returning diagonal"
+                "adjustment in nearestSPD did not converge; " "returning diagonal",
             )
             return np.diag(np.diag(A))
     return Ahat
 
 
 def _confidence(
-    coef, cnstit, opt, t, e, tin, elor, xraw, xmod, W, m, B, Xu, Yu, Xv, Yv
+    coef,
+    cnstit,
+    opt,
+    t,
+    e,
+    tin,
+    elor,
+    xraw,
+    xmod,
+    W,
+    m,
+    B,
+    Xu,
+    Yu,
+    Xv,
+    Yv,
 ):
     """
     This confidence interval calculation does not correspond
@@ -205,10 +220,10 @@ def _confidence(
 
     for c in range(nc):
         G = np.array(
-            [[Gall[c, c], Gall[c, c + nc]], [Gall[c + nc, c], Gall[c + nc, c + nc]]]
+            [[Gall[c, c], Gall[c, c + nc]], [Gall[c + nc, c], Gall[c + nc, c + nc]]],
         )
         H = np.array(
-            [[Hall[c, c], Hall[c, c + nc]], [Hall[c + nc, c], Hall[c + nc, c + nc]]]
+            [[Hall[c, c], Hall[c, c + nc]], [Hall[c + nc, c], Hall[c + nc, c + nc]]],
         )
         varXu = np.real(G[0, 0] + G[1, 1] + 2 * G[0, 1]) / 2
         varYu = np.real(H[0, 0] + H[1, 1] - 2 * H[0, 1]) / 2
@@ -235,7 +250,7 @@ def _confidence(
                     varXv = Pvv[c] * varXv / den
                     varYv = Pvv[c] * varYv / den
                     varcov_mCc[c, :, :] = np.diag(
-                        np.array([varXu, varYu, varXv, varYv])
+                        np.array([varXu, varYu, varXv, varYv]),
                     )
                 with np.errstate(invalid="ignore"):
                     sig1, sig2 = ut_linci(
@@ -262,11 +277,15 @@ def _confidence(
                 if not opt.white:
                     varcov_mCc[c, :, :] = nearestSPD(varcov_mCc[c, :, :])
                     mCall = np.random.multivariate_normal(
-                        (Xu[c], Yu[c]), varcov_mCc[c], opt.nrlzn
+                        (Xu[c], Yu[c]),
+                        varcov_mCc[c],
+                        opt.nrlzn,
                     )
                 else:
                     mCall = np.random.multivariate_normal(
-                        (Xu[c], Yu[c]), varcov_mCw[c], opt.nrlzn
+                        (Xu[c], Yu[c]),
+                        varcov_mCw[c],
+                        opt.nrlzn,
                     )
                 A, _, _, g = ut_cs2cep(mCall)
                 coef.A_ci[c] = (
@@ -304,11 +323,15 @@ def _confidence(
 
                     varcov_mCc[c] = nearestSPD(varcov_mCc[c])
                     mCall = np.random.multivariate_normal(
-                        (Xu[c], Yu[c], Xv[c], Yv[c]), varcov_mCc[c], opt.nrlzn
+                        (Xu[c], Yu[c], Xv[c], Yv[c]),
+                        varcov_mCc[c],
+                        opt.nrlzn,
                     )  # noqa
                 else:
                     mCall = np.random.multivariate_normal(
-                        (Xu[c], Yu[c], Xv[c], Yv[c]), varcov_mCw[c], opt.nrlzn
+                        (Xu[c], Yu[c], Xv[c], Yv[c]),
+                        varcov_mCw[c],
+                        opt.nrlzn,
                     )  # noqa
                 Lsmaj, Lsmin, theta, g = ut_cs2cep(mCall)
                 coef.Lsmaj_ci[c] = (
@@ -351,7 +374,10 @@ def _confidence(
                 for varX, varY in zip(varXuHH, varYuHH):
                     if not opt.twodim:
                         sig1, sig2 = ut_linci(
-                            Xu[nNR + k], Yu[nNR + k], np.sqrt(varX), np.sqrt(varY)
+                            Xu[nNR + k],
+                            Yu[nNR + k],
+                            np.sqrt(varX),
+                            np.sqrt(varY),
                         )
                         coef.A_ci[ind] = 1.96 * sig1
                         coef.g_ci[ind] = 1.96 * sig2
@@ -438,7 +464,7 @@ def ut_linci(X, Y, sigX, sigY):
     dXv2 = ((rd * Yv - rn * Xv) / den) ** 2
     dYv2 = ((rd * Xv + rn * Yv) / den) ** 2
     sig2 = (180 / np.pi) * np.sqrt(
-        dXu2 * sigXu2 + dYu2 * sigYu2 + dXv2 * sigXv2 + dYv2 * sigYv2
+        dXu2 * sigXu2 + dYu2 * sigYu2 + dXv2 * sigXv2 + dYv2 * sigYv2,
     )
 
     # if ~isreal(X)
@@ -449,7 +475,7 @@ def ut_linci(X, Y, sigX, sigY):
         dXv2 = (0.25 * (hx + gx)) ** 2
         dYv2 = (0.25 * (ex + fx)) ** 2
         sig1 = sig1 + 1j * np.sqrt(
-            dXu2 * sigXu2 + dYu2 * sigYu2 + dXv2 * sigXv2 + dYv2 * sigYv2
+            dXu2 * sigXu2 + dYu2 * sigYu2 + dXv2 * sigXv2 + dYv2 * sigYv2,
         )
 
         # Orientation.
@@ -461,7 +487,7 @@ def ut_linci(X, Y, sigX, sigY):
         dXv2 = ((rd * Xu + rn * Xv) / den) ** 2
         dYv2 = ((rd * Yu + rn * Yv) / den) ** 2
         sig2 = sig2 + 1j * (180 / np.pi) * np.sqrt(
-            dXu2 * sigXu2 + dYu2 * sigYu2 + dXv2 * sigXv2 + dYv2 * sigYv2
+            dXu2 * sigXu2 + dYu2 * sigYu2 + dXv2 * sigXv2 + dYv2 * sigYv2,
         )
 
     return sig1, sig2

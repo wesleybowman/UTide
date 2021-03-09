@@ -5,6 +5,7 @@ repos:
   hooks:
     - id: check-ast
     - id: end-of-file-fixer
+      exclude: github_deploy_key_wesleybowman_utide.enc
     - id: check-docstring-first
     - id: check-added-large-files
     - id: requirements-txt-fixer

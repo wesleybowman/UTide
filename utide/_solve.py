@@ -211,7 +211,10 @@ def _solv1(tin, uin, vin, lat, **opts):
 
     # opt['cnstit'] = cnstit
     cnstit, coef = ut_cnstitsel(
-        tref, opt["rmin"] / (24 * lor), opt["cnstit"], opt["infer"]
+        tref,
+        opt["rmin"] / (24 * lor),
+        opt["cnstit"],
+        opt["infer"],
     )
 
     # a function we don't need
@@ -260,7 +263,7 @@ def _solv1(tin, uin, vin, lat, **opts):
                 Etilm[:, k] = E
                 num = ut_E(tref, tref, ref.I.frq, ref.I.lind, *E_args).real
                 den = ut_E(tref, tref, ref.frq, ref.lind, *E_args).real
-                Q[k] = ((num / den))[0, 0]
+                Q[k] = (num / den)[0, 0]
                 arg = np.pi * lor * 24 * (ref.I.frq - ref.frq) * (nt + 1) / nt
                 beta[k] = np.sin(arg) / arg
 
@@ -369,7 +372,22 @@ def _solv1(tin, uin, vin, lat, **opts):
 
     if opt["conf_int"] is True:
         coef = _confidence(
-            coef, cnstit, opt, t, e, tin, elor, xraw, xmod, W, m, B, Xu, Yu, Xv, Yv
+            coef,
+            cnstit,
+            opt,
+            t,
+            e,
+            tin,
+            elor,
+            xraw,
+            xmod,
+            W,
+            m,
+            B,
+            Xu,
+            Yu,
+            Xv,
+            Yv,
         )
 
     # Diagnostics.
@@ -530,6 +548,6 @@ def _slvinit(tin, uin, vin, lat, **opts):
         try:
             opt[key] = item
         except KeyError:
-            print("solve: unrecognized input: {0}".format(key))
+            print(f"solve: unrecognized input: {key}")
 
     return tin, t, u, v, tref, lor, elor, opt

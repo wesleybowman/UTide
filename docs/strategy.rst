@@ -71,5 +71,3 @@ of nans and masked array inputs to indicate missing values.
 
 The degree to which masked arrays will be used internally is
 unclear, but most likely their use will be highly localized.
-
-

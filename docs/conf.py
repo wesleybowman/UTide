@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 #
 # UTide documentation build configuration file, created by
 # sphinx-quickstart on Sat Mar 28 09:00:51 2015.
@@ -241,7 +240,7 @@ man_pages = [
         "UTide Documentation",
         ["Dan Codiga, Wesley Bowman, and contributors"],
         1,
-    )
+    ),
 ]
 
 # If true, show URL addresses after external links.

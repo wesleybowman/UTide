@@ -15,7 +15,7 @@ ut_constants = convert_unicode_arrays(ut_constants)
 constit_names = list(ut_constants.const.name)
 
 # Make a dictionary for index lookups.
-constit_index_dict = dict([(name, i) for (i, name) in enumerate(constit_names)])
+constit_index_dict = {name: i for (i, name) in enumerate(constit_names)}
 
 _uc = ut_constants.const
 cycles_per_hour = Bunch(zip(_uc.name, _uc.freq))

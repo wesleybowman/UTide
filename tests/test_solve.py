@@ -39,6 +39,7 @@ noise = 1e-5 * np.random.randn(len(time))
 
 time_series = tide + noise
 
+
 # We omit the 'MC' case for now because with this test data, it
 # fails with 'numpy.linalg.LinAlgError: SVD did not converge'.
 @pytest.mark.parametrize("conf_int", ["linear", "none"])
@@ -184,9 +185,13 @@ def test_MC():
     elev_coef = solve(time, noisy, lat=lat, **opts)
 
     for name, AA, AA_ci, gg, gg_ci in zip(
-        elev_coef.name, elev_coef.A, elev_coef.A_ci, elev_coef.g, elev_coef.g_ci
+        elev_coef.name,
+        elev_coef.A,
+        elev_coef.A_ci,
+        elev_coef.g,
+        elev_coef.g_ci,
     ):
-        print("%5s %10.4g %10.4g  %10.4g %10.4g" % (name, AA, AA_ci, gg, gg_ci))
+        print(f"{name:>5} {AA:10.4g} {AA_ci:10.4g}  {gg:10.4g} {gg_ci:10.4g}")
 
     for (name, Lsmaj, Lsmaj_ci, Lsmin, Lsmin_ci, theta, theta_ci, gg, gg_ci) in zip(
         speed_coef.name,
@@ -201,5 +206,5 @@ def test_MC():
     ):
         print(
             "%5s %10.4g %10.4g  %10.4g %10.4g  %10.4g %10.4g  %10.4g %10.4g"
-            % (name, Lsmaj, Lsmaj_ci, Lsmin, Lsmin_ci, theta, theta_ci, gg, gg_ci)
+            % (name, Lsmaj, Lsmaj_ci, Lsmin, Lsmin_ci, theta, theta_ci, gg, gg_ci),
         )

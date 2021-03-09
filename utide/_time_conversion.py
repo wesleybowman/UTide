@@ -33,7 +33,7 @@ def _normalize_time(t, epoch):
                 epoch = epoch.astimezone(timezone.utc)
             else:
                 warnings.warn(
-                    "Timezone info in epoch is being ignored;" " UTC is assumed."
+                    "Timezone info in epoch is being ignored;" " UTC is assumed.",
                 )
         ofs = (
             epoch.toordinal()
