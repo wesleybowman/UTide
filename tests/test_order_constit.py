@@ -42,9 +42,9 @@ opts0 = {
 @pytest.mark.parametrize("conf_int", ["none", "linear", "MC"])
 def test_order(conf_int):
 
-    orders = ["energy", "frequency", opts0["constit"]]
+    orders = [None, "PE", "frequency", opts0["constit"]]
     if conf_int != "none":
-        orders.append("snr")
+        orders.append("SNR")
     elevs = []
     ts_elevs = []
     vels = []
@@ -64,10 +64,14 @@ def test_order(conf_int):
         assert (ts_vels[i].u == ts_vels[0].u).all()
         assert (ts_vels[i].v == ts_vels[0].v).all()
 
+    # Is None equivalent to "PE"? (Just a spot check.)
+    assert (elevs[0].name == elevs[1].name).all()
+    assert (elevs[0].A == elevs[1].A).all()
+
 
 def test_invalid_snr():
     opts = opts0.copy()
     opts["conf_int"] = "none"
-    opts["order_constit"] = "snr"
+    opts["order_constit"] = "SNR"
     with pytest.raises(ValueError):
         solve(time, time_series, lat=45, **opts)

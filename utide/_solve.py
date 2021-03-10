@@ -105,15 +105,13 @@ def validate_infer(infer, is_2D):
 
 
 def validate_order_constit(arg, have_snr):
-    available = ["energy", "frequency"]
+    available = ["PE", "frequency"]
     if have_snr:
-        available.append("snr")
+        available.append("SNR")
     if arg is None:
-        return "energy"
-    if isinstance(arg, str):
-        arg = arg.lower()
-        if arg in available:
-            return arg
+        return "PE"
+    if isinstance(arg, str) and arg in available:
+        return arg
     if not isinstance(arg, str) and np.iterable(arg):
         return arg  # TODO: add checking of its elements
     raise ValueError(
@@ -186,8 +184,8 @@ def solve(t, u, v=None, lat=None, **opts):
         amp_ratios and phase_offsets have length N for a scalar
         time series, or 2N for a vector series.
 
-    order_constit : {'energy', 'SNR', 'frequency', sequence}, optional
-        The default is 'energy' order, returning results ordered from
+    order_constit : {'PE', 'SNR', 'frequency', sequence}, optional
+        The default is 'PE' (percent energy) order, returning results ordered from
         high energy to low.
         The 'SNR' order is from high signal-to-noise ratio to low, and is
         available only if `conf_int` is not 'none'. The
@@ -440,7 +438,7 @@ def _solv1(tin, uin, vin, lat, **opts):
 
 
 def _reorder(coef, opt):
-    if opt["ordercnstit"] == "energy":
+    if opt["ordercnstit"] == "PE":
         # Default: order by decreasing energy.
         if "PE" not in coef:
             coef["PE"] = _PE(coef)
@@ -449,7 +447,7 @@ def _reorder(coef, opt):
     elif opt["ordercnstit"] == "frequency":
         ind = coef["aux"]["frq"].argsort()
 
-    elif opt["ordercnstit"] == "snr":
+    elif opt["ordercnstit"] == "SNR":
         # If we are here, we should be guaranteed to have SNR already.
         ind = coef["SNR"].argsort()[::-1]
     else:
