@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>utide._solve &#8212; UTide 0.2.6.dev29+g5f15bcb documentation</title>
+    <title>utide._solve &#8212; UTide 0.2.6.dev32+gef3d445 documentation</title>
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
     <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
@@ -24,7 +24,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">UTide 0.2.6.dev29+g5f15bcb documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">UTide 0.2.6.dev32+gef3d445 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">utide._solve</a></li> 
       </ul>
@@ -43,10 +43,9 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="kn">from</span> <span class="nn">._time_conversion</span> <span class="kn">import</span> <span class="n">_normalize_time</span>
-<span class="kn">from</span> <span class="nn">._ut_constants</span> <span class="kn">import</span> <span class="n">constit_index_dict</span>
 <span class="kn">from</span> <span class="nn">.confidence</span> <span class="kn">import</span> <span class="n">_confidence</span>
 <span class="kn">from</span> <span class="nn">.constituent_selection</span> <span class="kn">import</span> <span class="n">ut_cnstitsel</span>
-<span class="kn">from</span> <span class="nn">.diagnostics</span> <span class="kn">import</span> <span class="n">ut_diagn</span>
+<span class="kn">from</span> <span class="nn">.diagnostics</span> <span class="kn">import</span> <span class="n">_PE</span><span class="p">,</span> <span class="n">_SNR</span><span class="p">,</span> <span class="n">ut_diagn</span>
 <span class="kn">from</span> <span class="nn">.ellipse_params</span> <span class="kn">import</span> <span class="n">ut_cs2cep</span>
 <span class="kn">from</span> <span class="nn">.harmonics</span> <span class="kn">import</span> <span class="n">ut_E</span>
 <span class="kn">from</span> <span class="nn">.robustfit</span> <span class="kn">import</span> <span class="n">robustfit</span>
@@ -55,6 +54,7 @@
 
 <span class="n">default_opts</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;constit&quot;</span><span class="p">:</span> <span class="s2">&quot;auto&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;order_constit&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
     <span class="s2">&quot;conf_int&quot;</span><span class="p">:</span> <span class="s2">&quot;linear&quot;</span><span class="p">,</span>
     <span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;ols&quot;</span><span class="p">,</span>
     <span class="s2">&quot;trend&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
@@ -75,6 +75,8 @@
     <span class="n">newopts</span><span class="o">.</span><span class="n">update_values</span><span class="p">(</span><span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">opts</span><span class="p">)</span>
     <span class="c1"># TODO: add more validations.</span>
     <span class="n">newopts</span><span class="o">.</span><span class="n">infer</span> <span class="o">=</span> <span class="n">validate_infer</span><span class="p">(</span><span class="n">newopts</span><span class="o">.</span><span class="n">infer</span><span class="p">,</span> <span class="n">is_2D</span><span class="p">)</span>
+    <span class="n">snr</span> <span class="o">=</span> <span class="n">newopts</span><span class="o">.</span><span class="n">conf_int</span> <span class="o">!=</span> <span class="s2">&quot;none&quot;</span>
+    <span class="n">newopts</span><span class="o">.</span><span class="n">order_constit</span> <span class="o">=</span> <span class="n">validate_order_constit</span><span class="p">(</span><span class="n">newopts</span><span class="o">.</span><span class="n">order_constit</span><span class="p">,</span> <span class="n">snr</span><span class="p">)</span>
 
     <span class="n">compat_opts</span> <span class="o">=</span> <span class="n">_translate_opts</span><span class="p">(</span><span class="n">newopts</span><span class="p">)</span>
 
@@ -86,6 +88,7 @@
     <span class="c1"># Here or elsewhere, proper validation remains to be added.</span>
     <span class="n">oldopts</span> <span class="o">=</span> <span class="n">Bunch</span><span class="p">()</span>
     <span class="n">oldopts</span><span class="o">.</span><span class="n">cnstit</span> <span class="o">=</span> <span class="n">opts</span><span class="o">.</span><span class="n">constit</span>
+    <span class="n">oldopts</span><span class="o">.</span><span class="n">ordercnstit</span> <span class="o">=</span> <span class="n">opts</span><span class="o">.</span><span class="n">order_constit</span>
     <span class="n">oldopts</span><span class="o">.</span><span class="n">infer</span> <span class="o">=</span> <span class="n">opts</span><span class="o">.</span><span class="n">infer</span>  <span class="c1"># we will not use the matlab names, though</span>
 
     <span class="n">oldopts</span><span class="o">.</span><span class="n">conf_int</span> <span class="o">=</span> <span class="kc">True</span>
@@ -139,6 +142,22 @@
     <span class="k">return</span> <span class="n">infer</span>
 
 
+<span class="k">def</span> <span class="nf">validate_order_constit</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">have_snr</span><span class="p">):</span>
+    <span class="n">available</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;PE&quot;</span><span class="p">,</span> <span class="s2">&quot;frequency&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">have_snr</span><span class="p">:</span>
+        <span class="n">available</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;SNR&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">arg</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;PE&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">available</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">arg</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">iterable</span><span class="p">(</span><span class="n">arg</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">arg</span>  <span class="c1"># TODO: add checking of its elements</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;order_constit must be one of </span><span class="si">{</span><span class="n">available</span><span class="si">}</span><span class="s2"> or&quot;</span>
+        <span class="sa">f</span><span class="s2">&quot; a sequence of constituents, not &#39;</span><span class="si">{</span><span class="n">arg</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
 <div class="viewcode-block" id="solve"><a class="viewcode-back" href="../../usage.html#utide.solve">[docs]</a><span class="k">def</span> <span class="nf">solve</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lat</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">opts</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate amplitude, phase, confidence intervals of tidal constituents.</span>
@@ -160,7 +179,7 @@
 <span class="sd">        standard library `datetime` proleptic Gregorian calendar,</span>
 <span class="sd">        starting with 1 at 00:00 on January 1 of year 1; this is</span>
 <span class="sd">        the &#39;datenum&#39; used by Matplotlib.</span>
-<span class="sd">    constit : {&#39;auto&#39;, array_like}, optional</span>
+<span class="sd">    constit : {&#39;auto&#39;, sequence}, optional</span>
 <span class="sd">        List of strings with standard letter abbreviations of</span>
 <span class="sd">        tidal constituents; or &#39;auto&#39; to let the list be determined</span>
 <span class="sd">        based on the time span.</span>
@@ -203,6 +222,14 @@
 <span class="sd">        amp_ratios and phase_offsets have length N for a scalar</span>
 <span class="sd">        time series, or 2N for a vector series.</span>
 
+<span class="sd">    order_constit : {&#39;PE&#39;, &#39;SNR&#39;, &#39;frequency&#39;, sequence}, optional</span>
+<span class="sd">        The default is &#39;PE&#39; (percent energy) order, returning results ordered from</span>
+<span class="sd">        high energy to low.</span>
+<span class="sd">        The &#39;SNR&#39; order is from high signal-to-noise ratio to low, and is</span>
+<span class="sd">        available only if `conf_int` is not &#39;none&#39;. The</span>
+<span class="sd">        &#39;frequency&#39; order is from low to high frequency. Alternatively, a</span>
+<span class="sd">        sequence of constituent names may be supplied, typically the same list as</span>
+<span class="sd">        given in the *constit* option.</span>
 <span class="sd">    MC_n : integer, optional</span>
 <span class="sd">        Not yet implemented.</span>
 <span class="sd">    robust_kw : dict, optional</span>
@@ -408,7 +435,7 @@
             <span class="n">coef</span><span class="o">.</span><span class="n">theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">coef</span><span class="o">.</span><span class="n">theta</span><span class="p">,</span> <span class="n">theta</span><span class="p">))</span>
             <span class="n">coef</span><span class="o">.</span><span class="n">g</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">coef</span><span class="o">.</span><span class="n">g</span><span class="p">,</span> <span class="n">g</span><span class="p">))</span>
 
-    <span class="k">if</span> <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;conf_int&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;conf_int&quot;</span><span class="p">]:</span>
         <span class="n">coef</span> <span class="o">=</span> <span class="n">_confidence</span><span class="p">(</span>
             <span class="n">coef</span><span class="p">,</span>
             <span class="n">cnstit</span><span class="p">,</span>
@@ -430,63 +457,50 @@
 
     <span class="c1"># Diagnostics.</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;nodiagn&quot;</span><span class="p">]:</span>
-        <span class="n">coef</span><span class="p">,</span> <span class="n">indPE</span> <span class="o">=</span> <span class="n">ut_diagn</span><span class="p">(</span><span class="n">coef</span><span class="p">,</span> <span class="n">opt</span><span class="p">)</span>
+        <span class="n">coef</span> <span class="o">=</span> <span class="n">ut_diagn</span><span class="p">(</span><span class="n">coef</span><span class="p">)</span>
+        <span class="c1"># Adds a diagn dictionary, always sorted by energy.</span>
+        <span class="c1"># This doesn&#39;t seem very useful.  Let&#39;s directly add the variables</span>
+        <span class="c1"># to the base coef structure.  Then they can be sorted with everything</span>
+        <span class="c1"># else.</span>
+        <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;PE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_PE</span><span class="p">(</span><span class="n">coef</span><span class="p">)</span>
+        <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;SNR&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_SNR</span><span class="p">(</span><span class="n">coef</span><span class="p">)</span>
 
     <span class="c1"># Re-order constituents.</span>
-    <span class="k">if</span> <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;ordercnstit&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">coef</span> <span class="o">=</span> <span class="n">_reorder</span><span class="p">(</span><span class="n">coef</span><span class="p">,</span> <span class="n">opt</span><span class="p">)</span>
+    <span class="c1"># This might have added PE if it was not already present.</span>
 
-        <span class="k">if</span> <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;ordercnstit&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;frq&quot;</span><span class="p">:</span>
-            <span class="n">ind</span> <span class="o">=</span> <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;aux&quot;</span><span class="p">][</span><span class="s2">&quot;frq&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">argsort</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;RunTimeDisp&quot;</span><span class="p">]:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;done.&quot;</span><span class="p">)</span>
 
-        <span class="k">elif</span> <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;ordercnstit&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;snr&quot;</span><span class="p">:</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;nodiagn&quot;</span><span class="p">]:</span>
-                <span class="n">ind</span> <span class="o">=</span> <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;diagn&quot;</span><span class="p">][</span><span class="s2">&quot;SNR&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">argsort</span><span class="p">()[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;twodim&quot;</span><span class="p">]:</span>
-                    <span class="n">SNR</span> <span class="o">=</span> <span class="p">(</span><span class="n">coef</span><span class="p">[</span><span class="s2">&quot;Lsmaj&quot;</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;Lsmin&quot;</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span>
-                        <span class="p">(</span><span class="n">coef</span><span class="p">[</span><span class="s2">&quot;Lsmaj_ci&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="mf">1.96</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">coef</span><span class="p">[</span><span class="s2">&quot;Lsmin_ci&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="mf">1.96</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
-                    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">coef</span>
 
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">SNR</span> <span class="o">=</span> <span class="p">(</span><span class="n">coef</span><span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">coef</span><span class="p">[</span><span class="s2">&quot;A_ci&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="mf">1.96</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
 
-                <span class="n">ind</span> <span class="o">=</span> <span class="n">SNR</span><span class="o">.</span><span class="n">argsort</span><span class="p">()[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="k">def</span> <span class="nf">_reorder</span><span class="p">(</span><span class="n">coef</span><span class="p">,</span> <span class="n">opt</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;ordercnstit&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;PE&quot;</span><span class="p">:</span>
+        <span class="c1"># Default: order by decreasing energy.</span>
+        <span class="k">if</span> <span class="s2">&quot;PE&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">coef</span><span class="p">:</span>
+            <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;PE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_PE</span><span class="p">(</span><span class="n">coef</span><span class="p">)</span>
+        <span class="n">ind</span> <span class="o">=</span> <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;PE&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">argsort</span><span class="p">()[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">ilist</span> <span class="o">=</span> <span class="p">[</span><span class="n">constit_index_dict</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;ordercnstit&quot;</span><span class="p">]]</span>
-            <span class="n">ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ilist</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;ordercnstit&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;frequency&quot;</span><span class="p">:</span>
+        <span class="n">ind</span> <span class="o">=</span> <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;aux&quot;</span><span class="p">][</span><span class="s2">&quot;frq&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">argsort</span><span class="p">()</span>
 
-    <span class="k">else</span><span class="p">:</span>  <span class="c1"># Default: order by decreasing energy.</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;nodiagn&quot;</span><span class="p">]:</span>
-            <span class="n">ind</span> <span class="o">=</span> <span class="n">indPE</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;twodim&quot;</span><span class="p">]:</span>
-                <span class="n">PE</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">coef</span><span class="p">[</span><span class="s2">&quot;Lsmaj&quot;</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;Lsmin&quot;</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
-                <span class="n">PE</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">*</span> <span class="p">(</span><span class="n">coef</span><span class="p">[</span><span class="s2">&quot;Lsmaj&quot;</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;Lsmin&quot;</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="n">PE</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">PE</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">*</span> <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">coef</span><span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
-
-            <span class="n">ind</span> <span class="o">=</span> <span class="n">PE</span><span class="o">.</span><span class="n">argsort</span><span class="p">()[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-
-    <span class="n">reorderlist</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;g&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">]</span>
-    <span class="k">if</span> <span class="n">opt</span><span class="o">.</span><span class="n">twodim</span><span class="p">:</span>
-        <span class="n">reorderlist</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s2">&quot;Lsmaj&quot;</span><span class="p">,</span> <span class="s2">&quot;Lsmin&quot;</span><span class="p">,</span> <span class="s2">&quot;theta&quot;</span><span class="p">])</span>
-        <span class="k">if</span> <span class="n">opt</span><span class="o">.</span><span class="n">conf_int</span><span class="p">:</span>
-            <span class="n">reorderlist</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s2">&quot;Lsmaj_ci&quot;</span><span class="p">,</span> <span class="s2">&quot;Lsmin_ci&quot;</span><span class="p">,</span> <span class="s2">&quot;theta_ci&quot;</span><span class="p">,</span> <span class="s2">&quot;g_ci&quot;</span><span class="p">])</span>
+    <span class="k">elif</span> <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;ordercnstit&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;SNR&quot;</span><span class="p">:</span>
+        <span class="c1"># If we are here, we should be guaranteed to have SNR already.</span>
+        <span class="n">ind</span> <span class="o">=</span> <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;SNR&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">argsort</span><span class="p">()[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">reorderlist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">opt</span><span class="o">.</span><span class="n">conf_int</span><span class="p">:</span>
-            <span class="n">reorderlist</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s2">&quot;A_ci&quot;</span><span class="p">,</span> <span class="s2">&quot;g_ci&quot;</span><span class="p">])</span>
+        <span class="n">namelist</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">coef</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])</span>
+        <span class="n">ilist</span> <span class="o">=</span> <span class="p">[</span><span class="n">namelist</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;ordercnstit&quot;</span><span class="p">]]</span>
+        <span class="n">ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ilist</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+
+    <span class="n">arrays</span> <span class="o">=</span> <span class="s2">&quot;name PE SNR A A_ci g g_ci Lsmaj Lsmaj_ci Lsmin Lsmin_ci theta theta_ci&quot;</span>
+    <span class="n">reorderlist</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">arrays</span><span class="o">.</span><span class="n">split</span><span class="p">()</span> <span class="k">if</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">coef</span><span class="p">]</span>
 
     <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">reorderlist</span><span class="p">:</span>
         <span class="n">coef</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">coef</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">ind</span><span class="p">]</span>
 
     <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;aux&quot;</span><span class="p">][</span><span class="s2">&quot;frq&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;aux&quot;</span><span class="p">][</span><span class="s2">&quot;frq&quot;</span><span class="p">][</span><span class="n">ind</span><span class="p">]</span>
     <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;aux&quot;</span><span class="p">][</span><span class="s2">&quot;lind&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">coef</span><span class="p">[</span><span class="s2">&quot;aux&quot;</span><span class="p">][</span><span class="s2">&quot;lind&quot;</span><span class="p">][</span><span class="n">ind</span><span class="p">]</span>
-
-    <span class="k">if</span> <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;RunTimeDisp&quot;</span><span class="p">]:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;done.&quot;</span><span class="p">)</span>
-
     <span class="k">return</span> <span class="n">coef</span>
 
 
@@ -570,7 +584,7 @@
     <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;rmin&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;method&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;ols&quot;</span>
     <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;tunrdn&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-    <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;linci&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;linci&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;white&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;nrlzn&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">200</span>
     <span class="n">opt</span><span class="p">[</span><span class="s2">&quot;lsfrqosmp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
@@ -620,7 +634,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">UTide 0.2.6.dev29+g5f15bcb documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">UTide 0.2.6.dev32+gef3d445 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">utide._solve</a></li> 
       </ul>

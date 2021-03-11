@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Usage &#8212; UTide 0.2.6.dev29+g5f15bcb documentation</title>
+    <title>Usage &#8212; UTide 0.2.6.dev32+gef3d445 documentation</title>
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -32,7 +32,7 @@
         <li class="right" >
           <a href="strategy.html" title="Strategy"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">UTide 0.2.6.dev29+g5f15bcb documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">UTide 0.2.6.dev32+gef3d445 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Usage</a></li> 
       </ul>
     </div>  
@@ -65,7 +65,7 @@ form ‘YYYY-MM-DD’.  The default corresponds to the Python
 standard library <a class="reference external" href="https://docs.python.org/3/library/datetime.html#module-datetime" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">datetime</span></code></a> proleptic Gregorian calendar,
 starting with 1 at 00:00 on January 1 of year 1; this is
 the ‘datenum’ used by Matplotlib.</p></li>
-<li><p><strong>constit</strong> (<em>{'auto'</em><em>, </em><em>array_like}</em><em>, </em><em>optional</em>) – List of strings with standard letter abbreviations of
+<li><p><strong>constit</strong> (<em>{'auto'</em><em>, </em><em>sequence}</em><em>, </em><em>optional</em>) – List of strings with standard letter abbreviations of
 tidal constituents; or ‘auto’ to let the list be determined
 based on the time span.</p></li>
 <li><p><strong>conf_int</strong> (<em>{'linear'</em><em>, </em><em>'MC'</em><em>, </em><em>'none'}</em><em>, </em><em>optional</em>) – If not ‘none’ (string), calculate linearized confidence
@@ -103,6 +103,13 @@ False to omit nodal corrections.</p></li>
 <p>amp_ratios and phase_offsets have length N for a scalar
 time series, or 2N for a vector series.</p>
 </li>
+<li><p><strong>order_constit</strong> (<em>{‘PE’, ‘SNR’, ‘frequency’, sequence}, optional</em>) – The default is ‘PE’ (percent energy) order, returning results ordered from
+high energy to low.
+The ‘SNR’ order is from high signal-to-noise ratio to low, and is
+available only if <code class="xref py py-obj docutils literal notranslate"><span class="pre">conf_int</span></code> is not ‘none’. The
+‘frequency’ order is from low to high frequency. Alternatively, a
+sequence of constituent names may be supplied, typically the same list as
+given in the <em>constit</em> option.</p></li>
 <li><p><strong>MC_n</strong> (<em>integer, optional</em>) – Not yet implemented.</p></li>
 <li><p><strong>robust_kw</strong> (<em>dict, optional</em>) – Keyword arguments for <a class="reference internal" href="internals/robustfit.html#module-utide.robustfit" title="utide.robustfit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">robustfit</span></code></a>, if <code class="xref py py-obj docutils literal notranslate"><span class="pre">method</span></code> is ‘robust’.</p></li>
 <li><p><strong>Rayleigh_min</strong> (<em>float</em>) – Minimum conventional Rayleigh criterion for automatic
@@ -260,7 +267,7 @@ formatted() method.</p>
         <li class="right" >
           <a href="strategy.html" title="Strategy"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">UTide 0.2.6.dev29+g5f15bcb documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">UTide 0.2.6.dev32+gef3d445 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Usage</a></li> 
       </ul>
     </div>
