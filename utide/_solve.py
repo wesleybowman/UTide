@@ -5,10 +5,9 @@ Central module for calculating the tidal amplitudes, phases, etc.
 import numpy as np
 
 from ._time_conversion import _normalize_time
-from ._ut_constants import constit_index_dict
 from .confidence import _confidence
 from .constituent_selection import ut_cnstitsel
-from .diagnostics import ut_diagn
+from .diagnostics import _PE, _SNR, ut_diagn
 from .ellipse_params import ut_cs2cep
 from .harmonics import ut_E
 from .robustfit import robustfit
@@ -17,6 +16,7 @@ from .utilities import Bunch
 
 default_opts = {
     "constit": "auto",
+    "order_constit": None,
     "conf_int": "linear",
     "method": "ols",
     "trend": True,
@@ -37,6 +37,8 @@ def _process_opts(opts, is_2D):
     newopts.update_values(strict=True, **opts)
     # TODO: add more validations.
     newopts.infer = validate_infer(newopts.infer, is_2D)
+    snr = newopts.conf_int != "none"
+    newopts.order_constit = validate_order_constit(newopts.order_constit, snr)
 
     compat_opts = _translate_opts(newopts)
 
@@ -48,6 +50,7 @@ def _translate_opts(opts):
     # Here or elsewhere, proper validation remains to be added.
     oldopts = Bunch()
     oldopts.cnstit = opts.constit
+    oldopts.ordercnstit = opts.order_constit
     oldopts.infer = opts.infer  # we will not use the matlab names, though
 
     oldopts.conf_int = True
@@ -101,6 +104,22 @@ def validate_infer(infer, is_2D):
     return infer
 
 
+def validate_order_constit(arg, have_snr):
+    available = ["PE", "frequency"]
+    if have_snr:
+        available.append("SNR")
+    if arg is None:
+        return "PE"
+    if isinstance(arg, str) and arg in available:
+        return arg
+    if not isinstance(arg, str) and np.iterable(arg):
+        return arg  # TODO: add checking of its elements
+    raise ValueError(
+        f"order_constit must be one of {available} or"
+        f" a sequence of constituents, not '{arg}'",
+    )
+
+
 def solve(t, u, v=None, lat=None, **opts):
     """
     Calculate amplitude, phase, confidence intervals of tidal constituents.
@@ -122,7 +141,7 @@ def solve(t, u, v=None, lat=None, **opts):
         standard library `datetime` proleptic Gregorian calendar,
         starting with 1 at 00:00 on January 1 of year 1; this is
         the 'datenum' used by Matplotlib.
-    constit : {'auto', array_like}, optional
+    constit : {'auto', sequence}, optional
         List of strings with standard letter abbreviations of
         tidal constituents; or 'auto' to let the list be determined
         based on the time span.
@@ -165,6 +184,14 @@ def solve(t, u, v=None, lat=None, **opts):
         amp_ratios and phase_offsets have length N for a scalar
         time series, or 2N for a vector series.
 
+    order_constit : {'PE', 'SNR', 'frequency', sequence}, optional
+        The default is 'PE' (percent energy) order, returning results ordered from
+        high energy to low.
+        The 'SNR' order is from high signal-to-noise ratio to low, and is
+        available only if `conf_int` is not 'none'. The
+        'frequency' order is from low to high frequency. Alternatively, a
+        sequence of constituent names may be supplied, typically the same list as
+        given in the *constit* option.
     MC_n : integer, optional
         Not yet implemented.
     robust_kw : dict, optional
@@ -370,7 +397,7 @@ def _solv1(tin, uin, vin, lat, **opts):
             coef.theta = np.hstack((coef.theta, theta))
             coef.g = np.hstack((coef.g, g))
 
-    if opt["conf_int"] is True:
+    if opt["conf_int"]:
         coef = _confidence(
             coef,
             cnstit,
@@ -392,63 +419,50 @@ def _solv1(tin, uin, vin, lat, **opts):
 
     # Diagnostics.
     if not opt["nodiagn"]:
-        coef, indPE = ut_diagn(coef, opt)
+        coef = ut_diagn(coef)
+        # Adds a diagn dictionary, always sorted by energy.
+        # This doesn't seem very useful.  Let's directly add the variables
+        # to the base coef structure.  Then they can be sorted with everything
+        # else.
+        coef["PE"] = _PE(coef)
+        coef["SNR"] = _SNR(coef)
 
     # Re-order constituents.
-    if opt["ordercnstit"] is not None:
+    coef = _reorder(coef, opt)
+    # This might have added PE if it was not already present.
 
-        if opt["ordercnstit"] == "frq":
-            ind = coef["aux"]["frq"].argsort()
+    if opt["RunTimeDisp"]:
+        print("done.")
 
-        elif opt["ordercnstit"] == "snr":
-            if not opt["nodiagn"]:
-                ind = coef["diagn"]["SNR"].argsort()[::-1]
-            else:
-                if opt["twodim"]:
-                    SNR = (coef["Lsmaj"] ** 2 + coef["Lsmin"] ** 2) / (
-                        (coef["Lsmaj_ci"] / 1.96) ** 2 + (coef["Lsmin_ci"] / 1.96) ** 2
-                    )
+    return coef
 
-                else:
-                    SNR = (coef["A"] ** 2) / (coef["A_ci"] / 1.96) ** 2
 
-                ind = SNR.argsort()[::-1]
+def _reorder(coef, opt):
+    if opt["ordercnstit"] == "PE":
+        # Default: order by decreasing energy.
+        if "PE" not in coef:
+            coef["PE"] = _PE(coef)
+        ind = coef["PE"].argsort()[::-1]
 
-        else:
-            ilist = [constit_index_dict[name] for name in opt["ordercnstit"]]
-            ind = np.array(ilist, dtype=int)
+    elif opt["ordercnstit"] == "frequency":
+        ind = coef["aux"]["frq"].argsort()
 
-    else:  # Default: order by decreasing energy.
-        if not opt["nodiagn"]:
-            ind = indPE
-        else:
-            if opt["twodim"]:
-                PE = np.sum(coef["Lsmaj"] ** 2 + coef["Lsmin"] ** 2)
-                PE = 100 * (coef["Lsmaj"] ** 2 + coef["Lsmin"] ** 2) / PE
-            else:
-                PE = 100 * coef["A"] ** 2 / np.sum(coef["A"] ** 2)
-
-            ind = PE.argsort()[::-1]
-
-    reorderlist = ["g", "name"]
-    if opt.twodim:
-        reorderlist.extend(["Lsmaj", "Lsmin", "theta"])
-        if opt.conf_int:
-            reorderlist.extend(["Lsmaj_ci", "Lsmin_ci", "theta_ci", "g_ci"])
+    elif opt["ordercnstit"] == "SNR":
+        # If we are here, we should be guaranteed to have SNR already.
+        ind = coef["SNR"].argsort()[::-1]
     else:
-        reorderlist.append("A")
-        if opt.conf_int:
-            reorderlist.extend(["A_ci", "g_ci"])
+        namelist = list(coef["name"])
+        ilist = [namelist.index(name) for name in opt["ordercnstit"]]
+        ind = np.array(ilist, dtype=int)
+
+    arrays = "name PE SNR A A_ci g g_ci Lsmaj Lsmaj_ci Lsmin Lsmin_ci theta theta_ci"
+    reorderlist = [a for a in arrays.split() if a in coef]
 
     for key in reorderlist:
         coef[key] = coef[key][ind]
 
     coef["aux"]["frq"] = coef["aux"]["frq"][ind]
     coef["aux"]["lind"] = coef["aux"]["lind"][ind]
-
-    if opt["RunTimeDisp"]:
-        print("done.")
-
     return coef
 
 
@@ -532,7 +546,7 @@ def _slvinit(tin, uin, vin, lat, **opts):
     opt["rmin"] = 1
     opt["method"] = "ols"
     opt["tunrdn"] = 1
-    opt["linci"] = 0
+    opt["linci"] = False
     opt["white"] = 0
     opt["nrlzn"] = 200
     opt["lsfrqosmp"] = 1
