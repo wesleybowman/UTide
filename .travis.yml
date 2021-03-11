@@ -43,17 +43,3 @@ script:
         python -m doctr deploy --build-tags --key-path github_deploy_key_wesleybowman_utide.enc --built-docs docs/_build/html .
       fi
     fi
-
-deploy:
-  skip_cleanup: true
-  provider: pypi
-  user: ocefpaf
-  password:
-    secure: "n7V/06zaWzAHiAx2YLh6n+glbRKHEdHntw8oOJXQJKQaiDzJR+Be2FANZ4rSof4kkDVUwwqTNzAuVn43BJBt4WdKdh3PWZwhfm4+/lzN1lpwyhK+P/5IUxSynov2JcqzvJtmrGCELEqrULBvrbBbcf9f93NPUr6Id5iA0shKv4w="
-  distributions: sdist bdist_wheel
-  upload_docs: no
-  on:
-    repo: wesleybowman/UTide
-    tags: true
-    all_branches: master
-    condition: '$TRAVIS_JOB_NAME == "tarball"'
