@@ -29,6 +29,7 @@ jobs:
       shell: bash -l {0}
       run: |
         source activate TEST
+        python setup.py --version
         pip wheel . -w dist --no-deps
         check-manifest --verbose
         twine check dist/*
