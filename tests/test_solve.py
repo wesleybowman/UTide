@@ -6,7 +6,6 @@ Smoke testing--just see if the system runs.
 # TODO: extend the tests by cycling through various combinations
 #       of configuration and data input.
 
-import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 
