@@ -2,11 +2,9 @@
 Full example test.
 
 """
-
 import numpy as np
 import pytest
 
-from matplotlib.dates import date2num
 from pandas import date_range
 
 from utide import reconstruct, solve
@@ -35,8 +33,7 @@ def make_data():
     # Signal + some noise.
     u = _fake_tide(np.arange(N), M2amp=2, M2phase=0) + np.random.randn(N)
     v = _fake_tide(np.arange(N), M2amp=1, M2phase=np.pi) + np.random.randn(N)
-    time = date2num(t.to_pydatetime())
-    return time, u, v
+    return t, u, v
 
 
 def test_solve(make_data):
@@ -51,6 +48,7 @@ def test_solve(make_data):
         method="ols",
         conf_int="linear",
         Rayleigh_min=0.95,
+        epoch=None
     )
     assert isinstance(coef, Bunch)
 
