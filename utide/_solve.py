@@ -133,9 +133,9 @@ def solve(t, u, v=None, lat=None, **opts):
         If `u` is a velocity component, `v` is the orthogonal component.
     lat : float, required
         Latitude in degrees.
-    epoch : {string, `datetime.date`, `datetime.datetime`}, if datenum is provided in t. 
-        Default `None` if `t` is `datetime`, `np.datetime64`, or `pd.datetime array.` 
-        Optional valid strings are 
+    epoch : {string, `datetime.date`, `datetime.datetime`}, if datenum is provided in t.
+        Default `None` if `t` is `datetime`, `np.datetime64`, or `pd.datetime array.`
+        Optional valid strings are
             - 'python' : if `t` is days since '0000-12-31'
             - 'matlab' : if `t` is days since '0000-00-00'
         Or, an arbitrary date in the form 'YYYY-MM-DD'.

@@ -48,7 +48,7 @@ def test_solve(make_data):
         method="ols",
         conf_int="linear",
         Rayleigh_min=0.95,
-        epoch=None
+        epoch=None,
     )
     assert isinstance(coef, Bunch)
 

@@ -4,73 +4,77 @@ Utility for allowing flexible time input.
 
 import numpy as np
 
+
 # to be added to get 1 on 1st January of year 1 from unix epoch '1970-01-01'
-_DAY_TO_GREGORIAN_EPOCH = 719163 
+_DAY_TO_GREGORIAN_EPOCH = 719163
 
 # milisecond in a day
-_MS_PER_DAY = 1000*86400
+_MS_PER_DAY = 1000 * 86400
 
 # datenum types
 _DATENUM_TYPES = (np.float, np.int64, np.int32)
 
-def _date2num(date, epoch='1970-01-01 00:00:00.000'):
-    '''
+
+def _date2num(date, epoch="1970-01-01 00:00:00.000"):
+    """
     Numpy based date to datenum calculator.
 
     `date` can be anything parsable by np.datetime64 - string, datetime, datetime64,
-    pandas datetime. 
+    pandas datetime.
 
-    `epoch` is taken as the unix epoch. 
-    '''
+    `epoch` is taken as the unix epoch.
+    """
     date = np.atleast_1d(date)
 
     try:
-        date = date.astype('datetime64[ms]')
+        date = date.astype("datetime64[ms]")
     except ValueError:
-        raise ValueError('Cannot parse epoch as string or date or datetime')
+        raise ValueError("Cannot parse epoch as string or date or datetime")
 
     try:
-        epoch = np.datetime64(epoch, 'ms')
+        epoch = np.datetime64(epoch, "ms")
     except ValueError:
-        raise ValueError('Cannot parse epoch as string or date or datetime')
+        raise ValueError("Cannot parse epoch as string or date or datetime")
 
     # datenum calculation
-    datenum = (date - epoch).astype(float)/_MS_PER_DAY
-    return(datenum)
+    datenum = (date - epoch).astype(float) / _MS_PER_DAY
+    return datenum
+
 
 def _python_gregorian_datenum(date):
-    '''
+    """
     Number of days since 0000-12-31.
 
-    Python gregorian time is 1 on 1st day of 1st year. Essentially, it means, 
+    Python gregorian time is 1 on 1st day of 1st year. Essentially, it means,
     the epoch for python gregorian time is 0000-12-31. With _date2num() defined
-    above, this amounts to 719163 days from the unix-epoch 1970-01-01 00:00:00. 
+    above, this amounts to 719163 days from the unix-epoch 1970-01-01 00:00:00.
     To avoid repetative calculation, this is defined as _DAY_TO_GREGORIAN_EPOCH.
-    '''
+    """
     return _date2num(date) + _DAY_TO_GREGORIAN_EPOCH
 
+
 def _normalize_time(t, epoch=None):
-    '''
-    Convert datetime or datenum array to proper input datenum array with an 
+    """
+    Convert datetime or datenum array to proper input datenum array with an
     epoch from '0000-12-31' - 1st Jan of 1st year is 1.
 
     `t` input time or datenum array
     `epoch` either 'python', 'matlab', or np.datetime64 compatible value
-    '''
+    """
     if epoch is None:
         # default datetime, datetime64, or datetime array
         return _python_gregorian_datenum(t)
     elif (epoch is not None) & (isinstance(np.atleast_1d(t)[0], _DATENUM_TYPES)):
-        if epoch == 'python':
+        if epoch == "python":
             return t
-        elif epoch == 'matlab':
-            return t-366
+        elif epoch == "matlab":
+            return t - 366
         else:
             try:
                 ofs = _python_gregorian_datenum(epoch)
             except ValueError:
-                raise ValueError('Cannot parse epoch as string or date or datetime')
+                raise ValueError("Cannot parse epoch as string or date or datetime")
             else:
                 return t + ofs
     else:
-        raise ValueError('Can not procress time array as timestamp or datenum.')
+        raise ValueError("Can not procress time array as timestamp or datenum.")

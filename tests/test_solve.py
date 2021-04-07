@@ -6,14 +6,13 @@ Smoke testing--just see if the system runs.
 # TODO: extend the tests by cycling through various combinations
 #       of configuration and data input.
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 
 from utide import reconstruct, solve
 from utide._ut_constants import ut_constants
 from utide.utilities import Bunch
-
-import matplotlib.pyplot as plt
 
 
 ts = 735604
@@ -55,7 +54,7 @@ def test_roundtrip(conf_int):
         "method": "ols",
         "conf_int": conf_int,
         "Rayleigh_min": 0.95,
-        "epoch":'python'
+        "epoch": "python",
     }
 
     speed_coef = solve(time, time_series, time_series, lat=lat, **opts)
@@ -63,7 +62,7 @@ def test_roundtrip(conf_int):
 
     amp_err = amp - elev_coef["A"][0]
     phase_err = phase - elev_coef["g"][0]
-    ts_recon = reconstruct(time, elev_coef, epoch='python').h
+    ts_recon = reconstruct(time, elev_coef, epoch="python").h
 
     # pure smoke testing of reconstruct
     vel = reconstruct(time, speed_coef)
@@ -101,7 +100,7 @@ def test_masked_input():
         "method": "ols",
         "conf_int": "linear",
         "Rayleigh_min": 0.95,
-        "epoch":'python'
+        "epoch": "python",
     }
 
     t = np.ma.array(time)
@@ -155,7 +154,7 @@ def test_robust():
         "method": "robust",
         "conf_int": "linear",
         "Rayleigh_min": 0.95,
-        "epoch":'python'
+        "epoch": "python",
     }
 
     speed_coef = solve(time, noisy, noisy, lat=lat, **opts)
@@ -164,7 +163,7 @@ def test_robust():
     print(speed_coef.weights, elev_coef.weights)
     print(speed_coef.rf, elev_coef.rf)
 
-    ts_recon = reconstruct(time, elev_coef, epoch='python').h
+    ts_recon = reconstruct(time, elev_coef, epoch="python").h
     err = np.std(tide - ts_recon)
     np.testing.assert_almost_equal(err, 0, decimal=2)
 
@@ -183,7 +182,7 @@ def test_MC():
         "conf_int": "MC",
         "white": False,
         "Rayleigh_min": 0.95,
-        "epoch":'python'
+        "epoch": "python",
     }
 
     speed_coef = solve(time, noisy, noisy, lat=lat, **opts)
