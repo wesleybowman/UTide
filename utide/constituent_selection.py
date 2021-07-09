@@ -3,7 +3,7 @@ from collections import OrderedDict
 import numpy as np
 
 from ._ut_constants import constit_index_dict, ut_constants
-from .harmonics import linearize_freqs
+from .harmonics import linearized_freqs
 from .utilities import Bunch
 
 
@@ -36,7 +36,7 @@ def ut_cnstitsel(tref, minres, incnstit, infer):
     cnstit = Bunch()
     coef = Bunch()
 
-    freqs = linearize_freqs(tref)
+    freqs = linearized_freqs(tref)
     
     # cnstit.NR
     cnstit["NR"] = Bunch()
