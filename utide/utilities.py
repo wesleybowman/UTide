@@ -1,3 +1,5 @@
+import warnings
+
 import numpy as np
 
 from scipy.io import loadmat
@@ -166,6 +168,14 @@ class Bunch(dict):
                 ek = list(self.keys())
                 ek.sort()
                 raise KeyError(f"Update keys {bk} don't match existing keys {ek}")
+
+    @property
+    def t_mpl(self):
+        warnings.warn(
+            "t_mpl is being depreciated. Please directly input a time array and use variable t_in for plots.",
+            category=FutureWarning,
+        )
+        return self["t_mpl"]
 
 
 # The following functions ending with loadbunch() and showmatbunch()
