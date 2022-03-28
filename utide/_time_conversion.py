@@ -19,12 +19,12 @@ def _date2num(date, epoch="1970-01-01 00:00:00.000"):
     """
     Numpy based date to datenum calculator.
 
-    `date` can be anything parsable by np.datetime64 - string, datetime, datetime64,
+    `date` and `epoch` can be anything parsable by np.datetime64 - string, datetime, datetime64,
     pandas datetime.
 
-    `epoch` is taken as the unix epoch.
+    Default `epoch` is the unix epoch 1970-01-01 00:00:00.
     """
-    date = np.atleast_1d(date)
+    date = np.asarray(date)
 
     try:
         date = date.astype("datetime64[ms]")
@@ -77,4 +77,4 @@ def _normalize_time(t, epoch=None):
             else:
                 return t + ofs
     else:
-        raise ValueError("Can not procress time array as timestamp or datenum.")
+        raise ValueError("Can not process time array as timestamp or datenum.")
