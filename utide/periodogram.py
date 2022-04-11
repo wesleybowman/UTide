@@ -167,15 +167,16 @@ def _psd_lomb(t, x, window=None, freq=None, ofac=1):
     PSD units are [`x`-units^2 per cycle per unit time]
 
     """
+
+    # In scipy 1.7.x, the new pythran-based lombscargle requires contiguous
+    # array arguments.
+    def _lombscargle(*args):
+        newargs = [np.ascontiguousarray(a, dtype=np.float64) for a in args]
+        return signal.lombscargle(*newargs)
+
     out = Bunch()
 
-    # copy inputs
-    x = np.array(x)
-    t = np.array(t, dtype=float)
-
-    # remove mean
-    x -= x.mean()
-
+    xdm = x - x.mean()
     n = len(x)
 
     if window is None:
@@ -184,8 +185,7 @@ def _psd_lomb(t, x, window=None, freq=None, ofac=1):
         # interpolate window from uniform grid to nonuniform t
         t_uniform = np.linspace(np.min(t), np.max(t), n)
         w = np.interp(t, t_uniform, window)
-
-        x *= w
+        xdm *= w
 
     # Estimated record length as n delta-t, where delta-t
     # is the *average* time per sample.
@@ -201,24 +201,22 @@ def _psd_lomb(t, x, window=None, freq=None, ofac=1):
 
     out.F = freq
 
-    xr = np.real(x)
-
     # signal.lombscargle returns "(A**2) * N/4 for a harmonic signal
     # with amplitude A for sufficiently large N."
     # It takes *angular* frequencies as 3rd argument.
     freq_radian = freq * 2 * np.pi
     psdnorm = 2 * delta_t * n / (w ** 2).sum()
-    out.Pxx = psdnorm * signal.lombscargle(t, xr, freq_radian)
+    out.Pxx = psdnorm * _lombscargle(t, np.real(xdm), freq_radian)
 
     if x.dtype.kind == "f":
         return out
 
-    out.Pyy = psdnorm * signal.lombscargle(t, x.imag, freq_radian)
+    out.Pyy = psdnorm * _lombscargle(t, xdm.imag, freq_radian)
 
     # If we need to limit memory usage and don't want to use
     # Cython, we can segment the frequencies and loop over the
     # segments.  The speed penalty will be minimal.
-    out.Pxy = psdnorm * _ls_cross(t, x, freq_radian)
+    out.Pxy = psdnorm * _ls_cross(t, xdm, freq_radian)
 
     return out
 
