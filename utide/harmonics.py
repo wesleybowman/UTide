@@ -126,7 +126,7 @@ def FUV(t, tref, lind, lat, ngflgs):
         rr = sat.amprat.copy()
 
         j = sat.ilatfac == 1
-        rr[j] *= 0.36309 * (1.0 - 5.0 * slat ** 2) / slat
+        rr[j] *= 0.36309 * (1.0 - 5.0 * slat**2) / slat
 
         j = sat.ilatfac == 2
         rr[j] *= 2.59808 * slat

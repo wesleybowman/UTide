@@ -65,7 +65,7 @@ def ut_astron(jd):
     d = jd - daten
     D = d / 10000
 
-    args = np.vstack((np.ones(jd.shape), d, D * D, D ** 3))
+    args = np.vstack((np.ones(jd.shape), d, D * D, D**3))
 
     astro = np.fmod((np.dot(_coefs, args) / 360), 1)
 
