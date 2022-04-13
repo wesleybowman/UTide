@@ -18,13 +18,13 @@ def andrews(r):
 
 def bisquare(r):
     r = np.abs(r)
-    w = (r < 1) * (1 - r ** 2) ** 2
+    w = (r < 1) * (1 - r**2) ** 2
     return w
 
 
 def cauchy(r):
     r = np.abs(r)
-    w = 1 / (1 + r ** 2)
+    w = 1 / (1 + r**2)
     return w
 
 
@@ -57,7 +57,7 @@ def talwar(r):
 
 def welsch(r):
     r = np.abs(r)
-    w = np.exp(-(r ** 2))
+    w = np.exp(-(r**2))
     return w
 
 

@@ -365,11 +365,11 @@ def _confidence(
                     varImap += 0.25 * varcov[nNR + k, 2, 2]
                 rp = ref.I.Rp
                 rm = ref.I.Rm
-                varXuHH = (rp.real ** 2 + rm.real ** 2) * varReap + (
-                    rp.imag ** 2 + rm.imag ** 2
+                varXuHH = (rp.real**2 + rm.real**2) * varReap + (
+                    rp.imag**2 + rm.imag**2
                 ) * varImap
-                varYuHH = (rp.real ** 2 + rm.real ** 2) * varImap + (
-                    rp.imag ** 2 + rm.imag ** 2
+                varYuHH = (rp.real**2 + rm.real**2) * varImap + (
+                    rp.imag**2 + rm.imag**2
                 ) * varReap
                 for varX, varY in zip(varXuHH, varYuHH):
                     if not opt.twodim:
@@ -438,10 +438,10 @@ def ut_linci(X, Y, sigX, sigY):
 
     rp = 0.5 * np.sqrt((Xu + Yv) ** 2 + (Xv - Yu) ** 2)
     rm = 0.5 * np.sqrt((Xu - Yv) ** 2 + (Xv + Yu) ** 2)
-    sigXu2 = sigXu ** 2
-    sigYu2 = sigYu ** 2
-    sigXv2 = sigXv ** 2
-    sigYv2 = sigYv ** 2
+    sigXu2 = sigXu**2
+    sigYu2 = sigYu**2
+    sigXv2 = sigXv**2
+    sigYv2 = sigYv**2
 
     ex = (Xu + Yv) / rp
     fx = (Xu - Yv) / rm
@@ -457,8 +457,8 @@ def ut_linci(X, Y, sigX, sigY):
 
     # phase
     rn = 2 * (Xu * Yu + Xv * Yv)
-    rd = Xu ** 2 - Yu ** 2 + Xv ** 2 - Yv ** 2
-    den = rn ** 2 + rd ** 2
+    rd = Xu**2 - Yu**2 + Xv**2 - Yv**2
+    den = rn**2 + rd**2
     dXu2 = ((rd * Yu - rn * Xu) / den) ** 2
     dYu2 = ((rd * Xu + rn * Yu) / den) ** 2
     dXv2 = ((rd * Yv - rn * Xv) / den) ** 2
@@ -480,8 +480,8 @@ def ut_linci(X, Y, sigX, sigY):
 
         # Orientation.
         rn = 2.0 * (Xu * Xv + Yu * Yv)
-        rd = Xu ** 2 + Yu ** 2 - (Xv ** 2 + Yv ** 2)
-        den = rn ** 2 + rd ** 2
+        rd = Xu**2 + Yu**2 - (Xv**2 + Yv**2)
+        den = rn**2 + rd**2
         dXu2 = ((rd * Xv - rn * Xu) / den) ** 2
         dYu2 = ((rd * Yv - rn * Yu) / den) ** 2
         dXv2 = ((rd * Xu + rn * Xv) / den) ** 2

@@ -244,7 +244,7 @@ def _showmatbunch(b, elements=None, origin=None):
                 else:
                     entry = f"ndarray, shape {v.shape}, dtype {v.dtype}"
             else:
-                entry = "{} {}".format(type(v).__name__, v)
+                entry = f"{type(v).__name__} {v}"
             elements.append((_origin, entry))
     elements.sort()
     return elements
@@ -263,7 +263,7 @@ def showmatbunch(b):
         b = loadbunch(b)
     elist = _showmatbunch(b)
     names = [n for n, v in elist]
-    namelen = min(40, max([len(n) for n in names]))
+    namelen = min(40, max(len(n) for n in names))
     str_fmt = "{0!s:<{namelen}} : {1!s}\n"
     strlist = [str_fmt.format(n[1:], v, namelen=namelen) for (n, v) in elist]
     return "".join(strlist)

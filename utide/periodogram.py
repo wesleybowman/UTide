@@ -205,7 +205,7 @@ def _psd_lomb(t, x, window=None, freq=None, ofac=1):
     # with amplitude A for sufficiently large N."
     # It takes *angular* frequencies as 3rd argument.
     freq_radian = freq * 2 * np.pi
-    psdnorm = 2 * delta_t * n / (w ** 2).sum()
+    psdnorm = 2 * delta_t * n / (w**2).sum()
     out.Pxx = psdnorm * _lombscargle(t, np.real(xdm), freq_radian)
 
     if x.dtype.kind == "f":
@@ -245,14 +245,14 @@ def _ls_cross(t, x, fr):
     tmpy = np.empty(fr.shape, dtype=complex)
 
     c = np.cos(arg)
-    a = 1 / np.sqrt(sum(c ** 2))
+    a = 1 / np.sqrt(sum(c**2))
     tmpx.real = a * (xr[:, np.newaxis] * c).sum(axis=0)
     tmpy.real = a * (xi[:, np.newaxis] * c).sum(axis=0)
 
     del c
 
     s = np.sin(arg)
-    b = 1 / np.sqrt(sum(s ** 2))
+    b = 1 / np.sqrt(sum(s**2))
     tmpx.imag = b * (xr[:, np.newaxis] * s).sum(axis=0)
     tmpy.imag = -b * (xi[:, np.newaxis] * s).sum(axis=0)
 
@@ -287,7 +287,7 @@ def _psd(e, window, fs):
 
     # cs = cs[:iny]
     cs[1:-1] *= 2
-    psdnorm = (1 / fs) * (1 / (window ** 2).sum())  # dt / sum of win squared.
+    psdnorm = (1 / fs) * (1 / (window**2).sum())  # dt / sum of win squared.
     return cs * psdnorm
 
 
