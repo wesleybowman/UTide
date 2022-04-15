@@ -29,12 +29,16 @@ def _date2num(date, epoch="1970-01-01 00:00:00.000"):
     try:
         date = date.astype("datetime64[ms]")
     except ValueError:
-        raise ValueError("Cannot parse epoch as string or date or datetime")
+        raise ValueError(
+            f"Cannot convert date argument ({date}) to scalar or array of numpy datetime64 dtype.",
+        )
 
     try:
         epoch = np.datetime64(epoch, "ms")
     except ValueError:
-        raise ValueError("Cannot parse epoch as string or date or datetime")
+        raise ValueError(
+            f"Cannot convert epoch argument ({epoch}) to numpy datetime64 dtype.",
+        )
 
     # datenum calculation
     datenum = (date - epoch).astype(float) / _MS_PER_DAY
