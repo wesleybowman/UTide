@@ -11,9 +11,6 @@ _DAY_TO_GREGORIAN_EPOCH = 719163
 # milisecond in a day
 _MS_PER_DAY = 1000 * 86400
 
-# datenum types
-_DATENUM_TYPES = (np.float, np.int64, np.int32)
-
 
 def _date2num(date, epoch="1970-01-01 00:00:00.000"):
     """
@@ -65,10 +62,13 @@ def _normalize_time(t, epoch=None):
     `t` input time or datenum array
     `epoch` either 'python', 'matlab', or np.datetime64 compatible value
     """
+    t = np.asarray(t)
+
     if epoch is None:
         # default datetime, datetime64, or datetime array
         return _python_gregorian_datenum(t)
-    elif (epoch is not None) & (isinstance(np.atleast_1d(t)[0], _DATENUM_TYPES)):
+
+    if t.dtype.kind in ("if"):
         if epoch == "python":
             return t
         elif epoch == "matlab":
