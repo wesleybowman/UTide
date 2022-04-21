@@ -14,7 +14,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v1
       with:
-        python-version: 3.8
+        python-version: "3.x"
 
     - name: Get tags
       run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
@@ -41,7 +41,7 @@ jobs:
       shell: bash
 
     - name: Publish a Python distribution to PyPI
-      uses: pypa/gh-action-pypi-publish@master
+      uses: pypa/gh-action-pypi-publish@main
       with:
         user: __token__
         password: ${{ secrets.PYPI_PASSWORD }}
