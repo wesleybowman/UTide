@@ -36,6 +36,7 @@ opts0 = {
     "method": "ols",
     "conf_int": "MC",
     "Rayleigh_min": 0.95,
+    "epoch": "python",
 }
 
 

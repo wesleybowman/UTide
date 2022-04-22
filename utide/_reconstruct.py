@@ -8,7 +8,7 @@ from .utilities import Bunch
 def reconstruct(
     t,
     coef,
-    epoch="python",
+    epoch=None,
     verbose=True,
     constit=None,
     min_SNR=2,
@@ -20,15 +20,15 @@ def reconstruct(
     Parameters
     ----------
     t : array_like
-        Time in days since ``epoch``.
+        Time in days since ``epoch``, or array of datetime, np.datetime64, or pd.datetime
     coef : `Bunch`
         Data structure returned by `utide.solve`.
-    epoch : {string, `datetime.date`, `datetime.datetime`}, optional
-        Valid strings are 'python' (default); 'matlab' if `t` is
-        an array of Matlab datenums; or an arbitrary date in the
-        form 'YYYY-MM-DD'.  The default corresponds to the Python
-        standard library `datetime` proleptic Gregorian calendar,
-        starting with 1 on January 1 of year 1.
+    epoch : {string, `datetime.date`, `datetime.datetime`}, if datenum is provided in t.
+        Default `None` if `t` is `datetime`, `np.datetime64`, or `pd.datetime array.`
+        Optional valid strings are
+            - 'python' : if `t` is days since '0000-12-31'
+            - 'matlab' : if `t` is days since '0000-00-00'
+        Or, an arbitrary date in the form 'YYYY-MM-DD'.
     verbose : {True, False}, optional
         True to enable output message (default). False turns off all
         messages.
@@ -54,7 +54,7 @@ def reconstruct(
         'min_SNR', and 'min_PE'.
         The input time array is included as 't_in', and 't_mpl';
         the former is the original input time argument, and the
-        latter is the time as a matplotlib datenum.  If 'epoch'
+        latter is the time as a datenum from '0000-12-31'.  If 'epoch'
         is 'python', these will be identical, and the names will
         point to the same array.
 

@@ -1,7 +1,6 @@
 """
 Central module for calculating the tidal amplitudes, phases, etc.
 """
-
 import numpy as np
 
 from ._time_conversion import _normalize_time
@@ -28,7 +27,7 @@ default_opts = {
     "robust_kw": {"weight_function": "cauchy"},
     "white": False,
     "verbose": True,
-    "epoch": "python",
+    "epoch": None,
 }
 
 
@@ -127,20 +126,19 @@ def solve(t, u, v=None, lat=None, **opts):
     Parameters
     ----------
     t : array_like
-        Time in days since `epoch`.
+        Time in days since `epoch`, or np.datetime64 array, or pandas datetime array.
     u : array_like
         Sea-surface height, velocity component, etc.
     v : {None, array_like}, optional
         If `u` is a velocity component, `v` is the orthogonal component.
     lat : float, required
         Latitude in degrees.
-    epoch : {string, `datetime.date`, `datetime.datetime`}, optional
-        Valid strings are 'python' (default); 'matlab' if `t` is
-        an array of Matlab datenums; or an arbitrary date in the
-        form 'YYYY-MM-DD'.  The default corresponds to the Python
-        standard library `datetime` proleptic Gregorian calendar,
-        starting with 1 at 00:00 on January 1 of year 1; this is
-        the 'datenum' used by Matplotlib.
+    epoch : {string, `datetime.date`, `datetime.datetime`}, if datenum is provided in t.
+        Default `None` if `t` is `datetime`, `np.datetime64`, or `pd.datetime array.`
+        Optional valid strings are
+            - 'python' : if `t` is days since '0000-12-31'
+            - 'matlab' : if `t` is days since '0000-00-00'
+        Or, an arbitrary date in the form 'YYYY-MM-DD'.
     constit : {'auto', sequence}, optional
         List of strings with standard letter abbreviations of
         tidal constituents; or 'auto' to let the list be determined

@@ -1,7 +1,6 @@
 """
 Tests for periodogram module.
 """
-
 import numpy as np
 
 import utide.periodogram as pgram
