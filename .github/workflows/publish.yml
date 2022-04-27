@@ -41,7 +41,7 @@ jobs:
       shell: bash
 
     - name: Publish a Python distribution to PyPI
-      uses: pypa/gh-action-pypi-publish@main
+      uses: pypa/gh-action-pypi-publish@master
       with:
         user: __token__
         password: ${{ secrets.PYPI_PASSWORD }}
