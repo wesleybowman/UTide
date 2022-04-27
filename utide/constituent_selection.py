@@ -37,7 +37,7 @@ def ut_cnstitsel(tref, minres, incnstit, infer):
     coef = Bunch()
 
     freqs = linearized_freqs(tref)
-    
+
     # cnstit.NR
     cnstit["NR"] = Bunch()
 
