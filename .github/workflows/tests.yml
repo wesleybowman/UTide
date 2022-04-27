@@ -18,6 +18,7 @@ jobs:
         exclude:
           - python-version: "3.10"
             numpy-version: "1.19"
+      fail-fast: false
 
     steps:
     - uses: actions/checkout@v2
@@ -38,6 +39,7 @@ jobs:
     - name: Debug Info
       shell: bash -l {0}
       run: |
+        micromamba activate TEST
         micromamba info --all
         micromamba list
 
@@ -45,4 +47,4 @@ jobs:
       shell: bash -l {0}
       run: |
         micromamba activate TEST
-        pytest -n 2 -rxs --cov=utide tests/
+        pytest -n 2 -rxs --cov=utide tests
