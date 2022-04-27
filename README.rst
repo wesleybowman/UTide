@@ -1,8 +1,8 @@
 UTide
 =====
-|travis| |license| |conda| |downloads| |anaconda_cloud| |appveyor|
+|gha| |license| |conda| |downloads| |anaconda_cloud|
 
-.. |travis| image:: https://github.com/wesleybowman/UTide/actions/workflows/tests.yml/badge.svg
+.. |gha| image:: https://github.com/wesleybowman/UTide/actions/workflows/tests.yml/badge.svg
    :target: https://github.com/wesleybowman/UTide/actions
 
 .. |license| image:: https://anaconda.org/conda-forge/utide/badges/license.svg
