@@ -31,7 +31,7 @@ jobs:
     - name: Python ${{ matrix.python-version }} numpy ${{ matrix.numpy-version }}
       shell: bash -l {0}
       run: |
-        micromamba create --name TEST python=${{ matrix.python-version }} --file requirements.txt --file requirements-dev.txt
+        micromamba create --name TEST python=${{ matrix.python-version }} --file requirements.txt --file requirements-dev.txt --channel conda-forge
         micromamba activate TEST
         micromamba install numpy=${{ matrix.numpy-version }}
         pip install -e . --no-deps --force-reinstall
