@@ -22,24 +22,27 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Setup Conda
-      uses: s-weigand/setup-conda@v1
+    - name: Setup
+      uses: mamba-org/provision-with-micromamba@main
       with:
-        activate-conda: false
-        conda-channels: conda-forge
+        environment-file: false
 
     - name: Python ${{ matrix.python-version }} numpy ${{ matrix.numpy-version }}
       shell: bash -l {0}
       run: |
-        conda create --name TEST python=${{ matrix.python-version }} --file requirements.txt --file requirements-dev.txt
-        source activate TEST
-        conda install numpy=${{ matrix.numpy-version }}
+        micromamba create --name TEST python=${{ matrix.python-version }} --file requirements.txt --file requirements-dev.txt
+        micromamba activate TEST
+        micromamba install numpy=${{ matrix.numpy-version }}
         pip install -e . --no-deps --force-reinstall
-        conda info --all
-        conda list
+
+    - name: Debug Info
+      shell: bash -l {0}
+      run: |
+        micromamba info --all
+        micromamba list
 
     - name: Tests
       shell: bash -l {0}
       run: |
-        source activate TEST
-        pytest -n 2 -rxs --cov=utide tests
+        micromamba activate TEST
+        pytest -n 2 -rxs --cov=utide tests/
