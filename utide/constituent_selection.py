@@ -3,7 +3,7 @@ from collections import OrderedDict
 import numpy as np
 
 from ._ut_constants import constit_index_dict, ut_constants
-from .astronomy import ut_astron
+from .harmonics import linearized_freqs
 from .utilities import Bunch
 
 
@@ -31,21 +31,12 @@ def ut_cnstitsel(tref, minres, incnstit, infer):
       coef.aux.reftime = tref
     """
 
-    shallow = ut_constants.shallow
     const = ut_constants.const
 
     cnstit = Bunch()
     coef = Bunch()
 
-    astro, ader = ut_astron(tref)
-
-    ii = np.isfinite(const.ishallow)
-    const.freq[~ii] = np.dot(const.doodson[~ii, :], ader[:, 0]) / 24
-
-    for k in ii.nonzero()[0]:
-        ik = const.ishallow[k] + np.arange(const.nshallow[k])
-        ik = ik.astype(int) - 1
-        const.freq[k] = np.sum(const.freq[shallow.iname[ik] - 1] * shallow.coef[ik])
+    freqs = linearized_freqs(tref)
 
     # cnstit.NR
     cnstit["NR"] = Bunch()
@@ -62,7 +53,7 @@ def ut_cnstitsel(tref, minres, incnstit, infer):
         RI_index_set = {constit_index_dict[n] for n in RIset}
         cnstit.NR.lind = [ind for ind in cnstit.NR.lind if ind not in RI_index_set]
 
-    cnstit.NR.frq = const.freq[cnstit.NR.lind]
+    cnstit.NR.frq = freqs[cnstit.NR.lind]
     cnstit.NR.name = const.name[cnstit.NR.lind]
     nNR = len(cnstit.NR.frq)
 
@@ -80,7 +71,7 @@ def ut_cnstitsel(tref, minres, incnstit, infer):
         for k, name in enumerate(allrefs):
             refstruct = Bunch(name=name)
             refstruct.lind = constit_index_dict[name]
-            refstruct.frq = const.freq[refstruct.lind]
+            refstruct.frq = freqs[refstruct.lind]
             ind = [i for i, rname in enumerate(infer.reference_names) if name == rname]
             refstruct.nI = len(ind)
             refstruct.I = Bunch(Rp=[], Rm=[], name=[], lind=[], frq=[])  # noqa
@@ -101,7 +92,7 @@ def ut_cnstitsel(tref, minres, incnstit, infer):
                 refstruct.I.name.append(iname)
                 lind = constit_index_dict[iname]
                 refstruct.I.lind.append(lind)
-                refstruct.I.frq.append(const.freq[lind])
+                refstruct.I.frq.append(freqs[lind])
 
             refstruct.I.Rp = np.array(refstruct.I.Rp)
             refstruct.I.Rm = np.array(refstruct.I.Rm)
