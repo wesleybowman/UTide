@@ -1,0 +1,51 @@
+
+name: Documentation
+
+on:
+  pull_request:
+  push:
+    branches: [master, main]
+  release:
+    types:
+      - published
+
+jobs:
+  build-docs:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: checkout
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Setup Micromamba
+      uses: mamba-org/setup-micromamba@v1
+      with:
+        environment-name: TEST
+        init-shell: bash
+        create-args: >-
+          python=3 pip
+          --file requirements.txt
+          --file requirements-dev.txt
+          --channel conda-forge
+
+    - name: Install utide
+      shell: bash -l {0}
+      run: |
+        pip install -e . --no-deps --force-reinstall
+
+    - name: Build documentation
+      shell: bash -l {0}
+      run: |
+        set -e
+        pushd docs
+        make clean html linkcheck
+        popd
+
+    - name: Deploy
+      if: success() && github.event_name == 'release'
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: docs/build/html
