@@ -13,3 +13,4 @@ global-exclude *.mat
 
 exclude *.yaml
 exclude .gitignore
+exclude utide/_version.py
