@@ -15,6 +15,11 @@ jobs:
         # Oldest one based on NEP-29 and latest one.
         # See https://numpy.org/neps/nep-0029-deprecation_policy.html
         numpy-version: ["1.21", "1.25"]
+        exclude:
+          - python-version: "3.11"
+            numpy-version: "1.21"
+          - python-version: "3.8"
+            numpy-version: "1.25"
       fail-fast: false
 
     steps:
