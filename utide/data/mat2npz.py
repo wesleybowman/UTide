@@ -4,7 +4,6 @@ import numpy as np
 
 from utide.utilities import loadbunch
 
-
 datadir = os.path.join(os.path.dirname(__file__))
 
 fname = "ut_constants"

@@ -13,7 +13,6 @@ from utide import reconstruct, solve
 from utide._ut_constants import ut_constants
 from utide.utilities import Bunch
 
-
 ts = 735604
 duration = 35
 
@@ -196,7 +195,7 @@ def test_MC():
     ):
         print(f"{name:>5} {AA:10.4g} {AA_ci:10.4g}  {gg:10.4g} {gg_ci:10.4g}")
 
-    for (name, Lsmaj, Lsmaj_ci, Lsmin, Lsmin_ci, theta, theta_ci, gg, gg_ci) in zip(
+    for name, Lsmaj, Lsmaj_ci, Lsmin, Lsmin_ci, theta, theta_ci, gg, gg_ci in zip(
         speed_coef.name,
         speed_coef.Lsmaj,
         speed_coef.Lsmaj_ci,

@@ -1,6 +1,5 @@
 import numpy as np
 
-
 # (comments based on t_tide)
 # Coefficients of the formulas in the Explan. Suppl.
 _sc = np.array([270.434164, 13.1763965268, -0.0000850, 0.000000039])

@@ -1,9 +1,7 @@
 import warnings
 
 import numpy as np
-
 from scipy.io import loadmat
-
 
 # This module began as an excerpt from the one in python-gsw.
 
@@ -59,8 +57,8 @@ class Bunch(dict):
     def __getattr__(self, name):
         try:
             return self[name]
-        except KeyError:
-            raise AttributeError("'Bunch' object has no attribute '%s'" % name)
+        except KeyError as err:
+            raise AttributeError(f"'Bunch' object has no attribute '{name}'") from err
 
     def __setattr__(self, name, value):
         self[name] = value
@@ -109,7 +107,7 @@ class Bunch(dict):
         # Python 3 the scoping for list comprehensions would
         # lead to a NameError.  Wrapping the code in a function
         # fixes this.
-        d = dict()
+        d = {}
         lines = ["def _temp_func():\n"]
         with open(filename) as f:
             lines.extend(["    " + line for line in f])
@@ -137,7 +135,7 @@ class Bunch(dict):
         already in the Bunch instance will raise a KeyError.
         """
         strict = kw.pop("strict", False)
-        newkw = dict()
+        newkw = {}
         for d in args:
             newkw.update(d)
         newkw.update(kw)
@@ -151,7 +149,7 @@ class Bunch(dict):
         will be updated only if it is None.
         """
         strict = kw.pop("strict", False)
-        newkw = dict()
+        newkw = {}
         for d in args:
             newkw.update(d)
         newkw.update(kw)
@@ -174,6 +172,7 @@ class Bunch(dict):
         warnings.warn(
             "t_mpl is being depreciated. Please directly input a time array and use variable t_in for plots.",
             category=FutureWarning,
+            stacklevel=2,
         )
         return self["t_mpl"]
 

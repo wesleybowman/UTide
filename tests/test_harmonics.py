@@ -14,7 +14,6 @@ from utide._ut_constants import _base_dir
 from utide.harmonics import FUV
 from utide.utilities import loadbunch
 
-
 fname = os.path.join(_base_dir, "FUV0.npz")
 
 

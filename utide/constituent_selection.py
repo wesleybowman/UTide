@@ -68,7 +68,7 @@ def ut_cnstitsel(tref, minres, incnstit, infer):
         _r = infer.reference_names
         allrefs = list(OrderedDict(zip(_r, [1] * len(_r))).keys())
         nR = len(allrefs)
-        for k, name in enumerate(allrefs):
+        for _k, name in enumerate(allrefs):
             refstruct = Bunch(name=name)
             refstruct.lind = constit_index_dict[name]
             refstruct.frq = freqs[refstruct.lind]

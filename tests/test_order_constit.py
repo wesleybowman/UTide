@@ -4,7 +4,6 @@ import pytest
 from utide import reconstruct, solve
 from utide._ut_constants import constit_index_dict, ut_constants
 
-
 ts = 735604
 duration = 35
 
@@ -42,7 +41,6 @@ opts0 = {
 
 @pytest.mark.parametrize("conf_int", ["none", "linear", "MC"])
 def test_order(conf_int):
-
     orders = [None, "PE", "frequency", opts0["constit"]]
     if conf_int != "none":
         orders.append("SNR")

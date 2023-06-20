@@ -12,7 +12,6 @@ from .harmonics import ut_E
 from .robustfit import robustfit
 from .utilities import Bunch
 
-
 default_opts = {
     "constit": "auto",
     "order_constit": None,
@@ -225,7 +224,6 @@ def solve(t, u, v=None, lat=None, **opts):
 
 
 def _solv1(tin, uin, vin, lat, **opts):
-
     # The following returns a possibly modified copy of tin (ndarray).
     # t, u, v are fully edited ndarrays (unless v is None).
     packed = _slvinit(tin, uin, vin, lat, **opts)
@@ -262,7 +260,6 @@ def _solv1(tin, uin, vin, lat, **opts):
     B = np.hstack((E, E.conj()))
 
     if opt.infer is not None:
-
         Etilp = np.empty((nt, coef.nR), dtype=complex)
         Etilm = np.empty((nt, coef.nR), dtype=complex)
 
@@ -465,7 +462,6 @@ def _reorder(coef, opt):
 
 
 def _slvinit(tin, uin, vin, lat, **opts):
-
     if lat is None:
         raise ValueError("Latitude must be supplied")
 

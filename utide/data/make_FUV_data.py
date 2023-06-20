@@ -8,10 +8,8 @@ intermediate points where it is already being loaded.
 """
 
 import numpy as np
-
 from oct2py import Oct2PyError, octave
 from scipy.io.matlab import savemat
-
 
 octave.convert_to_float = False
 
@@ -61,7 +59,16 @@ for ilind, lind in enumerate(linds):
         except Oct2PyError:
             print("failed")
 
-    save_args = dict(t=t, t0=t0, lat=lat, lind=lind, flags=flags, Fo=Fo, Uo=Uo, Vo=Vo)
+    save_args = {
+        "t": t,
+        "t0": t0,
+        "lat": lat,
+        "lind": lind,
+        "flags": flags,
+        "Fo": Fo,
+        "Uo": Uo,
+        "Vo": Vo,
+    }
 
     np.savez("FUV%d.npz" % ilind, **save_args)
 

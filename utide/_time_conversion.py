@@ -4,11 +4,10 @@ Utility for allowing flexible time input.
 
 import numpy as np
 
-
 # to be added to get 1 on 1st January of year 1 from unix epoch '1970-01-01'
 _DAY_TO_GREGORIAN_EPOCH = 719163
 
-# milisecond in a day
+# millisecond in a day
 _MS_PER_DAY = 1000 * 86400
 
 
@@ -25,17 +24,17 @@ def _date2num(date, epoch="1970-01-01 00:00:00.000"):
 
     try:
         date = date.astype("datetime64[ms]")
-    except ValueError:
+    except ValueError as err:
         raise ValueError(
             f"Cannot convert date argument ({date}) to scalar or array of numpy datetime64 dtype.",
-        )
+        ) from err
 
     try:
         epoch = np.datetime64(epoch, "ms")
-    except ValueError:
+    except ValueError as err:
         raise ValueError(
             f"Cannot convert epoch argument ({epoch}) to numpy datetime64 dtype.",
-        )
+        ) from err
 
     # datenum calculation
     datenum = (date - epoch).astype(float) / _MS_PER_DAY
@@ -49,7 +48,7 @@ def _python_gregorian_datenum(date):
     Python gregorian time is 1 on 1st day of 1st year. Essentially, it means,
     the epoch for python gregorian time is 0000-12-31. With _date2num() defined
     above, this amounts to 719163 days from the unix-epoch 1970-01-01 00:00:00.
-    To avoid repetative calculation, this is defined as _DAY_TO_GREGORIAN_EPOCH.
+    To avoid repetitive calculation, this is defined as _DAY_TO_GREGORIAN_EPOCH.
     """
     return _date2num(date) + _DAY_TO_GREGORIAN_EPOCH
 
@@ -76,8 +75,10 @@ def _normalize_time(t, epoch=None):
         else:
             try:
                 ofs = _python_gregorian_datenum(epoch)
-            except ValueError:
-                raise ValueError("Cannot parse epoch as string or date or datetime")
+            except ValueError as err:
+                raise ValueError(
+                    "Cannot parse epoch as string or date or datetime",
+                ) from err
             else:
                 return t + ofs
     else:

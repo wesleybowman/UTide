@@ -4,7 +4,6 @@ import numpy as np
 
 from .utilities import Bunch, convert_unicode_arrays, loadbunch
 
-
 _base_dir = os.path.join(os.path.dirname(__file__), "data")
 _ut_constants_fname = os.path.join(_base_dir, "ut_constants.npz")
 
