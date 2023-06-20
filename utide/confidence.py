@@ -138,7 +138,8 @@ def nearestSPD(A):
         # Normally no more than one adjustment will be needed.
         if k > 100:
             warnings.warn(
-                "adjustment in nearestSPD did not converge; " "returning diagonal",
+                "adjustment in nearestSPD did not converge; returning diagonal",
+                stacklevel=2,
             )
             return np.diag(np.diag(A))
     return Ahat

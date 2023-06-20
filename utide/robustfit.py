@@ -61,17 +61,17 @@ def welsch(r):
     return w
 
 
-wfuncdict = dict(
-    andrews=andrews,
-    bisquare=bisquare,
-    cauchy=cauchy,
-    fair=fair,
-    huber=huber,
-    logistic=logistic,
-    ols=ols,
-    talwar=talwar,
-    welsch=welsch,
-)
+wfuncdict = {
+    "andrews": andrews,
+    "bisquare": bisquare,
+    "cauchy": cauchy,
+    "fair": fair,
+    "huber": huber,
+    "logistic": logistic,
+    "ols": ols,
+    "talwar": talwar,
+    "welsch": welsch,
+}
 
 tune_defaults = {
     "andrews": 1.339,
@@ -208,7 +208,7 @@ def robustfit(
         rsumsq = rsumsq[0]
         if i == 0:
             rms_resid = np.sqrt(rsumsq / n)
-            out.update(dict(ols_b=b, ols_rms_resid=rms_resid))
+            out.update({"ols_b": b, "ols_rms_resid": rms_resid})
 
         # Weighted mean of squared weighted residuals:
         rmeansq = rsumsq / w.sum()
@@ -247,14 +247,14 @@ def robustfit(
     rms_resid = np.sqrt(np.mean(np.abs(resid) ** 2))
 
     out.update(
-        dict(
-            iterations=iterations,
-            b=b,
-            s=sing,
-            w=w,
-            rank=rank,
-            rms_resid=rms_resid,
-        ),
+        {
+            "iterations": iterations,
+            "b": b,
+            "s": sing,
+            "w": w,
+            "rank": rank,
+            "rms_resid": rms_resid,
+        },
     )
 
     return out
@@ -263,7 +263,6 @@ def robustfit(
 # Some simple test cases; this probably will be removed.
 
 if __name__ == "__main__":
-
     np.random.seed(1)
     n = 10000
     x = np.arange(n)

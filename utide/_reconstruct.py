@@ -91,7 +91,6 @@ def reconstruct(
 
 
 def _reconstruct(t, goodmask, coef, verbose, constit, min_SNR, min_PE):
-
     twodim = coef["aux"]["opt"]["twodim"]
 
     # Determine constituents to include.

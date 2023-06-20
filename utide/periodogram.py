@@ -13,11 +13,9 @@ to facilitate testing.
 """
 
 import numpy as np
-
 from scipy import signal
 
 from utide.utilities import Bunch
-
 
 # __all__ = ['freq_bands', 'band_psd']
 
@@ -115,7 +113,7 @@ def _lomb_freqs(t, fbands=None, ofac=1, max_per_band=500):
     nfreq = len(freq)
 
     freqs = []
-    for k, (f0, f1) in enumerate(fbands):
+    for _k, (f0, f1) in enumerate(fbands):
         i0, i1 = np.searchsorted(freq, [f0, f1])
         i1 = min(nfreq, i1 + 1)
         inband = slice(i0, i1)
@@ -354,7 +352,6 @@ def band_psd(t, e, cfrq, equi=True, frqosamp=1):
 
     # If e is complex, handle imaginary part.
     if e.dtype.kind == "c":
-
         if equi:  # If even sampling, Welch.
             Pvv1s = _psd(e.imag, hn, fs)
             Puv1s = _psd(e, hn, fs)  # complex cross-periodogram

@@ -1,5 +1,5 @@
 include *.txt
-include README.rst
+include README.md
 include pyproject.toml
 
 graft utide
@@ -11,6 +11,6 @@ prune *.egg-info
 
 global-exclude *.mat
 
-exclude *.yml
-exclude *.enc
+exclude *.yaml
 exclude .gitignore
+exclude utide/_version.py

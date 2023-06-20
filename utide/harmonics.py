@@ -8,7 +8,6 @@ import numpy as np
 from ._ut_constants import ut_constants
 from .astronomy import ut_astron
 
-
 sat = ut_constants.sat
 const = ut_constants.const
 shallow = ut_constants.shallow

@@ -9,7 +9,6 @@ from ._ut_constants import (
     ut_constants,
 )
 
-
 try:
     __version__ = pkg_resources.get_distribution("utide").version
 except Exception:
