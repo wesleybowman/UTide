@@ -12,4 +12,5 @@ prune *.egg-info
 global-exclude *.mat
 
 exclude *.yml
+exclude *.yaml
 exclude .gitignore
