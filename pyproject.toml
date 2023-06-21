@@ -23,6 +23,7 @@ classifiers = [
 ]
 dynamic = [
   "dependencies",
+  "readme",
   "version",
 ]
 [project.urls]
