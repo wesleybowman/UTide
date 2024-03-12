@@ -12,11 +12,11 @@ sat = ut_constants.sat
 const = ut_constants.const
 shallow = ut_constants.shallow
 
-nshallow = np.ma.masked_invalid(const.nshallow).astype(int)
-ishallow = np.ma.masked_invalid(const.ishallow).astype(int) - 1
+nshallow = np.ma.masked_invalid(const.nshallow)
+ishallow = np.ma.masked_invalid(const.ishallow)
 not_shallow = ishallow.mask  # True where it was masked.
-nshallow = nshallow.compressed()
-ishallow = ishallow.compressed()
+nshallow = nshallow.compressed().astype(int)
+ishallow = ishallow.compressed().astype(int) - 1
 kshallow = np.nonzero(~not_shallow)[0]
 
 
