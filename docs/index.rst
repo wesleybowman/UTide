@@ -13,7 +13,7 @@ describe a Python implementation presently under
 development.
 
 .. _reference implementation:
-    http://www.po.gso.uri.edu/~codiga/utide/utide.htm
+    https://www.po.gso.uri.edu/~codiga/utide/utide.htm
 
 .. [codiga2011] Codiga, D.L., 2011. Unified Tidal Analysis and Prediction
     Using the UTide Matlab Functions. Technical Report 2011-01.
