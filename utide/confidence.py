@@ -423,19 +423,15 @@ def ut_linci(X, Y, sigX, sigY):
     # UTide v1p0 9/2011 d.codiga@gso.uri.edu
     # (adapted from errell.m of t_tide, Pawlowicz et al 2002)
 
-    X = np.array([X])
-    Y = np.array([Y])
-    sigX = np.array([sigX])
-    sigY = np.array([sigY])
-    Xu = np.real(X[:])
+    Xu = np.real(X)
     sigXu = np.real(sigX)
-    Yu = np.real(Y[:])
+    Yu = np.real(Y)
     sigYu = np.real(sigY)
 
-    Xv = np.imag(X[:])
-    sigXv = np.imag(sigX[:])
-    Yv = np.imag(Y[:])
-    sigYv = np.imag(sigY[:])
+    Xv = np.imag(X)
+    sigXv = np.imag(sigX)
+    Yv = np.imag(Y)
+    sigYv = np.imag(sigY)
 
     rp = 0.5 * np.sqrt((Xu + Yv) ** 2 + (Xv - Yu) ** 2)
     rm = 0.5 * np.sqrt((Xu - Yv) ** 2 + (Xv + Yu) ** 2)

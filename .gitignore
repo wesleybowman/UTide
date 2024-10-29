@@ -74,3 +74,6 @@ doc/_build/
 .pydevproject
 .vscode/
 utide/_version.py
+
+# Mac
+.DS_Store
