@@ -8,7 +8,6 @@ flake8-mutable
 isort
 matplotlib
 mypy
-nbsphinx
 pandas
 pre-commit
 pycodestyle
@@ -17,5 +16,7 @@ pytest
 pytest-cov
 pytest-xdist
 setuptools_scm
-sphinx
 twine
+mkdocs
+mkdocs-material
+mkdocstrings-python

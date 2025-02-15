@@ -1,0 +1,17 @@
+site_name: UTide
+site_description: One line description of project.
+copyright: 2015, Dan Codiga, Wesley Bowman, and contributors
+
+repo_name: wesleybowman/UTide
+repo_url: https://github.com/wesleybowman/UTide
+
+theme: "material"
+
+plugins:
+- mkdocstrings:
+    handlers:
+      python:
+        options:
+          show_source: false # change this if you prefer to be able to show the source code inside the docs
+          heading_level: 2
+          docstring_style: "numpy" # default is google

@@ -77,3 +77,5 @@ utide/_version.py
 
 # Mac
 .DS_Store
+
+site/

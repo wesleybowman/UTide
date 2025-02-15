@@ -1,5 +1,4 @@
-Strategy
---------
+# Strategy
 
 In translating the algorithms from Matlab to Python, the
 first step is generating a set of Python functions that
@@ -9,8 +8,8 @@ if the original implementation had been in Python.  This
 evolution will include extensive renaming of variables and
 functions to improve readability.
 
-Array dimension ordering
-^^^^^^^^^^^^^^^^^^^^^^^^
+## Array dimension ordering
+
 One of the basic differences between Matlab and Python
 (including numpy) is that the former is built around
 matrices and linear algebra operations, while the core array
@@ -33,8 +32,8 @@ assume that the time index is on the right for arrays with
 more than one dimension.  This is the opposite of the Matlab
 UTide case.
 
-Public interface
-^^^^^^^^^^^^^^^^
+## Public interface
+
 The package is called `utide`, and presently has a very
 simple interface, with two function: `solve` and
 `reconstruct`.  These are simply English spellings of their
@@ -50,8 +49,8 @@ complete.
 Options are being held internally in a `Bunch` so as to
 provide both dictionary and attribute access syntax.
 
-Time
-^^^^
+## Time
+
 Time inputs are arrays of time in days relative to the epoch
 given in the `epoch` keyword argument.  In the Matlab version
 of utide these would be Matlab datenums; in the python version,
@@ -63,8 +62,8 @@ string, like `'2015-01-01'`, or a Python standard library
 `datetime64` dtype is not yet supported, nor are any Pandas
 constructs.
 
-Missing values
-^^^^^^^^^^^^^^^
+## Missing values
+
 The `t`, `u`, `v` inputs to `solve` and the `t` input to `
 reconstruct` now support any combination
 of nans and masked array inputs to indicate missing values.

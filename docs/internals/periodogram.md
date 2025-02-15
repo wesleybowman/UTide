@@ -1,0 +1,4 @@
+# periodogram
+
+::: utide.periodogram
+
