@@ -7,6 +7,9 @@ flake8-comprehensions
 flake8-mutable
 isort
 matplotlib
+mkdocs
+mkdocs-material
+mkdocstrings-python
 mypy
 pandas
 pre-commit
@@ -17,6 +20,3 @@ pytest-cov
 pytest-xdist
 setuptools_scm
 twine
-mkdocs
-mkdocs-material
-mkdocstrings-python

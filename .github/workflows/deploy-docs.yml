@@ -1,4 +1,3 @@
-
 name: Documentation
 
 on:
@@ -38,14 +37,11 @@ jobs:
     - name: Build documentation
       shell: bash -l {0}
       run: |
-        set -e
-        pushd docs
-        make clean html linkcheck
-        popd
+        mkdocs build --strict
 
     - name: Deploy
       if: success() && github.event_name == 'release'
       uses: peaceiris/actions-gh-pages@v4
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: docs/build/html
+        publish_dir: site
