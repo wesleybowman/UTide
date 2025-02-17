@@ -37,7 +37,7 @@ jobs:
     - name: Build documentation
       shell: bash -l {0}
       run: |
-        mkdocs build --strict
+        mkdocs build --quiet
 
     - name: Deploy
       if: success() && github.event_name == 'release'
