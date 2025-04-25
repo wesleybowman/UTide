@@ -246,7 +246,7 @@ def _showmatbunch(b, elements=None, origin=None):
                 if slen < 50:
                     entry = v
                 else:
-                    entry = "string, %d characters" % slen
+                    entry = f"string, {slen:d} characters"
             elif isinstance(v, np.ndarray):
                 if np.ma.isMA(v):
                     entry = f"masked array, shape {v.shape}, dtype {v.dtype}"

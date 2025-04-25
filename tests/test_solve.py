@@ -2,6 +2,7 @@
 Smoke testing--just see if the system runs.
 
 """
+
 # These tests are quick and crude.
 # TODO: extend the tests by cycling through various combinations
 #       of configuration and data input.
@@ -207,6 +208,5 @@ def test_MC():
         speed_coef.g_ci,
     ):
         print(
-            "%5s %10.4g %10.4g  %10.4g %10.4g  %10.4g %10.4g  %10.4g %10.4g"
-            % (name, Lsmaj, Lsmaj_ci, Lsmin, Lsmin_ci, theta, theta_ci, gg, gg_ci),
+            f"{name:>5} {Lsmaj:10.4g} {Lsmaj_ci:10.4g} {Lsmin:10.4g} {Lsmin_ci:10.4g} {theta:10.4g} {theta_ci:10.4g} {gg:10.4g} {gg_ci:10.4g}",  # noqa: E501
         )

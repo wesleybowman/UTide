@@ -70,6 +70,6 @@ for ilind, lind in enumerate(linds):
         "Vo": Vo,
     }
 
-    np.savez("FUV%d.npz" % ilind, **save_args)
+    np.savez(f"FUV{ilind:d}.npz", **save_args)
 
-    savemat("FUV%d.mat" % ilind, save_args)
+    savemat(f"FUV{ilind:d}.mat", save_args)

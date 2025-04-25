@@ -2,6 +2,7 @@
 Full example test.
 
 """
+
 import numpy as np
 import pytest
 from pandas import date_range
