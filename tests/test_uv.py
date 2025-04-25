@@ -28,7 +28,7 @@ def _fake_tide(t, M2amp, M2phase):
 def make_data():
     N = 500
     np.random.seed(1234)
-    t = date_range(start="2016-03-29", periods=N, freq="H")
+    t = date_range(start="2016-03-29", periods=N, freq="h")
     # Signal + some noise.
     u = _fake_tide(np.arange(N), M2amp=2, M2phase=0) + np.random.randn(N)
     v = _fake_tide(np.arange(N), M2amp=1, M2phase=np.pi) + np.random.randn(N)
