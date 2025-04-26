@@ -1,5 +1,3 @@
-import pkg_resources
-
 from ._reconstruct import reconstruct
 from ._solve import solve
 from ._ut_constants import (
@@ -10,8 +8,8 @@ from ._ut_constants import (
 )
 
 try:
-    __version__ = pkg_resources.get_distribution("utide").version
-except Exception:
+    from ._version import __version__
+except ImportError:
     __version__ = "unknown"
 
 __all__ = [

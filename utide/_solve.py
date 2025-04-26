@@ -1,6 +1,7 @@
 """
 Central module for calculating the tidal amplitudes, phases, etc.
 """
+
 import numpy as np
 
 from ._time_conversion import _normalize_time
@@ -90,13 +91,13 @@ def validate_infer(infer, is_2D):
     required_keys = {"inferred_names", "reference_names", "amp_ratios", "phase_offsets"}
     keys = set(infer.keys())
     if keys < required_keys:
-        raise ValueError("infer option must include %s" % required_keys)
+        raise ValueError(f"infer option must include {required_keys:s}")
     nI = len(infer.inferred_names)
     if len(infer.reference_names) != nI:
         raise ValueError("inferred_names must be same" "  length as reference_names")
     nratios = 2 * nI if is_2D else nI
     if len(infer.amp_ratios) != nratios or len(infer.phase_offsets) != nratios:
-        raise ValueError("ratios and offsets need to have length %d" % nratios)
+        raise ValueError(f"ratios and offsets need to have length {nratios:d}")
     if "approximate" not in infer:
         infer.approximate = False
     return infer

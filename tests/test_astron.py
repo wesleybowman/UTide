@@ -9,6 +9,7 @@ to u_tide ut_astron::
     octave:11> [a, ad] = t_astron(dns)
 
 """
+
 import numpy as np
 
 from utide.astronomy import ut_astron
