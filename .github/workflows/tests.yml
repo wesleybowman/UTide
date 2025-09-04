@@ -27,7 +27,7 @@ jobs:
     - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8  # v5.0.0
 
     - name: Setup Micromamba Python ${{ matrix.python-version }}
-      uses: mamba-org/setup-micromamba@b09ef9b599704322748535812ca03efb2625677b # v2.0.5
+      uses: mamba-org/setup-micromamba@7f29b8b80078b1b601dfa018b0f7425c587c63bb # v2.0.6
       with:
         environment-name: TEST
         init-shell: bash
