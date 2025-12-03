@@ -17,6 +17,6 @@ constit_names = list(ut_constants.const.name)
 constit_index_dict = {name: i for (i, name) in enumerate(constit_names)}
 
 _uc = ut_constants.const
-cycles_per_hour = Bunch(zip(_uc.name, _uc.freq))
+cycles_per_hour = Bunch(zip(_uc.name, _uc.freq, strict=False))
 with np.errstate(divide="ignore"):
-    hours_per_cycle = Bunch(zip(_uc.name, 1 / _uc.freq))
+    hours_per_cycle = Bunch(zip(_uc.name, 1 / _uc.freq, strict=False))

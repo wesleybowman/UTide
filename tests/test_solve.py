@@ -193,6 +193,7 @@ def test_MC():
         elev_coef.A_ci,
         elev_coef.g,
         elev_coef.g_ci,
+        strict=False,
     ):
         print(f"{name:>5} {AA:10.4g} {AA_ci:10.4g}  {gg:10.4g} {gg_ci:10.4g}")
 
@@ -206,6 +207,7 @@ def test_MC():
         speed_coef.theta_ci,
         speed_coef.g,
         speed_coef.g_ci,
+        strict=False,
     ):
         print(
             f"{name:>5} {Lsmaj:10.4g} {Lsmaj_ci:10.4g} {Lsmin:10.4g} {Lsmin_ci:10.4g} {theta:10.4g} {theta_ci:10.4g} {gg:10.4g} {gg_ci:10.4g}",  # noqa: E501

@@ -372,7 +372,7 @@ def _confidence(
                 varYuHH = (rp.real**2 + rm.real**2) * varImap + (
                     rp.imag**2 + rm.imag**2
                 ) * varReap
-                for varX, varY in zip(varXuHH, varYuHH):
+                for varX, varY in zip(varXuHH, varYuHH, strict=False):
                     if not opt.twodim:
                         sig1, sig2 = ut_linci(
                             Xu[nNR + k],

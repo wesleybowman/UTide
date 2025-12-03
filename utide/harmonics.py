@@ -25,7 +25,7 @@ def linearized_freqs(tref):
     freq = const.freq.copy()
     selected = np.dot(const.doodson[not_shallow, :], ader) / 24
     freq[not_shallow] = selected.squeeze()
-    for i0, nshal, k in zip(ishallow, nshallow, kshallow):
+    for i0, nshal, k in zip(ishallow, nshallow, kshallow, strict=False):
         ik = i0 + np.arange(nshal)
         freq[k] = (freq[shallow.iname[ik] - 1] * shallow.coef[ik]).sum()
     return freq
@@ -146,7 +146,7 @@ def FUV(t, tref, lind, lat, ngflgs):
         U = np.angle(F) / (2 * np.pi)  # cycles
         F = np.abs(F)
 
-        for i0, nshal, k in zip(ishallow, nshallow, kshallow):
+        for i0, nshal, k in zip(ishallow, nshallow, kshallow, strict=False):
             ik = i0 + np.arange(nshal)
             j = shallow.iname[ik] - 1
             exp1 = shallow.coef[ik, None]
@@ -176,7 +176,7 @@ def FUV(t, tref, lind, lat, ngflgs):
         with np.errstate(invalid="ignore"):
             np.fmod(V, 1, out=V)
 
-        for i0, nshal, k in zip(ishallow, nshallow, kshallow):
+        for i0, nshal, k in zip(ishallow, nshallow, kshallow, strict=False):
             ik = i0 + np.arange(nshal)
             j = shallow.iname[ik] - 1
             exp1 = shallow.coef[ik, None]

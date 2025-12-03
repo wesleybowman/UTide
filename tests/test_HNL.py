@@ -36,7 +36,7 @@ infer = Bunch()
 infer.inferred_names = "S2", "N2", "O1"
 infer.reference_names = "M2", "M2", "K1"
 infer.amp_ratios, infer.phase_offsets = [], []
-for ref, inf in zip(infer.reference_names, infer.inferred_names):
+for ref, inf in zip(infer.reference_names, infer.inferred_names, strict=False):
     iref = month_index_dict[ref]
     iinf = month_index_dict[inf]
     infer.amp_ratios.append(coef_month.A[iinf] / coef_month.A[iref])
