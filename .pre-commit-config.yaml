@@ -1,7 +1,7 @@
 
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v5.0.0
+  rev: v6.0.0
   hooks:
     - id: check-ast
     - id: end-of-file-fixer
@@ -15,18 +15,18 @@ repos:
     - id: debug-statements
 
 - repo: https://github.com/psf/black
-  rev: 25.1.0
+  rev: 25.11.0
   hooks:
   - id: black
     language_version: python3
 
 - repo: https://github.com/asottile/add-trailing-comma
-  rev: v3.1.0
+  rev: v4.0.0
   hooks:
     - id: add-trailing-comma
 
 - repo: https://github.com/keewis/blackdoc
-  rev: v0.3.9
+  rev: v0.4.6
   hooks:
     - id: blackdoc
 
@@ -42,17 +42,17 @@ repos:
         - --ignore-words-list=fo,htmp
 
 - repo: https://github.com/asottile/add-trailing-comma
-  rev: v3.1.0
+  rev: v4.0.0
   hooks:
     - id: add-trailing-comma
 
 - repo: https://github.com/charliermarsh/ruff-pre-commit
-  rev: v0.11.7
+  rev: v0.14.7
   hooks:
     - id: ruff
       args: ["--fix", "--show-fixes"]
 
 - repo: https://github.com/tox-dev/pyproject-fmt
-  rev: v2.5.1
+  rev: v2.11.1
   hooks:
     - id: pyproject-fmt
