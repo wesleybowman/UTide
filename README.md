@@ -37,13 +37,13 @@ conda install utide --channel conda-forge
 
 The public functions can be imported using
 
-``` python
+```python
 from utide import solve, reconstruct
 ```
 
 A sample call would be
 
-``` python
+```python
 from utide import solve
 
 coef = solve(

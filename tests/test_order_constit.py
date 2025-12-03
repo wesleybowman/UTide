@@ -16,7 +16,7 @@ amps = [1.0, 0.5, 0.6, 0.1]
 names = ["M2", "S2", "K1", "O1"]
 cpds = [24 * const.freq[constit_index_dict[name]] for name in names]
 sinusoids = []
-for amp, cpd in zip(amps, cpds):
+for amp, cpd in zip(amps, cpds, strict=False):
     arg = 2 * np.pi * (time - tref) * cpd
     sinusoids.append(amp * np.cos(arg))
 tide = np.hstack(tuple(sinusoids)).sum(axis=0)

@@ -66,7 +66,7 @@ def ut_cnstitsel(tref, minres, incnstit, infer):
         nI = len(infer.inferred_names)
         # Find unique reference names
         _r = infer.reference_names
-        allrefs = list(OrderedDict(zip(_r, [1] * len(_r))).keys())
+        allrefs = list(OrderedDict(zip(_r, [1] * len(_r), strict=False)).keys())
         nR = len(allrefs)
         for _k, name in enumerate(allrefs):
             refstruct = Bunch(name=name)
