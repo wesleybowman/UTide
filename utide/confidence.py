@@ -271,7 +271,10 @@ def _confidence(
             varcov_mCw[c, :2, :2] = Duu
 
             if not opt.white:
-                Duu = Puu[c] * Duu / np.trace(Duu)
+                Duu = Puu[c] * Duu
+                trace = np.trace(Duu)
+                if trace != 0.:
+                    Duu /= trace
                 varcov_mCc[c, :2, :2] = Duu
 
             if not opt.twodim:
