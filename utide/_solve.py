@@ -64,8 +64,8 @@ def _translate_opts(opts):
         raise ValueError("'conf_int' must be 'linear', 'MC', or 'none'")
 
     oldopts.notrend = not opts.trend
-    oldopts["nodesatlint"] = False
-    oldopts["nodesatnone"] = False
+    oldopts["nodsatlint"] = False
+    oldopts["nodsatnone"] = False
     oldopts["gwchlint"] = False
     oldopts["gwchnone"] = False
     if opts.nodal == "linear_time":
