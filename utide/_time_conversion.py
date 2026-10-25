@@ -20,7 +20,7 @@ def _date2num(date, epoch="1970-01-01 00:00:00.000"):
 
     Default `epoch` is the unix epoch 1970-01-01 00:00:00.
     """
-    date = np.asarray(date)
+    date = np.asanyarray(date)
 
     try:
         date = date.astype("datetime64[ms]")
@@ -37,7 +37,7 @@ def _date2num(date, epoch="1970-01-01 00:00:00.000"):
         ) from err
 
     # datenum calculation
-    datenum = (date - epoch).astype(float) / _MS_PER_DAY
+    datenum = (date - epoch) / np.timedelta64(_MS_PER_DAY, "ms")
     return datenum
 
 
@@ -61,7 +61,7 @@ def _normalize_time(t, epoch=None):
     `t` input time or datenum array
     `epoch` either 'python', 'matlab', or np.datetime64 compatible value
     """
-    t = np.asarray(t)
+    t = np.asanyarray(t)
 
     if epoch is None:
         # default datetime, datetime64, or datetime array
