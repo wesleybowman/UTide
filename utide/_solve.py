@@ -88,6 +88,7 @@ def _translate_opts(opts):
 def validate_infer(infer, is_2D):
     if infer is None or infer == "none":
         return None
+    infer = Bunch(infer)
     required_keys = {"inferred_names", "reference_names", "amp_ratios", "phase_offsets"}
     keys = set(infer.keys())
     if keys < required_keys:
